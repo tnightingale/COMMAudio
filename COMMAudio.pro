@@ -22,3 +22,5 @@ HEADERS  += mainwindow.h \
             udpsocket.h
 
 FORMS    += mainwindow.ui
+
+LIBS += C:\Qt\2010.05\mingw\lib\libws2_32.a
