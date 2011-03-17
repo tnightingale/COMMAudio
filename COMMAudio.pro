@@ -4,7 +4,8 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui \
+            phonon
 
 TARGET	  = COMMAudio
 TEMPLATE  = app
@@ -14,12 +15,14 @@ SOURCES	 += main.cpp \
             mainwindow.cpp \
             socket.cpp \
             tcpsocket.cpp \
-            udpsocket.cpp
+            udpsocket.cpp \
+    audiocomponent.cpp
 
 HEADERS  += mainwindow.h \
             socket.h \
             tcpsocket.h \
-            udpsocket.h
+            udpsocket.h \
+    audiocomponent.h
 
 FORMS    += mainwindow.ui
 
