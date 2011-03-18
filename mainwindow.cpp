@@ -26,3 +26,14 @@ void MainWindow::on_action_Visible_toggled(bool status)
         return;
     }
 }
+
+bool MainWindow::winEvent(MSG * msg, long * result) {
+    switch (msg->message) {
+        case WM_WSASYNC:
+            emit signalWMWSASyncRx(msg);
+            return true;
+    }
+
+    return false;
+}
+

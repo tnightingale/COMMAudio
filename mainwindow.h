@@ -17,6 +17,17 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    /**
+     * Expose the windows message loop for us to respond to socket events.
+     * The first of many attrocities...
+     *
+     * @param msg The windows message received.
+     * @param result ... not sure >_>
+     *
+     * @author Tom Nightingale
+     */
+    bool MainWindow::winEvent(MSG * msg, long * result);
+
 private:
     Ui::MainWindow *ui;
     TCPSocket *controlSocket_;
