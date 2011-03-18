@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 
+#include "tcpsocket.h"
+
 namespace Ui {
     class MainWindow;
 }
@@ -17,6 +19,10 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    TCPSocket *controlSocket_;
+
+private slots:
+    void on_action_Visible_toggled(bool status);
 };
 
 #endif // MAINWINDOW_H
