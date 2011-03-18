@@ -1,19 +1,11 @@
 #include "socket.h"
 
-bool Socket::open(int addressFamily, int connectionType, int protocol) {
-    QString output;
-    QTextStream log(&output, QIODevice::WriteOnly);
-
+Socket::Socket(HWND hWnd, int addressFamily, int connectionType, int protocol)
+: hWnd_(hWnd) {
     if ((socket_ = WSASocket(addressFamily, connectionType, protocol, NULL, 0,
                              WSA_FLAG_OVERLAPPED)) == INVALID_SOCKET) {
-        qDebug("Socket::open(); Can't create socket. Error: %d",
-               WSAGetLastError());
-        return false;
+        throw "Socket::Socket(); Can't create socket.";
     }
-    log << "Socket::open(); SocketCreated: " << (int) socket_;
-    outputStatus(output);
-
-    return true;
 }
 
 bool Socket::listen(PSOCKADDR_IN pSockAddr) {

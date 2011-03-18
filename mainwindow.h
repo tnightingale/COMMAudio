@@ -26,11 +26,14 @@ public:
      *
      * @author Tom Nightingale
      */
-    bool MainWindow::winEvent(MSG * msg, long * result);
+    bool winEvent(MSG * msg, long * result);
 
 private:
     Ui::MainWindow *ui;
     TCPSocket *controlSocket_;
+
+signals:
+    void signalWMWSASyncRx(MSG *);
 
 private slots:
     void on_action_Visible_toggled(bool status);

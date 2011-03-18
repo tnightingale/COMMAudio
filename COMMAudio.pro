@@ -14,12 +14,14 @@ SOURCES	 += main.cpp \
             mainwindow.cpp \
             socket.cpp \
             tcpsocket.cpp \
-            udpsocket.cpp
+            udpsocket.cpp \
+            workstation.cpp
 
 HEADERS  += mainwindow.h \
             socket.h \
             tcpsocket.h \
-            udpsocket.h
+            udpsocket.h \
+            workstation.h
 
 FORMS    += mainwindow.ui
 

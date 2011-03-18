@@ -1,17 +1,7 @@
 #include "tcpsocket.h"
 
-TCPSocket::TCPSocket(HWND hWnd) {
-    int err = 0;
-    WSADATA wsaData;
-
-    WORD wVersionRequested_ = MAKEWORD(2,2);
-    if ((err = WSAStartup(wVersionRequested_, &wsaData)) < 0) {
-        throw "TCPSocket::TCPSocket(): Missing WINSOCK2 DLL.";
-    }
-
-    hWnd_ = hWnd;
-    open(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-}
+TCPSocket::TCPSocket(HWND hWnd) 
+: Socket(hWnd, AF_INET, SOCK_STREAM, IPPROTO_TCP) { }
 
 void TCPSocket::accept(PMSG pMsg) {
     QString output;

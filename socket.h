@@ -57,6 +57,8 @@ protected:
     HWND hWnd_;
 
 public:
+    Socket(HWND hWnd, int addressFamily, int connectionType, int protocol);
+
     virtual ~Socket() {
         qDebug("Socket::~Socket()");
         closesocket(socket_);
@@ -113,18 +115,6 @@ public:
      * @author Tom Nightingale.
      */
     size_t getPacketSize() { return packetSize_; }
-
-    /**
-     *
-     * @param addressFamily
-     * @param connectionType
-     * @param protocol
-     *
-     * @return
-     *
-     * @author Tom Nightingale.
-     */
-    bool open(int addressFamily, int connectionType, int protocol);
 
     /**
      *

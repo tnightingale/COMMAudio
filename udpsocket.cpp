@@ -1,17 +1,7 @@
 #include "udpsocket.h"
 
-UDPSocket::UDPSocket(HWND hWnd) {
-    int err = 0;
-    WSADATA wsaData;
-
-    WORD wVersionRequested_ = MAKEWORD(2,2);
-    if ((err = WSAStartup(wVersionRequested_, &wsaData)) < 0) {
-        throw "TCPConnection::TCPConnection(): Missing WINSOCK2 DLL.";
-    }
-
-    hWnd_ = hWnd;
-    open(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-}
+UDPSocket::UDPSocket(HWND hWnd) 
+: Socket(hWnd, AF_INET, SOCK_DGRAM, IPPROTO_UDP) { }
 
 void UDPSocket::send(PMSG pMsg) {
     QString output;
