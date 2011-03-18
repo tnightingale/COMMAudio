@@ -6,7 +6,7 @@ TCPSocket::TCPSocket(HWND hWnd) {
 
     WORD wVersionRequested_ = MAKEWORD(2,2);
     if ((err = WSAStartup(wVersionRequested_, &wsaData)) < 0) {
-        throw "TCPConnection::TCPConnection(): Missing WINSOCK2 DLL.";
+        throw "TCPSocket::TCPSocket(): Missing WINSOCK2 DLL.";
     }
 
     hWnd_ = hWnd;
@@ -24,7 +24,7 @@ void TCPSocket::accept(PMSG pMsg) {
     if ((clientSocket = ::accept(pMsg->wParam, (PSOCKADDR) &client,
                                  &client_length)) == INVALID_SOCKET) {
         if (WSAGetLastError() != WSAEWOULDBLOCK) {
-            qDebug("TCPConnection:accept(); Error: %d", WSAGetLastError());
+            qDebug("TCPSocket:accept(); Error: %d", WSAGetLastError());
             return;
         }
     }
@@ -140,7 +140,7 @@ bool TCPSocket::listen(PSOCKADDR_IN pSockAddr) {
 
     if ((::listen(socket_, 5)) == SOCKET_ERROR) {
         err = WSAGetLastError();
-        qDebug("Connection::listen(); Error: %d.", err);
+        qDebug("TCPSocket::listen(); Error: %d.", err);
         return false;
     }
 
@@ -172,8 +172,8 @@ bool TCPSocket::slotProcessWSAEvent(PMSG pMsg) {
     }
 
     // TODO: If want to receive TCP & UDP simultaneously, need to be able to
-    //		 filter messages against a list of open TCP client sockets here.
-    //		 Currently that list doesn't exist.
+    //       filter messages against a list of open TCP client sockets here.
+    //       Currently that list doesn't exist.
     //if (pMsg->wParam != socket_) {
     //    return false;
     //}

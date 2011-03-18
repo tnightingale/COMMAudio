@@ -6,11 +6,11 @@ bool Socket::open(int addressFamily, int connectionType, int protocol) {
 
     if ((socket_ = WSASocket(addressFamily, connectionType, protocol, NULL, 0,
                              WSA_FLAG_OVERLAPPED)) == INVALID_SOCKET) {
-        qDebug("Socket::openSocket(): Can't create socket. Error: %d",
+        qDebug("Socket::open(); Can't create socket. Error: %d",
                WSAGetLastError());
         return false;
     }
-    log << "SocketCreated: " << (int) socket_;
+    log << "Socket::open(); SocketCreated: " << (int) socket_;
     outputStatus(output);
 
     return true;
@@ -24,7 +24,7 @@ bool Socket::listen(PSOCKADDR_IN pSockAddr) {
 
     if ((err = bind(socket_, (PSOCKADDR) pSockAddr, sizeof(SOCKADDR))
         == SOCKET_ERROR)) {
-        qDebug("Connection::startServer(): Can't bind to socket. Error: %d",
+        qDebug("Socket::startServer(): Can't bind to socket. Error: %d",
                WSAGetLastError());
         return false;
     }
@@ -47,7 +47,7 @@ void Socket::close(PMSG pMsg) {
     QString output;
     QTextStream log(&output, QIODevice::WriteOnly);
 
-    log << "Socket: " << (int) pMsg->wParam << " disconnected.";
+    log << "Socket::close(); " << (int) pMsg->wParam << " disconnected.";
     outputStatus(output);
 
     emit signalStatsSetFinishTime(GetTickCount());
