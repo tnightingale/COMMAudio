@@ -1,7 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow" >
-  <property name="geometry" >
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,16 +10,60 @@
     <height>300</height>
    </rect>
   </property>
-  <property name="windowTitle" >
-   <string>MainWindow</string>
+  <property name="windowTitle">
+   <string>Need a fancy program name and icon</string>
   </property>
-  <widget class="QMenuBar" name="menuBar" />
-  <widget class="QToolBar" name="mainToolBar" />
-  <widget class="QWidget" name="centralWidget" />
-  <widget class="QStatusBar" name="statusBar" />
+  <widget class="QWidget" name="centralWidget"/>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>400</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuConnections">
+    <property name="title">
+     <string>&amp;Connections</string>
+    </property>
+    <addaction name="action_Request_Playlist"/>
+    <addaction name="action_Join_Multicast"/>
+    <addaction name="separator"/>
+    <addaction name="action_Visible"/>
+    <addaction name="action_Host_Multicast"/>
+   </widget>
+   <addaction name="menuConnections"/>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="action_Request_Playlist">
+   <property name="text">
+    <string>&amp;Request Playlist</string>
+   </property>
+  </action>
+  <action name="action_Join_Multicast">
+   <property name="text">
+    <string>&amp;Join Multicast</string>
+   </property>
+  </action>
+  <action name="action_Visible">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Visible</string>
+   </property>
+  </action>
+  <action name="action_Host_Multicast">
+   <property name="text">
+    <string>&amp;Host Multicast</string>
+   </property>
+  </action>
  </widget>
- <layoutDefault spacing="6" margin="11" />
- <pixmapfunction></pixmapfunction>
+ <layoutdefault spacing="6" margin="11"/>
  <resources/>
  <connections/>
 </ui>

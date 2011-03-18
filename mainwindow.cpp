@@ -27,3 +27,17 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+void MainWindow::on_action_Visible_toggled(bool status)
+{
+    if (status)
+    {
+        // Create the listen socket
+        return;
+    }
+    else
+    {
+        // Either close the socket here or find a way to hide it
+        return;
+    }
+}
