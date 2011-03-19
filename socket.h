@@ -154,28 +154,6 @@ public:
 
     /**
      *
-     * @param socket
-     * @param hWnd
-     * @param flags
-     *
-     * @return
-     *
-     * @author Tom Nightingale.
-     */
-    static bool init(SOCKET socket, HWND hWnd, int flags) {
-        int err = 0;
-
-        if ((err = WSAAsyncSelect(socket, hWnd, WM_WSASYNC,
-                                  flags)) == SOCKET_ERROR) {
-            throw "Connection::startServer(): Error setting up async select.";
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     *
      * @param bytes
      *
      * @author Tom Nightingale.
