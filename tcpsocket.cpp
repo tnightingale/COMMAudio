@@ -94,19 +94,24 @@ void TCPSocket::send(PMSG pMsg) {
 void TCPSocket::receive(PMSG pMsg) {
     int err = 0;
     DWORD flags = 0;
+    DWORD numReceived = 0;
     WSAOVERLAPPED* ol;
+    WSABUF winsockBuff;
 
-    PDATA data = (PDATA) calloc(1, sizeof(DATA));
-    data->socket = this;
-    data->winsockBuff.len = MAXUDPDGRAMSIZE;
-    data->winsockBuff.buf = (char*) calloc(data->winsockBuff.len, sizeof(char));
-    data->clientSD = pMsg->wParam;
+    winsockBuff.len = MAXUDPDGRAMSIZE;
+    winsockBuff.buf = (char *) calloc(winsockBuff.len, sizeof(char));
 
-    ol = (WSAOVERLAPPED*) calloc(1, sizeof(WSAOVERLAPPED));
-    ol->hEvent = (HANDLE) data;
+    //PDATA data = (PDATA) calloc(1, sizeof(DATA));
+    //data->socket = this;
+    //data->winsockBuff.len = MAXUDPDGRAMSIZE;
+    //data->winsockBuff.buf = (char*) calloc(data->winsockBuff.len, sizeof(char));
+    //data->clientSD = pMsg->wParam;
 
-    if (WSARecv(pMsg->wParam, &(data->winsockBuff), 1, NULL, &flags,
-                ol, TCPSocket::recvWorkerRoutine) == SOCKET_ERROR) {
+    //ol = (WSAOVERLAPPED*) calloc(1, sizeof(WSAOVERLAPPED));
+    //ol->hEvent = (HANDLE) data;
+
+    if (WSARecv(pMsg->wParam, &(winsockBuff), 1, &numReceived, &flags,
+                NULL, NULL) == SOCKET_ERROR) {
         if ((err = WSAGetLastError()) != WSA_IO_PENDING) {
             qDebug("TCPSocket::receive(): WSARecv() failed with error %d",
                    err);
@@ -114,6 +119,9 @@ void TCPSocket::receive(PMSG pMsg) {
         }
     }
 
+    QByteArray * buffer = new QByteArray(winsockBuff.buf, winsockBuff.len);
+    qDebug("Rx: %s", buffer->constData());
+    //emit signalDataReceived(socket_, buffer);
 
 }
 
