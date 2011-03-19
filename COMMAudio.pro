@@ -6,11 +6,11 @@
 
 QT       += core gui
 
-TARGET	  = COMMAudio
+TARGET    = COMMAudio
 TEMPLATE  = app
+CONFIG   += qt debug
 
-
-SOURCES	 += main.cpp \
+SOURCES  += main.cpp \
             mainwindow.cpp \
             socket.cpp \
             tcpsocket.cpp \
