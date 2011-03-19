@@ -5,7 +5,8 @@
 #-------------------------------------------------
 
 QT       += core gui \
-            phonon
+            phonon \
+            multimedia
 
 TARGET	  = COMMAudio
 TEMPLATE  = app

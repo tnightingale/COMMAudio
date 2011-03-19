@@ -4,6 +4,10 @@
 #include <QObject>
 #include <Phonon>
 #include <QDir>
+#include <QAudioInput>
+#include <QAudioOutput>
+#include <QBuffer>
+
 class AudioComponent : public QObject
 {
     Q_OBJECT
@@ -16,6 +20,7 @@ public:
         return sourceFolder_;
     }
     QFileInfoList getFileList();
+    void startMic();
 
 
 private:
@@ -23,12 +28,18 @@ private:
     Phonon::AudioOutput* output_;
     QDir sourceFolder_;
 
+
+    QAudioInput* input_;
+    QFile outputFile;
+    QAudioFormat format;
+    QBuffer* buffer_;
 signals:
 
 public slots:
 void play();
 void pause();
 void stop();
+void stopMic();
 
 };
 
