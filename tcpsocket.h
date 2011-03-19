@@ -10,6 +10,7 @@ class TCPSocket : public Socket
     Q_OBJECT
 public:
     TCPSocket(HWND hWnd);
+    TCPSocket(SOCKET socket, HWND hWnd);
 
     /**
      *
@@ -45,7 +46,7 @@ public:
      *
      * @author Tom Nightingale
      */
-    bool listen(PSOCKADDR_IN pSockAddr);
+    bool listen(int port);
 
     /**
      *
@@ -54,6 +55,9 @@ public:
      * @author Tom Nightingale
      */
     bool connectRemote(PSOCKADDR_IN pSockAddr);
+
+signals:
+    void signalClientConnected(TCPSocket * clientSocket);
 
 public slots:
     /**

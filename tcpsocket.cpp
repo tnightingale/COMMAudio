@@ -10,26 +10,33 @@ TCPSocket::TCPSocket(HWND hWnd)
         qDebug("TCPSocket::TCPSocket(): Error setting up async select.");
         throw "TCPSocket::TCPSocket(): Error setting up async select.";
     }
- }
+}
+
+TCPSocket::TCPSocket(SOCKET socket, HWND hWnd)
+: Socket(socket, hWnd) {
+    int err = 0;
+
+    if ((err = WSAAsyncSelect(socket, hWnd, FD_READ | FD_CLOSE, 
+                              WM_WSAASYNC_TCP)) == SOCKET_ERROR) {
+        qDebug("TCPSocket::accept(): Error setting up async select.");
+    }
+}
 
 void TCPSocket::accept(PMSG pMsg) {
-    int err = 0;
-    SOCKET clientSocket;
+    SOCKET newSocket;
     SOCKADDR_IN client;
     int client_length = sizeof(SOCKADDR_IN);
 
-    if ((clientSocket = ::accept(pMsg->wParam, (PSOCKADDR) &client,
+    if ((newSocket = ::accept(pMsg->wParam, (PSOCKADDR) &client,
                                  &client_length)) == INVALID_SOCKET) {
         if (WSAGetLastError() != WSAEWOULDBLOCK) {
             qDebug("TCPSocket:accept(); Error: %d", WSAGetLastError());
             return;
         }
     }
-
-    if ((err = WSAAsyncSelect(clientSocket, hWnd_, FD_READ | FD_CLOSE, 
-                              WM_WSAASYNC_TCP)) == SOCKET_ERROR) {
-        qDebug("TCPSocket::accept(): Error setting up async select.");
-    }
+    
+    TCPSocket * clientSocket = new TCPSocket(newSocket, hWnd_);
+    emit signalClientConnected(clientSocket);
 }
 
 void TCPSocket::send(PMSG pMsg) {
@@ -126,10 +133,15 @@ int TCPSocket::loadBuffer(size_t bytesToRead) {
     return data_->readRawData(socketBuffer_->data(), bytesToRead);
 }
 
-bool TCPSocket::listen(PSOCKADDR_IN pSockAddr) {
+bool TCPSocket::listen(int port) {
     int err = 0;
+    SOCKADDR_IN sockAddrIn;
 
-    if (!Socket::listen(pSockAddr)) {
+    sockAddrIn.sin_family = AF_INET;
+    sockAddrIn.sin_port = htons(port);
+    sockAddrIn.sin_addr.s_addr = htonl(INADDR_ANY);
+
+    if (!Socket::listen(&sockAddrIn)) {
         return false;
     }
 

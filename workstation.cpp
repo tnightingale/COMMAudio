@@ -20,6 +20,8 @@ Workstation::Workstation(MainWindow * mainWindow) {
     udpSocket_ = new UDPSocket(mainWindow->winId());
     connect(mainWindow, SIGNAL(signalWMWSASyncUDPRx(PMSG)),
             udpSocket_, SLOT(slotProcessWSAEvent(PMSG)));
+
+    tcpSocket_->listen(7000);
 }
 
 Workstation::~Workstation() {

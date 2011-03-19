@@ -59,6 +59,7 @@ protected:
 
 public:
     Socket(HWND hWnd, int addressFamily, int connectionType, int protocol);
+    Socket(SOCKET socket, HWND hWnd);
 
     virtual ~Socket() {
         qDebug("Socket::~Socket()");

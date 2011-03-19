@@ -10,6 +10,11 @@ Socket::Socket(HWND hWnd, int addressFamily, int connectionType, int protocol)
     }
 }
 
+Socket::Socket(SOCKET socket, HWND hWnd) {
+    socket_ = socket;
+    hWnd_ = hWnd;
+}
+
 bool Socket::listen(PSOCKADDR_IN pSockAddr) {
     QString output;
     QTextStream log(&output, QIODevice::WriteOnly);
