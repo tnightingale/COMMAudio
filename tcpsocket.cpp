@@ -1,12 +1,19 @@
 #include "tcpsocket.h"
 
 TCPSocket::TCPSocket(HWND hWnd) 
-: Socket(hWnd, AF_INET, SOCK_STREAM, IPPROTO_TCP) { }
+: Socket(hWnd, AF_INET, SOCK_STREAM, IPPROTO_TCP) {
+    int err = 0;
+    int flags = FD_CONNECT | FD_ACCEPT | FD_CLOSE;
+
+    if ((err = WSAAsyncSelect(socket_, hWnd, WM_WSAASYNC_TCP, flags))
+                              == SOCKET_ERROR) {
+        qDebug("TCPSocket::TCPSocket(): Error setting up async select.");
+        throw "TCPSocket::TCPSocket(): Error setting up async select.";
+    }
+ }
 
 void TCPSocket::accept(PMSG pMsg) {
-    QString output;
-    QTextStream log(&output, QIODevice::WriteOnly);
-
+    int err = 0;
     SOCKET clientSocket;
     SOCKADDR_IN client;
     int client_length = sizeof(SOCKADDR_IN);
@@ -18,13 +25,11 @@ void TCPSocket::accept(PMSG pMsg) {
             return;
         }
     }
-    emit signalStatsSetStartTime(GetTickCount());
 
-    log << "Remote address (" << inet_ntoa(client.sin_addr)
-        << ") connected. (" << (int) clientSocket << ")";
-    outputStatus(output);
-
-    Socket::init(clientSocket, hWnd_, FD_READ | FD_CLOSE);
+    if ((err = WSAAsyncSelect(clientSocket, hWnd_, FD_READ | FD_CLOSE, 
+                              WM_WSAASYNC_TCP)) == SOCKET_ERROR) {
+        qDebug("TCPSocket::accept(): Error setting up async select.");
+    }
 }
 
 void TCPSocket::send(PMSG pMsg) {

@@ -1,7 +1,16 @@
 #include "udpsocket.h"
 
 UDPSocket::UDPSocket(HWND hWnd) 
-: Socket(hWnd, AF_INET, SOCK_DGRAM, IPPROTO_UDP) { }
+: Socket(hWnd, AF_INET, SOCK_DGRAM, IPPROTO_UDP) {
+    int err = 0;
+    int flags = FD_READ | FD_CLOSE;
+
+    if ((err = WSAAsyncSelect(socket_, hWnd, WM_WSAASYNC_TCP, flags))
+                              == SOCKET_ERROR) {
+        qDebug("UDPSocket::UDPSocket(): Error setting up async select.");
+        throw "UDPSocket::UDPSocket(): Error setting up async select.";
+    }
+}
 
 void UDPSocket::send(PMSG pMsg) {
     QString output;
