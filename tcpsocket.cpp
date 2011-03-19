@@ -3,7 +3,7 @@
 TCPSocket::TCPSocket(HWND hWnd) 
 : Socket(hWnd, AF_INET, SOCK_STREAM, IPPROTO_TCP) {
     int err = 0;
-    int flags = FD_CONNECT | FD_ACCEPT | FD_CLOSE;
+    int flags = FD_CONNECT | FD_READ | FD_ACCEPT | FD_CLOSE;
 
     if ((err = WSAAsyncSelect(socket_, hWnd, WM_WSAASYNC_TCP, flags))
                               == SOCKET_ERROR) {
@@ -15,10 +15,11 @@ TCPSocket::TCPSocket(HWND hWnd)
 TCPSocket::TCPSocket(SOCKET socket, HWND hWnd)
 : Socket(socket, hWnd) {
     int err = 0;
+    int flags = FD_READ | FD_CLOSE;
 
-    if ((err = WSAAsyncSelect(socket, hWnd, FD_READ | FD_CLOSE, 
-                              WM_WSAASYNC_TCP)) == SOCKET_ERROR) {
-        qDebug("TCPSocket::accept(): Error setting up async select.");
+    if ((err = WSAAsyncSelect(socket, hWnd, WM_WSAASYNC_TCP, flags)) 
+                              == SOCKET_ERROR) {
+        qDebug("TCPSocket::TCPSocket(): Error setting up async select.");
     }
 }
 
