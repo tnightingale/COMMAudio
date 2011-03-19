@@ -29,8 +29,12 @@ void MainWindow::on_action_Visible_toggled(bool status)
 
 bool MainWindow::winEvent(MSG * msg, long * result) {
     switch (msg->message) {
-        case WM_WSASYNC:
-            emit signalWMWSASyncRx(msg);
+        case WM_WSAASYNC_TCP:
+            emit signalWMWSASyncTCPRx(msg);
+            return true;
+
+        case WM_WSAASYNC_UDP:
+            emit signalWMWSASyncUDPRx(msg);
             return true;
     }
 

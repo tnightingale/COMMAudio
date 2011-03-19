@@ -10,7 +10,8 @@
 #include <QDebug>
 
 #define MSGSIZE 1024
-#define WM_WSASYNC (WM_USER + 1)
+#define WM_WSAASYNC_TCP (WM_USER + 1)
+#define WM_WSAASYNC_UDP (WM_USER + 2)
 #define DATABUFSIZE 2097152
 #define MAXUDPDGRAMSIZE 65507
 #define PACKETSIZE 4096

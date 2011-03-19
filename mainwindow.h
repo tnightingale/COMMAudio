@@ -33,7 +33,8 @@ private:
     TCPSocket *controlSocket_;
 
 signals:
-    void signalWMWSASyncRx(MSG *);
+    void signalWMWSASyncTCPRx(PMSG);
+    void signalWMWSASyncUDPRx(PMSG);
 
 private slots:
     void on_action_Visible_toggled(bool status);
