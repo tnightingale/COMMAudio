@@ -36,8 +36,20 @@ public:
      */
     void send(PMSG pMsg);
 
+    /**
+     *
+     * @param pMsg
+     *
+     * @author Tom Nightingale
+     */
     void connect(PMSG pMsg);
 
+    /**
+     * 
+     * @param bytesToRead
+     *
+     * @author Tom Nightingale
+     */
     int loadBuffer(size_t bytesToRead);
 
     /**
@@ -57,7 +69,22 @@ public:
     bool connectRemote(PSOCKADDR_IN pSockAddr);
 
 signals:
+    /**
+     *
+     * @param clientSocket
+     *
+     * @author Tom Nightingale
+     */
     void signalClientConnected(TCPSocket * clientSocket);
+
+    /**
+     *
+     * @param socket
+     * @param buffer
+     *
+     * @author Tom Nightingale
+     */
+    void signalDataReceived(int socket, QByteArray * buffer);
 
 public slots:
     /**
