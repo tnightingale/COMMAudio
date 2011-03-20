@@ -65,9 +65,7 @@ public:
         qDebug("Socket::~Socket()");
         closesocket(socket_);
 
-        if (data_ != NULL) {
-            delete data_;
-        }
+        delete data_;
     }
 
     /**

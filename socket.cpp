@@ -1,13 +1,16 @@
 #include "socket.h"
 
 Socket::Socket(HWND hWnd, int addressFamily, int connectionType, int protocol)
-: hWnd_(hWnd) {
+: data_(NULL), hWnd_(hWnd) {
     if ((socket_ = WSASocket(addressFamily, connectionType, protocol, NULL, 0,
                              WSA_FLAG_OVERLAPPED)) == INVALID_SOCKET) {
         int err = WSAGetLastError();
         qDebug("Socket::Socket(): Can't create socket. (%d)", err);
         throw "Socket::Socket(); Can't create socket.";
     }
+
+    connect(this, SIGNAL(signalSocketClosed()),
+            this, SLOT(deleteLater()));
 }
 
 Socket::Socket(SOCKET socket, HWND hWnd) {
