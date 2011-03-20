@@ -77,38 +77,6 @@ public:
      *
      * @author Tom Nightingale
      */
-    static void CALLBACK recvWorkerRoutine(DWORD error, DWORD bytesTransferred,
-                                           LPWSAOVERLAPPED overlapped,
-                                           DWORD inFlags) {
-        int num = 0;
-        PDATA data;
-
-        if (error != 0) {
-          qDebug("I/O operation failed with error %d\n", (int) error);
-          return;
-        }
-
-        data = (PDATA) overlapped->hEvent;
-        data->socket->updatePacketReceived(bytesTransferred);
-
-        QDataStream * fileOutput = data->socket->getDataStream();
-        if ((num = fileOutput->writeRawData(data->winsockBuff.buf, bytesTransferred)) < 0) {
-            qDebug("STATIC TCPSocket::recvWorkerRoutine(): Error writing to file.");
-        }
-
-        QFile * file = (QFile *) fileOutput->device();
-        if (!file->flush()) qDebug("error flushing file");
-
-        free(data);
-        free(overlapped);
-    }
-
-    /**
-     *
-     * @param error
-     *
-     * @author Tom Nightingale
-     */
     static void CALLBACK sendWorkerRoutine(DWORD error, DWORD bytesTransferred,
                                            LPWSAOVERLAPPED overlapped,
                                            DWORD inFlags) {

@@ -96,20 +96,10 @@ void TCPSocket::receive(PMSG pMsg) {
     int err = 0;
     DWORD flags = 0;
     DWORD numReceived = 0;
-    WSAOVERLAPPED* ol;
     WSABUF winsockBuff;
 
     winsockBuff.len = MAXUDPDGRAMSIZE;
     winsockBuff.buf = (char *) calloc(winsockBuff.len, sizeof(char));
-
-    //PDATA data = (PDATA) calloc(1, sizeof(DATA));
-    //data->socket = this;
-    //data->winsockBuff.len = MAXUDPDGRAMSIZE;
-    //data->winsockBuff.buf = (char*) calloc(data->winsockBuff.len, sizeof(char));
-    //data->clientSD = pMsg->wParam;
-
-    //ol = (WSAOVERLAPPED*) calloc(1, sizeof(WSAOVERLAPPED));
-    //ol->hEvent = (HANDLE) data;
 
     if (WSARecv(pMsg->wParam, &(winsockBuff), 1, &numReceived, &flags,
                 NULL, NULL) == SOCKET_ERROR) {
@@ -121,9 +111,10 @@ void TCPSocket::receive(PMSG pMsg) {
     }
 
     QByteArray * buffer = new QByteArray(winsockBuff.buf, winsockBuff.len);
-    qDebug("Rx: %s", buffer->constData());
-    //emit signalDataReceived(socket_, buffer);
+    delete[] winsockBuff.buf;
 
+    qDebug("Rx: %s", buffer->constData());
+    emit signalDataReceived(socket_, buffer);
 }
 
 void TCPSocket::connect(PMSG) {
