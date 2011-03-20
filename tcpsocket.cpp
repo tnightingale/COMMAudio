@@ -41,9 +41,6 @@ void TCPSocket::accept(PMSG pMsg) {
 }
 
 void TCPSocket::send(PMSG pMsg) {
-    QString output;
-    QTextStream log(&output, QIODevice::WriteOnly);
-
     int err = 0;
     int result = 0;
     int num = 0;
@@ -70,22 +67,13 @@ void TCPSocket::send(PMSG pMsg) {
             return;
         }
 
-        emit signalStatsSetBytes(winsockBuff.len);
-        emit signalStatsSetPackets(1);
-        //log << "    " << "Packet sent, size: " << winsockBuff.len;
-        //outputStatus(output);
-
         delete socketBuffer_;
         if ((num = loadBuffer(bytesToRead)) <= 0) {
-            log << "    " << "Finishing...";
-            outputStatus(output);
+            qDebug("TCPSocket::send(); Finishing...");
             break;
         }
         winsockBuff.len = num;
     }
-
-    //log << "Total bytes sent: " << stats_.totalBytes;
-    //outputStatus(output);
 
     if (data_->status() == QDataStream::Ok) {
         ::shutdown(socket_, SD_SEND);
@@ -177,13 +165,6 @@ bool TCPSocket::slotProcessWSAEvent(PMSG pMsg) {
               (int) pMsg->wParam, WSAGETSELECTERROR(pMsg->lParam));
         return false;
     }
-
-    // TODO: If want to receive TCP & UDP simultaneously, need to be able to
-    //       filter messages against a list of open TCP client sockets here.
-    //       Currently that list doesn't exist.
-    //if (pMsg->wParam != socket_) {
-    //    return false;
-    //}
 
     switch (WSAGETSELECTEVENT(pMsg->lParam)) {
         case FD_ACCEPT:
