@@ -2,7 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-
+#include <QListWidgetItem>
+#include <QDebug>
 #include "tcpsocket.h"
 
 namespace Ui {
@@ -23,6 +24,7 @@ private:
 
 private slots:
     void on_action_Visible_toggled(bool status);
+    void on_clientListWidget_itemDoubleClicked(QListWidgetItem* item);
 };
 
 #endif // MAINWINDOW_H
