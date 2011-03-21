@@ -33,6 +33,8 @@ private:
     QFile outputFile;
     QAudioFormat format;
     QBuffer* buffer_;
+    QBuffer* inputBuffer_;
+    QList<QBuffer*> allBuffers_;
 signals:
 
 public slots:

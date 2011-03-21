@@ -8,6 +8,9 @@ AudioComponent::AudioComponent(QObject *parent) :
     playlist_ = new Phonon::MediaObject(this);
     output_ = new Phonon::AudioOutput(Phonon::MusicCategory,this);
     Phonon::createPath(playlist_,output_);
+
+
+
 }
 
 void AudioComponent::setSourceFolder(){
@@ -61,33 +64,40 @@ void AudioComponent::startMic(){
     }
 
     input_ = new QAudioInput(format,NULL);
-    QTimer::singleShot(3000, this, SLOT(stopMic()));
+    QTimer::singleShot(100, this, SLOT(stopMic()));
 /*
     outputFile.setFileName("./test.wav");
     outputFile.open(QIODevice::WriteOnly|QIODevice::Truncate);*/
     buf = new QByteArray();
-    buffer_ = new QBuffer(buf,NULL);
-    if(!buffer_->open(QIODevice::ReadWrite)){
+    inputBuffer_ = new QBuffer(buf,NULL);
+    if(!inputBuffer_->open(QIODevice::ReadWrite)){
         qWarning("unable to open buffer");
     }
-    input_->start(buffer_);
+    allBuffers_.append(inputBuffer_);
+    input_->start(inputBuffer_);
 }
 void AudioComponent::stopMic(){
     QAudioOutput* output;
-    input_->stop();
-    outputFile.close();
+    /*input_->stop();
+    //outputFile.close();
     delete input_;
     qWarning()<<"done recording";
-
-    outputFile.setFileName("./test.wav");
-    outputFile.open(QIODevice::ReadOnly);
-
-    QAudioDeviceInfo info( QAudioDeviceInfo::defaultOutputDevice());
-    if (!info.isFormatSupported(format));{
-        qWarning()<<"format not supported";
-        format = info.nearestFormat(format);
-    }
-    output = new QAudioOutput(format, NULL);
-    buffer_->seek(0);
-    output->start(buffer_);
+    startMic();
+    //outputFile.setFileName("./test.wav");
+    //outputFile.open(QIODevice::ReadOnly);*/
+    //if(allBuffers_.size()>10){
+        QAudioDeviceInfo info( QAudioDeviceInfo::defaultOutputDevice());
+        if (!info.isFormatSupported(format));{
+            qWarning()<<"format not supported";
+            format = info.nearestFormat(format);
+        }
+        output = new QAudioOutput(format, NULL);
+        buffer_ = new QBuffer();
+        buffer_->setBuffer(&allBuffers_.takeFirst()->buffer());
+        if(!buffer_->open(QIODevice::ReadWrite)){
+            qWarning("unable to open buffer");
+        }
+        buffer_->seek(0);
+        output->start(buffer_);
+    //}
 }

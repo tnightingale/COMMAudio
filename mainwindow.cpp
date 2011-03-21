@@ -11,16 +11,15 @@ MainWindow::MainWindow(QWidget *parent) :
     AudioComponent* player = new AudioComponent(this);
     /*player->addSong("./test.raw");
     player->play();*/
-    player->setSourceFolder();
+    //player->setSourceFolder();
 
     player->startMic();
-/*
-    for (int i = 0; i < player->getFileList().size();++i){
+
+/*    for (int i = 0; i < player->getFileList().size();++i){
 
        player->addSong(player->getFileList().at(i).filePath());
 
     }*/
-
     //working player code for wav files. will play following 3 files from internet in succession
 
 
