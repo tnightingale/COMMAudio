@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "audiocomponent.h"
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -8,17 +7,17 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->setupUi(this);
 
-    AudioComponent* player = new AudioComponent(this);
+    player_ = new AudioComponent(this);
     /*player->addSong("./test.raw");
     player->play();*/
-    player->setSourceFolder();
+    player_->setSourceFolder();
 
-    player->startMic();
+   // player->startMic();
 
-    for (int i = 0; i < player->getFileList().size();++i){
+    for (int i = 0; i < player_->getFileList().size();++i){
 
-       player->addSong(player->getFileList().at(i).filePath());
-       ui->clientListWidget->addItem(new QListWidgetItem(player->getFileList().at(i).filePath()));
+       player_->addSong(player_->getFileList().at(i));
+       ui->clientListWidget->addItem(new QListWidgetItem(player_->getFileList().at(i)));
 
     }
     //working player code for wav files. will play following 3 files from internet in succession
@@ -52,6 +51,7 @@ void MainWindow::on_action_Visible_toggled(bool status)
 
 void MainWindow::on_clientListWidget_itemDoubleClicked(QListWidgetItem* item)
 {
+    QList<Phonon::MediaSource> queue = player_->getQueue();
     QString dataClicked = item->text();
     qDebug(qPrintable(item->text()));
 }

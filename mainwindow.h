@@ -4,7 +4,9 @@
 #include <QMainWindow>
 #include <QListWidgetItem>
 #include <QDebug>
+#include <Phonon/MediaSource>
 #include "tcpsocket.h"
+#include "audiocomponent.h"
 
 namespace Ui {
     class MainWindow;
@@ -21,6 +23,7 @@ public:
 private:
     Ui::MainWindow *ui;
     TCPSocket *controlSocket_;
+    AudioComponent* player_;
 
 private slots:
     void on_action_Visible_toggled(bool status);

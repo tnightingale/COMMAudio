@@ -21,7 +21,7 @@ public:
     }
     QStringList getFileList();
     void startMic();
-
+    QList<Phonon::MediaSource> getQueue();
 
 private:
     Phonon::MediaObject* playlist_;

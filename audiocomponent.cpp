@@ -32,6 +32,10 @@ QStringList AudioComponent::getFileList(){
     return stuff;
 }
 
+QList<Phonon::MediaSource> AudioComponent::getQueue() {
+    return playlist_->queue();
+}
+
 void AudioComponent::addSong(QString filename) {
 
     playlist_->enqueue(filename);
