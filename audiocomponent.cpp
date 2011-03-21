@@ -36,6 +36,14 @@ QList<Phonon::MediaSource> AudioComponent::getQueue() {
     return playlist_->queue();
 }
 
+void AudioComponent::addSongToBegining(QString filename) {
+    QList<Phonon::MediaSource> queue = playlist_->queue();
+}
+
+void AudioComponent::setCurrentSong(QString fileName){
+    playlist_->setCurrentSource(fileName);
+}
+
 void AudioComponent::addSong(QString filename) {
 
     playlist_->enqueue(filename);
