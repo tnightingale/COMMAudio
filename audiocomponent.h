@@ -19,7 +19,7 @@ public:
     QDir getSourceFolder(){
         return sourceFolder_;
     }
-    QFileInfoList getFileList();
+    QStringList getFileList();
     void startMic();
 
 
