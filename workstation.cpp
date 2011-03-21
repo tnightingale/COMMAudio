@@ -16,7 +16,7 @@ Workstation::Workstation(MainWindow * mainWindow) {
     tcpSocket_ = new TCPSocket(mainWindow->winId());
     connect(mainWindow, SIGNAL(signalWMWSASyncTCPRx(PMSG)),
             tcpSocket_, SLOT(slotProcessWSAEvent(PMSG)));
-    
+
     udpSocket_ = new UDPSocket(mainWindow->winId());
     connect(mainWindow, SIGNAL(signalWMWSASyncUDPRx(PMSG)),
             udpSocket_, SLOT(slotProcessWSAEvent(PMSG)));
@@ -27,4 +27,49 @@ Workstation::Workstation(MainWindow * mainWindow) {
 Workstation::~Workstation() {
     delete tcpSocket_;
     delete udpSocket_;
+}
+
+void Workstation::requestFileList()
+{
+
+}
+
+void Workstation::sendFile()
+{
+
+}
+
+void Workstation::sendFileList()
+{
+
+}
+
+void Workstation::acceptVoiceChat()
+{
+
+}
+
+void Workstation::connectToServer()
+{
+
+}
+
+void Workstation::requestFile()
+{
+
+}
+
+void Workstation::processControlMessage()
+{
+
+}
+
+void Workstation::receiveUDP()
+{
+
+}
+
+void Workstation::receiveFile()
+{
+
 }
