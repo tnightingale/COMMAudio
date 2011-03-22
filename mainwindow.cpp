@@ -15,8 +15,15 @@ MainWindow::MainWindow(QWidget *parent) :
     player->play();*/
     player_->setSourceFolder();
 
-   // player->startMic();
+    Phonon::SeekSlider *slider = new Phonon::SeekSlider(this);
+    slider->setMediaObject(player_->getPlaylist());
+    slider->setGeometry(180,490,450,19);
+    slider->saveGeometry();
+    slider->show();
 
+   // player->startMic();
+    ui->remoteListWidget_2->setSortingEnabled(true);
+    //ui->clientListWidget->setSortingEnabled(true);
     for (int i = 0; i < player_->getFileList().size();++i){
 
        fileName = player_->getFileList().at(i);
@@ -93,6 +100,7 @@ void MainWindow::on_action_Visible_toggled(bool status)
 */
 void MainWindow::on_clientListWidget_itemDoubleClicked(QListWidgetItem* item)
 {
+    player_->stop();
     QList<Phonon::MediaSource> queue = player_->getQueue();
     QString dataClicked = item->text();
     QString fullPath = findFullPath(dataClicked);
@@ -144,7 +152,10 @@ void MainWindow::on_remoteListWidget_2_itemDoubleClicked(QListWidgetItem* item)
 */
 void MainWindow::on_playButton_clicked()
 {
-    player_->play();
+    if(player_->getState() == Phonon::StoppedState ||
+            player_->getState() == Phonon::PausedState) {
+        player_->play();
+    }
 }
 
 /*

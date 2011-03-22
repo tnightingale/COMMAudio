@@ -32,6 +32,10 @@ QStringList AudioComponent::getFileList(){
     return stuff;
 }
 
+Phonon::State AudioComponent::getState(){
+    return playlist_->state();
+}
+
 QList<Phonon::MediaSource> AudioComponent::getQueue() {
     return playlist_->queue();
 }

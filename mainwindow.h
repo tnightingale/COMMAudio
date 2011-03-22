@@ -5,6 +5,7 @@
 #include <QListWidgetItem>
 #include <QDebug>
 #include <Phonon/MediaSource>
+ #include <Phonon/SeekSlider>
 #include "tcpsocket.h"
 #include "audiocomponent.h"
 
