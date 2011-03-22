@@ -27,7 +27,7 @@ public slots:
     void connectToServer();
     void requestFile();
     // Tied to sockets
-    void processControlMessage();
+    void processConnection(TCPSocket*);
 
     void receiveUDP();
     void receiveFile();
