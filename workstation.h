@@ -32,8 +32,9 @@ public slots:
     void requestFileList();
     // Triggered by sockets, so signal is coming from a socket
     void processConnection(TCPSocket*);
+    void decodeControlMessage(TCPSocket*, QByteArray*);
     void receiveUDP();
-    void receiveFile();
+    void receiveFile(TCPSocket*, QByteArray*);
 
 public:
     Workstation(MainWindow *mainWindow);

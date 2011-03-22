@@ -3,6 +3,10 @@
 #include "tcpsocket.h"
 #include "udpsocket.h"
 
+#define FILE_LIST 1
+#define FILE_TRANSFER 2
+#define VOICE_CHAT 3
+
 Workstation::Workstation(MainWindow *mainWindow) {
     int err = 0;
     WSADATA wsaData;
@@ -107,6 +111,7 @@ void Workstation::requestFileList()
     // Hard coded values pending Joel's implementation of a connect window.
     short port = 7000;
     const char *ip = "192.168.0.190";
+    QString fileNames = "Canon In D Major\nViolin Concerto in E Minor";
     // End of hard coded values
 
     // Create the socket
@@ -149,13 +154,39 @@ void Workstation::requestFileList()
 -- RETURNS: void
 --
 -- NOTES:
--- The function that gets called when a new connection is established. This
--- function will process the received control packet and call the correct
--- response function.
+-- The function gets called when a new connection is established. It connects
+-- the socket's receive signal to the workstation's decode message function.
 */
 void Workstation::processConnection(TCPSocket* socket)
 {
     // Connect the socket's receive signal to
+    connect(socket, SIGNAL(signalDataReceived(TCPSocket*,QByteArray*)),
+            this, SLOT(decodeControlMessage(TCPSocket*,QByteArray*)));
+}
+
+void Workstation::decodeControlMessage(TCPSocket *socket, QByteArray *buffer)
+{
+    // Disconnect from decode control message
+    disconnect(socket, SIGNAL(signalDataReceived(TCPSocket*,QByteArray*)),
+               this, SLOT(decodeControlMessage(TCPSocket*,QByteArray*)));
+    // Check for type of message
+    switch (*buffer[0])
+    {
+    case FILE_LIST:
+        // Connect to file list here
+        break;
+    case FILE_TRANSFER:
+        connect(socket, SIGNAL(signalDataReceived(TCPSocket*,QByteArray*)),
+                this, SLOT(receiveFile(TCPSocket*, QByteArray*)));
+        break;
+    case VOICE_CHAT:
+        // Connect to voice chat here
+        break;
+    default:
+        // Should probably close the connection here
+        break;
+    }
+
 }
 
 void Workstation::receiveUDP()
@@ -163,7 +194,7 @@ void Workstation::receiveUDP()
 
 }
 
-void Workstation::receiveFile()
+void Workstation::receiveFile(TCPSocket*, QByteArray*)
 {
 
 }
