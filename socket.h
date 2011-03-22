@@ -2,6 +2,7 @@
 #define SOCKET_H
 
 #include <QObject>
+#include <QThread>
 #include <windowsx.h>
 #include <winsock2.h>
 #include <QTextStream>
@@ -134,46 +135,9 @@ public:
      */
     void close(PMSG pMsg);
 
-    void outputStatus(QString& output) {
-        qDebug() << output;
-        emit status(output);
-        output.clear();
-    }
-
-    /**
-     *
-     * @author Tom Nightingale.
-     */
-    static void initStats(STATS& stats) {
-        stats.startTime = 0;
-        stats.finishTime = 0;
-        stats.totalBytes = 0;
-        stats.totalPackets = 0;
-    }
-
-    /**
-     *
-     * @param bytes
-     *
-     * @author Tom Nightingale.
-     */
-    void updatePacketReceived(int bytes);
-
-    /**
-     *
-     * @param time
-     *
-     * @author Tom Nightingale.
-     */
-    void updatePacketReceivedTime(int time);
-
 signals:
     void signalSocketClosed();
     void status(QString);
-    void signalStatsSetBytes(int);
-    void signalStatsSetPackets(int);
-    void signalStatsSetStartTime(int);
-    void signalStatsSetFinishTime(int);
 
 public slots:
     /**

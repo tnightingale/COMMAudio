@@ -73,8 +73,6 @@ public:
         }
 
         data = (PDATA) overlapped->hEvent;
-        data->socket->updatePacketReceived(bytesTransferred);
-        data->socket->updatePacketReceivedTime(GetTickCount());
 
         QDataStream * fileOutput = data->socket->getDataStream();
         if ((num = fileOutput->writeRawData(data->winsockBuff.buf, bytesTransferred)) < 0) {

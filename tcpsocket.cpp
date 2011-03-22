@@ -142,10 +142,22 @@ bool TCPSocket::listen(int port) {
     return true;
 }
 
-bool TCPSocket::connectRemote(PSOCKADDR_IN pSockAddr) {
+bool TCPSocket::connectRemote(QString address, int port) {
+    PHOSTENT host;
+    SOCKADDR_IN serverSockAddrIn;
     int err = 0;
 
-    if ((err = ::connect(socket_, (PSOCKADDR) pSockAddr,
+    if ((host = gethostbyname(address.toAscii().data())) == NULL) {
+        err = GetLastError();
+        qDebug("Client::writeTCP(): Unknown server address. Error: %d.", err);
+        return false;
+    }
+
+    memcpy((char*) &serverSockAddrIn.sin_addr, host->h_addr, host->h_length);
+    serverSockAddrIn.sin_family = AF_INET;
+    serverSockAddrIn.sin_port = htons(port);
+
+    if ((err = ::connect(socket_, (PSOCKADDR) &serverSockAddrIn,
                    sizeof(SOCKADDR_IN))) == SOCKET_ERROR) {
         if ((err = WSAGetLastError()) != WSAEWOULDBLOCK) {
             qDebug("TCPSocket::connectRemote(): Connect failed. Error: %d",
@@ -153,8 +165,6 @@ bool TCPSocket::connectRemote(PSOCKADDR_IN pSockAddr) {
             return false;
         }
     }
-
-    emit signalStatsSetStartTime(GetTickCount());
 
     return true;
 }

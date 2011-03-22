@@ -106,27 +106,14 @@ void Workstation::requestFileList()
 {
     // Hard coded values pending Joel's implementation of a connect window.
     short port = 7000;
-    const char *ip = "192.168.0.190";
+    QString ip("localhost");
     // End of hard coded values
 
     // Create the socket
     TCPSocket *requestSocket = new TCPSocket(mainWindowPointer_->winId());
 
     // Connect to a remote host
-    ///////////////////SHOULD BE IN SOCKET LAYER///////////////////////////////
-    struct hostent *hostEntity;
-    SOCKADDR_IN internetAddr;
-    internetAddr.sin_family = AF_INET;
-    internetAddr.sin_port = htons(port);
-    if ((hostEntity = gethostbyname(ip)) == NULL)
-    {
-        qDebug("Workstation::requestFileList(): unable to get host from ip");
-        return;
-    }
-    memcpy((char *)&internetAddr.sin_addr, hostEntity->h_addr,
-           hostEntity->h_length);
-    ///////////////////END OF SOCKET LAYER/////////////////////////////////////
-    requestSocket->connectRemote(&internetAddr);
+    requestSocket->connectRemote(ip, port);
 
     // Send our file list to the remote host
 
