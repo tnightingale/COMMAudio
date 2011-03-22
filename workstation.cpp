@@ -173,7 +173,8 @@ void Workstation::decodeControlMessage(TCPSocket *socket, QByteArray *buffer)
     switch (*buffer[0])
     {
     case FILE_LIST:
-        // Connect to file list here
+        connect(socket, SIGNAL(signalDataReceived(TCPSocket*,QByteArray*)),
+                this, SLOT(receiveFileList(TCPSocket*, QByteArray*)));
         break;
     case FILE_TRANSFER:
         connect(socket, SIGNAL(signalDataReceived(TCPSocket*,QByteArray*)),
@@ -183,7 +184,8 @@ void Workstation::decodeControlMessage(TCPSocket *socket, QByteArray *buffer)
         // Connect to voice chat here
         break;
     default:
-        // Should probably close the connection here
+        // Since the message is not recognized, close the connection
+        //socket->close();
         break;
     }
 
@@ -198,3 +200,26 @@ void Workstation::receiveFile(TCPSocket*, QByteArray*)
 {
 
 }
+
+void Workstation::receiveFileList(TCPSocket *socket, QByteArray *packet)
+{
+    // Create the local storage for the packet
+    QStringList *fileList = new QStringList();
+    QDataStream *stream = new QDataStream(*packet);
+
+    // Convert QByteArray to QStringList
+    *stream >> *fileList;
+
+    // Signal slot in workstation
+    emit signalFileListUpdate(&(*fileList));
+
+    // If this is the last packet, send our own file list
+    // Need a way to figure out if we are at the last packet.
+    //fileList = mainWindowPointer_->getFileList();
+    QByteArray *sendBuffer = new QByteArray();
+    stream = new QDataStream(*sendBuffer);
+    *stream << *fileList;
+    //socket->send();
+
+}
+

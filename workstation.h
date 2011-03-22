@@ -35,6 +35,10 @@ public slots:
     void decodeControlMessage(TCPSocket*, QByteArray*);
     void receiveUDP();
     void receiveFile(TCPSocket*, QByteArray*);
+    void receiveFileList(TCPSocket*, QByteArray*);
+
+signals:
+    void signalFileListUpdate(QStringList*);
 
 public:
     Workstation(MainWindow *mainWindow);
