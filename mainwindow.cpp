@@ -101,12 +101,12 @@ void MainWindow::on_action_Visible_toggled(bool status)
 void MainWindow::on_clientListWidget_itemDoubleClicked(QListWidgetItem* item)
 {
     player_->stop();
-    QList<Phonon::MediaSource> queue = player_->getQueue();
     QString dataClicked = item->text();
     QString fullPath = findFullPath(dataClicked);
     player_->setCurrentSong(fullPath);
     ui->currentSongEditBox->setText(dataClicked);
     qDebug(qPrintable(item->text()));
+    player_->play();
 }
 
 /*
@@ -155,6 +155,14 @@ void MainWindow::on_playButton_clicked()
     if(player_->getState() == Phonon::StoppedState ||
             player_->getState() == Phonon::PausedState) {
         player_->play();
+    } else {
+        switch(player_->getState()) {
+        case Phonon::ErrorState:
+            qDebug("Error");
+            break;
+        case Phonon::LoadingState:
+            qDebug("Loading");
+        }
     }
 }
 
@@ -202,6 +210,8 @@ void MainWindow::on_stopButton_clicked()
 */
 void MainWindow::on_pauseButton_clicked()
 {
-    player_->pause();
+    if(player_->getState() == Phonon::PlayingState) {
+        player_->pause();
+    }
 }
 
