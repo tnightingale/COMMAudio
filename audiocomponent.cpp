@@ -3,6 +3,9 @@
 #include <QTimer>
 #include <QByteArray>
 #include <QDirIterator>
+#include <al.h>
+#include <alc.h>
+
 AudioComponent::AudioComponent(QObject *parent) :
     QObject(parent)
 {

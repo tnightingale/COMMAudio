@@ -27,4 +27,7 @@ HEADERS  += mainwindow.h \
 
 FORMS    += mainwindow.ui
 
-LIBS += C:\Qt\2010.05\mingw\lib\libws2_32.a
+INCLUDEPATH += "C:/OpenAL 1.1 SDK/include"
+
+LIBS += C:\Qt\2010.05\mingw\lib\libws2_32.a \
+"C:/OpenAL 1.1 SDK/libs"
