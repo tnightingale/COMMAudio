@@ -24,9 +24,10 @@ MainWindow::MainWindow(QWidget *parent) :
    // player->startMic();
     ui->remoteListWidget_2->setSortingEnabled(true);
     //ui->clientListWidget->setSortingEnabled(true);
-    for (int i = 0; i < player_->getFileList().size();++i){
+    QStringList songList = player_->getFileList();
+    for (int i = 0; i < songList.size();++i){
 
-       fileName = player_->getFileList().at(i);
+       fileName = songList.at(i);
        player_->addSong(fileName);
        int n = fileName.lastIndexOf('/');
        int s = fileName.size() - n - 1;
@@ -34,8 +35,8 @@ MainWindow::MainWindow(QWidget *parent) :
        ui->clientListWidget->addItem(new QListWidgetItem(songTitle));
 
     }
-    if(player_->getFileList().size() > 0) {
-        fileName = player_->getFileList().at(0);
+    if(songList.size() > 0) {
+        fileName = songList.at(0);
         int n = fileName.lastIndexOf('/');
         int s = fileName.size() - n - 1;
         songTitle = fileName.right(s);
