@@ -9,13 +9,16 @@ class Workstation : public QObject {
 
 private:
     /**  */
-    TCPSocket * tcpSocket_;
+    TCPSocket *tcpSocket_;
 
     /**  */
-    UDPSocket * udpSocket_;
+    UDPSocket *udpSocket_;
+
+    /* Pointer to the main window. This is used to access the window handle for
+    when we create new sockets.*/
+    MainWindow *mainWindowPointer_;
 
     // Functions
-    void requestFileList();
     void sendFile();
     void sendFileList();
     // Create, send back socket information,
@@ -23,16 +26,16 @@ private:
     void acceptVoiceChat();
 
 public slots:
-    // Tied to UI
+    // Triggered by user, so signal is coming from a button
     void connectToServer();
     void requestFile();
-    // Tied to sockets
+    void requestFileList();
+    // Triggered by sockets, so signal is coming from a socket
     void processConnection(TCPSocket*);
-
     void receiveUDP();
     void receiveFile();
 
 public:
-    Workstation(MainWindow * mainWindow);
+    Workstation(MainWindow *mainWindow);
     virtual ~Workstation();
 };

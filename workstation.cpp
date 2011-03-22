@@ -13,6 +13,9 @@ Workstation::Workstation(MainWindow *mainWindow) {
         throw "Workstation::Workstation(): Missing WINSOCK2 DLL.";
     }
 
+    // Save a pointer to the window
+    mainWindowPointer_ = mainWindow;
+
     // Create TCP socket to listen for requests
     tcpSocket_ = new TCPSocket(mainWindow->winId());
 
@@ -36,11 +39,6 @@ Workstation::~Workstation() {
     delete udpSocket_;
 }
 
-void Workstation::requestFileList()
-{
-
-}
-
 void Workstation::sendFile()
 {
 
@@ -56,6 +54,24 @@ void Workstation::acceptVoiceChat()
 
 }
 
+/*
+-- FUNCTION: connectToServer
+--
+-- DATE: March 21, 2011
+--
+-- REVISIONS: (Date and Description)
+--
+-- DESIGNER: Luke Queenan
+--
+-- PROGRAMMER: Luke Queenan
+--
+-- INTERFACE: void Workstation::connectToServer();
+--
+-- RETURNS: void
+--
+-- NOTES:
+--
+*/
 void Workstation::connectToServer()
 {
 
@@ -63,6 +79,57 @@ void Workstation::connectToServer()
 
 void Workstation::requestFile()
 {
+
+}
+
+/*
+-- FUNCTION: connectToServer
+--
+-- DATE: March 21, 2011
+--
+-- REVISIONS: (Date and Description)
+--
+-- DESIGNER: Luke Queenan
+--
+-- PROGRAMMER: Luke Queenan
+--
+-- INTERFACE: void Workstation::connectToServer();
+--
+-- RETURNS: void
+--
+-- NOTES:
+-- This function is triggered when the user wishes to obtain a remote file list.
+-- The function establishes a connection to the remote host and sends its file
+-- list.
+*/
+void Workstation::requestFileList()
+{
+    // Hard coded values pending Joel's implementation of a connect window.
+    short port = 7000;
+    const char *ip = "192.168.0.190";
+    // End of hard coded values
+
+    // Create the socket
+    TCPSocket *requestSocket = new TCPSocket(mainWindowPointer_->winId());
+
+    // Connect to a remote host
+    ///////////////////SHOULD BE IN SOCKET LAYER///////////////////////////////
+    struct hostent *hostEntity;
+    SOCKADDR_IN internetAddr;
+    internetAddr.sin_family = AF_INET;
+    internetAddr.sin_port = htons(port);
+    if ((hostEntity = gethostbyname(ip)) == NULL)
+    {
+        qDebug("Workstation::requestFileList(): unable to get host from ip");
+        return;
+    }
+    memcpy((char *)&internetAddr.sin_addr, hostEntity->h_addr,
+           hostEntity->h_length);
+    ///////////////////END OF SOCKET LAYER/////////////////////////////////////
+    requestSocket->connectRemote(&internetAddr);
+
+    // Send our file list to the remote host
+
 
 }
 
@@ -82,13 +149,13 @@ void Workstation::requestFile()
 -- RETURNS: void
 --
 -- NOTES:
--- The Qt slot function that gets called from the listening socket. This
--- function will call the correct private function based on the type of control
--- message received.
+-- The function that gets called when a new connection is established. This
+-- function will process the received control packet and call the correct
+-- response function.
 */
 void Workstation::processConnection(TCPSocket* socket)
 {
-
+    // Connect the socket's receive signal to
 }
 
 void Workstation::receiveUDP()
