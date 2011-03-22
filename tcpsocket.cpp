@@ -1,6 +1,6 @@
 #include "tcpsocket.h"
 
-TCPSocket::TCPSocket(HWND hWnd) 
+TCPSocket::TCPSocket(HWND hWnd)
 : Socket(hWnd, AF_INET, SOCK_STREAM, IPPROTO_TCP) {
     int err = 0;
     int flags = FD_CONNECT | FD_READ | FD_ACCEPT | FD_CLOSE;
@@ -17,7 +17,7 @@ TCPSocket::TCPSocket(SOCKET socket, HWND hWnd)
     int err = 0;
     int flags = FD_READ | FD_CLOSE;
 
-    if ((err = WSAAsyncSelect(socket, hWnd, WM_WSAASYNC_TCP, flags)) 
+    if ((err = WSAAsyncSelect(socket, hWnd, WM_WSAASYNC_TCP, flags))
                               == SOCKET_ERROR) {
         qDebug("TCPSocket::TCPSocket(): Error setting up async select.");
     }
@@ -35,7 +35,7 @@ void TCPSocket::accept(PMSG pMsg) {
             return;
         }
     }
-    
+
     TCPSocket * clientSocket = new TCPSocket(newSocket, hWnd_);
     emit signalClientConnected(clientSocket);
 }
@@ -102,7 +102,7 @@ void TCPSocket::receive(PMSG pMsg) {
     delete[] winsockBuff.buf;
 
     qDebug("Rx: %s", buffer->constData());
-    emit signalDataReceived(socket_, buffer);
+    emit signalDataReceived(this, buffer);
 }
 
 void TCPSocket::connect(PMSG) {
