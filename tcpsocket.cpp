@@ -1,46 +1,46 @@
 #include "tcpsocket.h"
 
-TCPSocket::TCPSocket(HWND hWnd) {
+TCPSocket::TCPSocket(HWND hWnd)
+: Socket(hWnd, AF_INET, SOCK_STREAM, IPPROTO_TCP) {
     int err = 0;
-    WSADATA wsaData;
+    int flags = FD_CONNECT | FD_READ | FD_ACCEPT | FD_CLOSE;
 
-    WORD wVersionRequested_ = MAKEWORD(2,2);
-    if ((err = WSAStartup(wVersionRequested_, &wsaData)) < 0) {
-        throw "TCPConnection::TCPConnection(): Missing WINSOCK2 DLL.";
+    if ((err = WSAAsyncSelect(socket_, hWnd, WM_WSAASYNC_TCP, flags))
+                              == SOCKET_ERROR) {
+        qDebug("TCPSocket::TCPSocket(): Error setting up async select.");
+        throw "TCPSocket::TCPSocket(): Error setting up async select.";
     }
+}
 
-    hWnd_ = hWnd;
-    open(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+TCPSocket::TCPSocket(SOCKET socket, HWND hWnd)
+: Socket(socket, hWnd) {
+    int err = 0;
+    int flags = FD_READ | FD_CLOSE;
+
+    if ((err = WSAAsyncSelect(socket, hWnd, WM_WSAASYNC_TCP, flags))
+                              == SOCKET_ERROR) {
+        qDebug("TCPSocket::TCPSocket(): Error setting up async select.");
+    }
 }
 
 void TCPSocket::accept(PMSG pMsg) {
-    QString output;
-    QTextStream log(&output, QIODevice::WriteOnly);
-
-    SOCKET clientSocket;
+    SOCKET newSocket;
     SOCKADDR_IN client;
     int client_length = sizeof(SOCKADDR_IN);
 
-    if ((clientSocket = ::accept(pMsg->wParam, (PSOCKADDR) &client,
+    if ((newSocket = ::accept(pMsg->wParam, (PSOCKADDR) &client,
                                  &client_length)) == INVALID_SOCKET) {
         if (WSAGetLastError() != WSAEWOULDBLOCK) {
-            qDebug("TCPConnection:accept(); Error: %d", WSAGetLastError());
+            qDebug("TCPSocket:accept(); Error: %d", WSAGetLastError());
             return;
         }
     }
-    emit signalStatsSetStartTime(GetTickCount());
 
-    log << "Remote address (" << inet_ntoa(client.sin_addr)
-        << ") connected. (" << (int) clientSocket << ")";
-    outputStatus(output);
-
-    Socket::init(clientSocket, hWnd_, FD_READ | FD_CLOSE);
+    TCPSocket * clientSocket = new TCPSocket(newSocket, hWnd_);
+    emit signalClientConnected(clientSocket);
 }
 
 void TCPSocket::send(PMSG pMsg) {
-    QString output;
-    QTextStream log(&output, QIODevice::WriteOnly);
-
     int err = 0;
     int result = 0;
     int num = 0;
@@ -67,22 +67,13 @@ void TCPSocket::send(PMSG pMsg) {
             return;
         }
 
-        emit signalStatsSetBytes(winsockBuff.len);
-        emit signalStatsSetPackets(1);
-        //log << "    " << "Packet sent, size: " << winsockBuff.len;
-        //outputStatus(output);
-
         delete socketBuffer_;
         if ((num = loadBuffer(bytesToRead)) <= 0) {
-            log << "    " << "Finishing...";
-            outputStatus(output);
+            qDebug("TCPSocket::send(); Finishing...");
             break;
         }
         winsockBuff.len = num;
     }
-
-    //log << "Total bytes sent: " << stats_.totalBytes;
-    //outputStatus(output);
 
     if (data_->status() == QDataStream::Ok) {
         ::shutdown(socket_, SD_SEND);
@@ -92,19 +83,14 @@ void TCPSocket::send(PMSG pMsg) {
 void TCPSocket::receive(PMSG pMsg) {
     int err = 0;
     DWORD flags = 0;
-    WSAOVERLAPPED* ol;
+    DWORD numReceived = 0;
+    WSABUF winsockBuff;
 
-    PDATA data = (PDATA) calloc(1, sizeof(DATA));
-    data->socket = this;
-    data->winsockBuff.len = MAXUDPDGRAMSIZE;
-    data->winsockBuff.buf = (char*) calloc(data->winsockBuff.len, sizeof(char));
-    data->clientSD = pMsg->wParam;
+    winsockBuff.len = MAXUDPDGRAMSIZE;
+    winsockBuff.buf = (char *) calloc(winsockBuff.len, sizeof(char));
 
-    ol = (WSAOVERLAPPED*) calloc(1, sizeof(WSAOVERLAPPED));
-    ol->hEvent = (HANDLE) data;
-
-    if (WSARecv(pMsg->wParam, &(data->winsockBuff), 1, NULL, &flags,
-                ol, TCPSocket::recvWorkerRoutine) == SOCKET_ERROR) {
+    if (WSARecv(pMsg->wParam, &(winsockBuff), 1, &numReceived, &flags,
+                NULL, NULL) == SOCKET_ERROR) {
         if ((err = WSAGetLastError()) != WSA_IO_PENDING) {
             qDebug("TCPSocket::receive(): WSARecv() failed with error %d",
                    err);
@@ -112,7 +98,11 @@ void TCPSocket::receive(PMSG pMsg) {
         }
     }
 
+    QByteArray * buffer = new QByteArray(winsockBuff.buf, winsockBuff.len);
+    delete[] winsockBuff.buf;
 
+    qDebug("Rx: %s", buffer->constData());
+    emit signalDataReceived(this, buffer);
 }
 
 void TCPSocket::connect(PMSG) {
@@ -131,16 +121,21 @@ int TCPSocket::loadBuffer(size_t bytesToRead) {
     return data_->readRawData(socketBuffer_->data(), bytesToRead);
 }
 
-bool TCPSocket::listen(PSOCKADDR_IN pSockAddr) {
+bool TCPSocket::listen(int port) {
     int err = 0;
+    SOCKADDR_IN sockAddrIn;
 
-    if (!Socket::listen(pSockAddr)) {
+    sockAddrIn.sin_family = AF_INET;
+    sockAddrIn.sin_port = htons(port);
+    sockAddrIn.sin_addr.s_addr = htonl(INADDR_ANY);
+
+    if (!Socket::listen(&sockAddrIn)) {
         return false;
     }
 
     if ((::listen(socket_, 5)) == SOCKET_ERROR) {
         err = WSAGetLastError();
-        qDebug("Connection::listen(); Error: %d.", err);
+        qDebug("TCPSocket::listen(); Error: %d.", err);
         return false;
     }
 
@@ -170,13 +165,6 @@ bool TCPSocket::slotProcessWSAEvent(PMSG pMsg) {
               (int) pMsg->wParam, WSAGETSELECTERROR(pMsg->lParam));
         return false;
     }
-
-    // TODO: If want to receive TCP & UDP simultaneously, need to be able to
-    //		 filter messages against a list of open TCP client sockets here.
-    //		 Currently that list doesn't exist.
-    //if (pMsg->wParam != socket_) {
-    //    return false;
-    //}
 
     switch (WSAGETSELECTEVENT(pMsg->lParam)) {
         case FD_ACCEPT:

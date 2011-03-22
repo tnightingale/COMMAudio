@@ -1,5 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "audiocomponent.h"
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -216,3 +218,16 @@ void MainWindow::on_pauseButton_clicked()
     }
 }
 
+bool MainWindow::winEvent(MSG * msg, long * result) {
+    switch (msg->message) {
+        case WM_WSAASYNC_TCP:
+            emit signalWMWSASyncTCPRx(msg);
+            return true;
+
+        case WM_WSAASYNC_UDP:
+            emit signalWMWSASyncUDPRx(msg);
+            return true;
+    }
+
+    return false;
+}

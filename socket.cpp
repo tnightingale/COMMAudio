@@ -1,19 +1,21 @@
 #include "socket.h"
 
-bool Socket::open(int addressFamily, int connectionType, int protocol) {
-    QString output;
-    QTextStream log(&output, QIODevice::WriteOnly);
-
+Socket::Socket(HWND hWnd, int addressFamily, int connectionType, int protocol)
+: data_(NULL), hWnd_(hWnd) {
     if ((socket_ = WSASocket(addressFamily, connectionType, protocol, NULL, 0,
                              WSA_FLAG_OVERLAPPED)) == INVALID_SOCKET) {
-        qDebug("Socket::openSocket(): Can't create socket. Error: %d",
-               WSAGetLastError());
-        return false;
+        int err = WSAGetLastError();
+        qDebug("Socket::Socket(): Can't create socket. (%d)", err);
+        throw "Socket::Socket(); Can't create socket.";
     }
-    log << "SocketCreated: " << (int) socket_;
-    outputStatus(output);
 
-    return true;
+    connect(this, SIGNAL(signalSocketClosed()),
+            this, SLOT(deleteLater()));
+}
+
+Socket::Socket(SOCKET socket, HWND hWnd) {
+    socket_ = socket;
+    hWnd_ = hWnd;
 }
 
 bool Socket::listen(PSOCKADDR_IN pSockAddr) {
@@ -24,7 +26,7 @@ bool Socket::listen(PSOCKADDR_IN pSockAddr) {
 
     if ((err = bind(socket_, (PSOCKADDR) pSockAddr, sizeof(SOCKADDR))
         == SOCKET_ERROR)) {
-        qDebug("Connection::startServer(): Can't bind to socket. Error: %d",
+        qDebug("Socket::startServer(): Can't bind to socket. Error: %d",
                WSAGetLastError());
         return false;
     }
@@ -47,7 +49,7 @@ void Socket::close(PMSG pMsg) {
     QString output;
     QTextStream log(&output, QIODevice::WriteOnly);
 
-    log << "Socket: " << (int) pMsg->wParam << " disconnected.";
+    log << "Socket::close(); " << (int) pMsg->wParam << " disconnected.";
     outputStatus(output);
 
     emit signalStatsSetFinishTime(GetTickCount());

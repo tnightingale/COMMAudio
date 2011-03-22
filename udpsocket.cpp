@@ -1,16 +1,15 @@
 #include "udpsocket.h"
 
-UDPSocket::UDPSocket(HWND hWnd) {
+UDPSocket::UDPSocket(HWND hWnd) 
+: Socket(hWnd, AF_INET, SOCK_DGRAM, IPPROTO_UDP) {
     int err = 0;
-    WSADATA wsaData;
+    int flags = FD_READ | FD_CLOSE;
 
-    WORD wVersionRequested_ = MAKEWORD(2,2);
-    if ((err = WSAStartup(wVersionRequested_, &wsaData)) < 0) {
-        throw "TCPConnection::TCPConnection(): Missing WINSOCK2 DLL.";
+    if ((err = WSAAsyncSelect(socket_, hWnd, WM_WSAASYNC_TCP, flags))
+                              == SOCKET_ERROR) {
+        qDebug("UDPSocket::UDPSocket(): Error setting up async select.");
+        throw "UDPSocket::UDPSocket(): Error setting up async select.";
     }
-
-    hWnd_ = hWnd;
-    open(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 }
 
 void UDPSocket::send(PMSG pMsg) {

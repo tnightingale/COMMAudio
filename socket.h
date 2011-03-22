@@ -10,7 +10,8 @@
 #include <QDebug>
 
 #define MSGSIZE 1024
-#define WM_WSASYNC (WM_USER + 1)
+#define WM_WSAASYNC_TCP (WM_USER + 1)
+#define WM_WSAASYNC_UDP (WM_USER + 2)
 #define DATABUFSIZE 2097152
 #define MAXUDPDGRAMSIZE 65507
 #define PACKETSIZE 4096
@@ -57,13 +58,14 @@ protected:
     HWND hWnd_;
 
 public:
+    Socket(HWND hWnd, int addressFamily, int connectionType, int protocol);
+    Socket(SOCKET socket, HWND hWnd);
+
     virtual ~Socket() {
         qDebug("Socket::~Socket()");
         closesocket(socket_);
 
-        if (data_ != NULL) {
-            delete data_;
-        }
+        delete data_;
     }
 
     /**
@@ -116,18 +118,6 @@ public:
 
     /**
      *
-     * @param addressFamily
-     * @param connectionType
-     * @param protocol
-     *
-     * @return
-     *
-     * @author Tom Nightingale.
-     */
-    bool open(int addressFamily, int connectionType, int protocol);
-
-    /**
-     *
      * @param pSockAddr
      *
      * @return
@@ -159,28 +149,6 @@ public:
         stats.finishTime = 0;
         stats.totalBytes = 0;
         stats.totalPackets = 0;
-    }
-
-    /**
-     *
-     * @param socket
-     * @param hWnd
-     * @param flags
-     *
-     * @return
-     *
-     * @author Tom Nightingale.
-     */
-    static bool init(SOCKET socket, HWND hWnd, int flags) {
-        int err = 0;
-
-        if ((err = WSAAsyncSelect(socket, hWnd, WM_WSASYNC,
-                                  flags)) == SOCKET_ERROR) {
-            throw "Connection::startServer(): Error setting up async select.";
-            return false;
-        }
-
-        return true;
     }
 
     /**

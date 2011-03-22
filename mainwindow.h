@@ -5,7 +5,7 @@
 #include <QListWidgetItem>
 #include <QDebug>
 #include <Phonon/MediaSource>
- #include <Phonon/SeekSlider>
+#include <Phonon/SeekSlider>
 #include "tcpsocket.h"
 #include "audiocomponent.h"
 
@@ -22,6 +22,21 @@ public:
     ~MainWindow();
 
     QString findFullPath(QString filename);
+
+    /**
+     * Expose the windows message loop for us to respond to socket events.
+     * The first of many attrocities...
+     *
+     * @param msg The windows message received.
+     * @param result ... not sure >_>
+     *
+     * @author Tom Nightingale
+     */
+    bool winEvent(MSG * msg, long * result);
+
+signals:
+    void signalWMWSASyncTCPRx(PMSG);
+    void signalWMWSASyncUDPRx(PMSG);
 
 private:
     Ui::MainWindow *ui;
