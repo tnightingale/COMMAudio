@@ -19,6 +19,7 @@ private:
     MainWindow *mainWindowPointer_;
 
     // Functions
+    QByteArray dataStreamFileList();
     void sendFile();
     void sendFileList();
     // Create, send back socket information,

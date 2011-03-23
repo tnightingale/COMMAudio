@@ -115,8 +115,11 @@ void Workstation::requestFileList()
 
     // Hard coded values pending Joel's implementation of a connect window.
     short port = 7000;
-    QString fileNames = "Canon In D Major\nViolin Concerto in E Minor";
     QString ip("192.168.0.96");
+    // Hard coded file list, waiting for Joel
+    QStringList *fileNames = new QStringList();
+    fileNames->append("song one");
+    fileNames->append("song two");
     // End of hard coded values
 
     // Create the socket
@@ -130,7 +133,7 @@ void Workstation::requestFileList()
 
     qDebug("Workstation::requestFileList(); Assuming connection suceeded!.");
     // Send our file list to the remote host
-
+    //requestSocket->send();
 
 }
 
@@ -210,8 +213,9 @@ void Workstation::receiveFileList(TCPSocket *socket, QByteArray *packet)
     emit signalFileListUpdate(&(*fileList));
 
     // If this is the last packet, send our own file list
-    // Need a way to figure out if we are at the last packet.
-    //fileList = mainWindowPointer_->getFileList();
+    // Need a way to figure out if we are at the last packet...
+    delete fileList;
+    *fileList = mainWindowPointer_->getLocalFileList();
     QByteArray *sendBuffer = new QByteArray();
     stream = new QDataStream(*sendBuffer);
     *stream << *fileList;
@@ -219,3 +223,17 @@ void Workstation::receiveFileList(TCPSocket *socket, QByteArray *packet)
 
 }
 
+QByteArray Workstation::dataStreamFileList()
+{
+    QStringList fileList = mainWindowPointer_->getLocalFileList();
+    QByteArray *returnValue = new QByteArray();
+    return *returnValue;
+    /*QDataStream *stream = new QDataStream(fileList);
+
+    *returnValue << *stream;
+/*
+    QByteArray *byteArray = new QByteArray();
+    QDataStream *s = new QDataStream(mainWindowPointer_->getLocalFileList());
+    *s >> *byteArray;
+    return *byteArray;*/
+}
