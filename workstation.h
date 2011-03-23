@@ -1,4 +1,6 @@
 #include <QObject>
+#include <QIODevice>
+#include <QMap>
 
 class MainWindow;
 class TCPSocket;
@@ -18,6 +20,9 @@ private:
     when we create new sockets.*/
     MainWindow *mainWindowPointer_;
 
+    // Collection for file transfers
+    QMap <TCPSocket*, QByteArray> currentTransfers;
+
     // Functions
     QByteArray dataStreamFileList();
     void sendFile();
@@ -33,10 +38,10 @@ public slots:
     void requestFileList();
     // Triggered by sockets, so signal is coming from a socket
     void processConnection(TCPSocket*);
-    void decodeControlMessage(TCPSocket*, QByteArray*);
+    void decodeControlMessage(TCPSocket*, QIODevice*);
     void receiveUDP();
-    void receiveFile(TCPSocket*, QByteArray*);
-    void receiveFileList(TCPSocket*, QByteArray*);
+    void receiveFile(TCPSocket*, QIODevice*);
+    void receiveFileList(TCPSocket*, QIODevice*);
 
 signals:
     void signalFileListUpdate(QStringList*);
