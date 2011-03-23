@@ -23,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :
     slider->saveGeometry();
     slider->show();
 
+    ui->tab->setStyleSheet(QString::fromUtf8("background-color: rgb(255, 255, 60);"));
    // player->startMic();
     ui->remoteListWidget->setSortingEnabled(true);
     //ui->clientListWidget->setSortingEnabled(true);
@@ -182,8 +183,31 @@ void MainWindow::on_playButton_clicked()
     } else {
        ui->playButton->setText("Pause");
        player_->play();
+
+       QGraphicsItem *ball = new QGraphicsEllipseItem(0, 0, 20, 20);
+
+       QTimeLine *timer = new QTimeLine(5000);
+       timer->setFrameRange(0, 100);
+
+       QGraphicsItemAnimation *animation = new QGraphicsItemAnimation;
+       animation->setItem(ball);
+       animation->setTimeLine(timer);
+
+       for (int i = 0; i < 200; ++i)
+            animation->setPosAt(i / 200.0, QPointF(i, i));
+
+       QGraphicsScene *scene = new QGraphicsScene();
+       scene->setSceneRect(0, 0, 250, 250);
+       scene->addItem(ball);
+
+       ui->visualGraphicsView->setScene(scene);
+       ui->visualGraphicsView->show();
+
+       timer->start();
+
     }
 }
+
 
 /*
 -- FUNCTION: on_stopButton_clicked

@@ -12,6 +12,10 @@
 #include "joinserver.h"
 #include "ui_joinserver.h"
 #include "remoteSong.h"
+#include <QGraphicsView>
+#include <QGraphicsItem>
+#include <QTimeLine>
+#include <QGraphicsItemAnimation>
 
 namespace Ui {
     class MainWindow;
@@ -54,6 +58,10 @@ public:
      * @author Joel Stewart
      */
     void appendToRemote(QStringList songList, QString ipAddress);
+
+    QRectF rect (int r);
+
+    void setupRot (QTimeLine *timeline, QGraphicsItem *item);
 
     QStringList getLocalFileList();
 
