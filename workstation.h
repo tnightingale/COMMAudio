@@ -31,6 +31,10 @@ private:
     // create buffer, connect signals/slots
     void acceptVoiceChat();
 
+    bool processReceivingFile();
+    bool processReceivingFileList(TCPSocket*, QByteArray*);
+
+
 public slots:
     // Triggered by user, so signal is coming from a button
     void connectToServer();

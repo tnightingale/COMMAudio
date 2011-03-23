@@ -176,15 +176,14 @@ void Workstation::decodeControlMessage(TCPSocket *socket, QIODevice *buffer)
     switch (packet[0])
     {
     case FILE_LIST:
-        // Insert rest of received packet into the current transfers map
-        currentTransfers.insert(socket, packet.left(packet.length() - 1));
+        processReceivingFileList(&(*socket), &packet.right(packet.length() - 1));
         // Connect the signal for the type of transfer
         connect(socket, SIGNAL(signalDataReceived(TCPSocket*,QByteArray*)),
                 this, SLOT(receiveFileList(TCPSocket*, QByteArray*)));
         break;
     case FILE_TRANSFER:
         // Insert rest of received packet into the current transfers map
-        currentTransfers.insert(socket, packet.left(packet.length() - 1));
+        currentTransfers.insert(socket, packet.right(packet.length() - 1));
         // Connect the signal for the type of transfer
         connect(socket, SIGNAL(signalDataReceived(TCPSocket*,QByteArray*)),
                 this, SLOT(receiveFile(TCPSocket*, QByteArray*)));
@@ -210,13 +209,38 @@ void Workstation::receiveFile(TCPSocket*, QIODevice*)
 
 }
 
+bool Workstation::processReceivingFile()
+{
+
+}
+
+bool Workstation::processReceivingFileList(TCPSocket *socket, QByteArray *packet)
+{
+    // Check to see if this is the last packet
+    if (*packet[packet->length() - 1] == '\n')
+    {
+        QStringList fileList;
+        QDataStream stream(*packet);
+        stream >> fileList;
+
+       //mainWindowPointer_->appendToRemote(fileList, socket->getIp());
+        return true;
+    }
+    else
+    {
+        // Insert rest of received packet into the current transfers map
+        currentTransfers.insert(socket, *packet);
+        return false;
+    }
+}
+
 void Workstation::receiveFileList(TCPSocket *socket, QIODevice *buffer)
 {
     QDataStream packetStream(buffer);
-    QStringList fileList;
     QByteArray packet;
-    packetStream >> packet >> fileList;
+    packetStream >> packet;
 
+    processReceivingFileList(&(*socket), &packet);
 
 /*
     // Create the local storage for the packet
