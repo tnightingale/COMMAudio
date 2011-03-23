@@ -176,10 +176,16 @@ void Workstation::decodeControlMessage(TCPSocket *socket, QIODevice *buffer)
     switch (packet[0])
     {
     case FILE_LIST:
+        // Insert rest of received packet into the current transfers map
+        currentTransfers.insert(socket, packet.left(packet.length() - 1));
+        // Connect the signal for the type of transfer
         connect(socket, SIGNAL(signalDataReceived(TCPSocket*,QByteArray*)),
                 this, SLOT(receiveFileList(TCPSocket*, QByteArray*)));
         break;
     case FILE_TRANSFER:
+        // Insert rest of received packet into the current transfers map
+        currentTransfers.insert(socket, packet.left(packet.length() - 1));
+        // Connect the signal for the type of transfer
         connect(socket, SIGNAL(signalDataReceived(TCPSocket*,QByteArray*)),
                 this, SLOT(receiveFile(TCPSocket*, QByteArray*)));
         break;
