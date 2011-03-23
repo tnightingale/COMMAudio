@@ -231,3 +231,26 @@ bool MainWindow::winEvent(MSG * msg, long * result) {
 
     return false;
 }
+
+/*
+-- FUNCTION: getLocalFileList
+--
+-- DATE: March 21, 2011
+--
+-- REVISIONS: (Date and Description)
+--
+-- DESIGNER: Luke Queenan
+--
+-- PROGRAMMER: Luke Queenan
+--
+-- INTERFACE: QStringList MainWindow::getLocalFileList()
+--
+-- RETURNS: The local filelist stored in the audio player
+--
+-- NOTES:
+-- Gets the local filelist stored in the audio player in main window.
+*/
+QStringList MainWindow::getLocalFileList()
+{
+    return player_->getFileList();
+}

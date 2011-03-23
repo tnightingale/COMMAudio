@@ -41,6 +41,8 @@ public:
      */
     bool winEvent(MSG * msg, long * result);
 
+    QStringList getLocalFileList();
+
 signals:
     void signalWMWSASyncTCPRx(PMSG);
     void signalWMWSASyncUDPRx(PMSG);
