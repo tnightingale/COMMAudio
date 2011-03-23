@@ -73,11 +73,11 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
-      <string>Tab 1</string>
+      <string>Transfer Info</string>
      </attribute>
      <widget class="QListWidget" name="remoteListWidget">
       <property name="geometry">
@@ -128,7 +128,7 @@
     </widget>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">
-      <string>Tab 2</string>
+      <string>Visuals</string>
      </attribute>
      <widget class="QGraphicsView" name="visualGraphicsView">
       <property name="geometry">
