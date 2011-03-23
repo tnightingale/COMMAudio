@@ -1,5 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "audiocomponent.h"
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -171,15 +173,6 @@ void MainWindow::on_playButton_clicked()
             break;
         case Phonon::LoadingState:
             qDebug("Loading");
-            break;
-        case Phonon::PlayingState:
-            break;
-        case Phonon::BufferingState:
-            break;
-        case Phonon::StoppedState:
-            break;
-        case Phonon::PausedState:
-            break;
         }
     }
 }
@@ -233,3 +226,39 @@ void MainWindow::on_pauseButton_clicked()
     }
 }
 
+bool MainWindow::winEvent(MSG * msg, long * result) {
+    switch (msg->message) {
+        case WM_WSAASYNC_TCP:
+            emit signalWMWSASyncTCPRx(msg);
+            return true;
+
+        case WM_WSAASYNC_UDP:
+            emit signalWMWSASyncUDPRx(msg);
+            return true;
+    }
+
+    return false;
+}
+
+/*
+-- FUNCTION: getLocalFileList
+--
+-- DATE: March 21, 2011
+--
+-- REVISIONS: (Date and Description)
+--
+-- DESIGNER: Luke Queenan
+--
+-- PROGRAMMER: Luke Queenan
+--
+-- INTERFACE: QStringList MainWindow::getLocalFileList()
+--
+-- RETURNS: The local filelist stored in the audio player
+--
+-- NOTES:
+-- Gets the local filelist stored in the audio player in main window.
+*/
+QStringList MainWindow::getLocalFileList()
+{
+    return player_->getFileList();
+}

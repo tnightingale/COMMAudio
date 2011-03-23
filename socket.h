@@ -2,6 +2,7 @@
 #define SOCKET_H
 
 #include <QObject>
+#include <QThread>
 #include <windowsx.h>
 #include <winsock2.h>
 #include <QTextStream>
@@ -10,7 +11,8 @@
 #include <QDebug>
 
 #define MSGSIZE 1024
-#define WM_WSASYNC (WM_USER + 1)
+#define WM_WSAASYNC_TCP (WM_USER + 1)
+#define WM_WSAASYNC_UDP (WM_USER + 2)
 #define DATABUFSIZE 2097152
 #define MAXUDPDGRAMSIZE 65507
 #define PACKETSIZE 4096
@@ -34,36 +36,30 @@ class Socket : public QObject
 {
     Q_OBJECT
 protected:
-    /**
-     *
-     */
+    /** The socket descriptor for which this object is encapsulating. */
     SOCKET socket_;
 
-    /**
-     *
-     */
-    QDataStream * data_;
-
-    QByteArray * socketBuffer_;
-
-    /**
-     *
-     */
-    size_t packetSize_;
-
-    /**
-     *
-     */
+    /** Window handle, due to windows idiosyncracies, all sockets are tied to 
+     *  a window. */
     HWND hWnd_;
 
+    /** Thread responsible for all writing to the socket. */
+    QThread * writeThread_;
+
+    /** These are probably going to be passed on to the writeThread. */
+    QDataStream * data_;
+    QByteArray * socketBuffer_;
+    size_t packetSize_;
+
 public:
+    Socket(HWND hWnd, int addressFamily, int connectionType, int protocol);
+    Socket(SOCKET socket, HWND hWnd);
+
     virtual ~Socket() {
         qDebug("Socket::~Socket()");
         closesocket(socket_);
 
-        if (data_ != NULL) {
-            delete data_;
-        }
+        delete data_;
     }
 
     /**
@@ -116,18 +112,6 @@ public:
 
     /**
      *
-     * @param addressFamily
-     * @param connectionType
-     * @param protocol
-     *
-     * @return
-     *
-     * @author Tom Nightingale.
-     */
-    bool open(int addressFamily, int connectionType, int protocol);
-
-    /**
-     *
      * @param pSockAddr
      *
      * @return
@@ -144,68 +128,9 @@ public:
      */
     void close(PMSG pMsg);
 
-    void outputStatus(QString& output) {
-        qDebug() << output;
-        emit status(output);
-        output.clear();
-    }
-
-    /**
-     *
-     * @author Tom Nightingale.
-     */
-    static void initStats(STATS& stats) {
-        stats.startTime = 0;
-        stats.finishTime = 0;
-        stats.totalBytes = 0;
-        stats.totalPackets = 0;
-    }
-
-    /**
-     *
-     * @param socket
-     * @param hWnd
-     * @param flags
-     *
-     * @return
-     *
-     * @author Tom Nightingale.
-     */
-    static bool init(SOCKET socket, HWND hWnd, int flags) {
-        int err = 0;
-
-        if ((err = WSAAsyncSelect(socket, hWnd, WM_WSASYNC,
-                                  flags)) == SOCKET_ERROR) {
-            throw "Connection::startServer(): Error setting up async select.";
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     *
-     * @param bytes
-     *
-     * @author Tom Nightingale.
-     */
-    void updatePacketReceived(int bytes);
-
-    /**
-     *
-     * @param time
-     *
-     * @author Tom Nightingale.
-     */
-    void updatePacketReceivedTime(int time);
-
 signals:
     void signalSocketClosed();
     void status(QString);
-    void signalStatsSetBytes(int);
-    void signalStatsSetPackets(int);
-    void signalStatsSetStartTime(int);
-    void signalStatsSetFinishTime(int);
 
 public slots:
     /**

@@ -8,24 +8,26 @@ QT       += core gui \
             phonon \
             multimedia
 
-TARGET	  = COMMAudio
+TARGET    = COMMAudio
 TEMPLATE  = app
+CONFIG   += qt debug
 
-
-SOURCES	 += main.cpp \
+SOURCES  += main.cpp \
             mainwindow.cpp \
             socket.cpp \
             tcpsocket.cpp \
             udpsocket.cpp \
             joinserver.cpp \
-    audiocomponent.cpp
+            workstation.cpp\
+            audiocomponent.cpp
 
 HEADERS  += mainwindow.h \
             socket.h \
             tcpsocket.h \
             udpsocket.h \
             joinserver.h \
-    audiocomponent.h
+            workstation.h\
+            audiocomponent.h
 
 FORMS    += mainwindow.ui \
     joinServer.ui
