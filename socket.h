@@ -36,27 +36,20 @@ class Socket : public QObject
 {
     Q_OBJECT
 protected:
-    /**
-     *
-     */
+    /** The socket descriptor for which this object is encapsulating. */
     SOCKET socket_;
 
-    /**
-     *
-     */
-    QDataStream * data_;
-
-    QByteArray * socketBuffer_;
-
-    /**
-     *
-     */
-    size_t packetSize_;
-
-    /**
-     *
-     */
+    /** Window handle, due to windows idiosyncracies, all sockets are tied to 
+     *  a window. */
     HWND hWnd_;
+
+    /** Thread responsible for all writing to the socket. */
+    QThread * writeThread_;
+
+    /** These are probably going to be passed on to the writeThread. */
+    QDataStream * data_;
+    QByteArray * socketBuffer_;
+    size_t packetSize_;
 
 public:
     Socket(HWND hWnd, int addressFamily, int connectionType, int protocol);

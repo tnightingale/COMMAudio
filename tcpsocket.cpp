@@ -106,10 +106,10 @@ void TCPSocket::receive(PMSG pMsg) {
 }
 
 void TCPSocket::connect(PMSG) {
-    if (loadBuffer(getPacketSize()) < 0) {
-        qDebug("TCPSocket::connect(); Cannot read from data source!");
-        throw "TCPSocket::connect(); Cannot read from data source!";
-    }
+    //if (loadBuffer(getPacketSize()) < 0) {
+    //    qDebug("TCPSocket::connect(); Cannot read from data source!");
+    //    throw "TCPSocket::connect(); Cannot read from data source!";
+    //}
 }
 
 int TCPSocket::loadBuffer(size_t bytesToRead) {

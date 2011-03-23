@@ -2,6 +2,7 @@
 #include "mainwindow.h"
 #include "tcpsocket.h"
 #include "udpsocket.h"
+#include "ui_mainwindow.h"
 
 Workstation::Workstation(MainWindow *mainWindow) {
     int err = 0;
@@ -31,7 +32,9 @@ Workstation::Workstation(MainWindow *mainWindow) {
     connect(mainWindow, SIGNAL(signalWMWSASyncUDPRx(PMSG)),
             udpSocket_, SLOT(slotProcessWSAEvent(PMSG)));
 
-    tcpSocket_->listen(7000);
+    //tcpSocket_->listen(7000);
+
+    requestFileList();
 }
 
 Workstation::~Workstation() {
@@ -104,17 +107,23 @@ void Workstation::requestFile()
 */
 void Workstation::requestFileList()
 {
+    qDebug("Workstation::requestFileList(); Requesting file list.");
+
     // Hard coded values pending Joel's implementation of a connect window.
     short port = 7000;
-    QString ip("localhost");
+    QString ip("192.168.0.96");
     // End of hard coded values
 
     // Create the socket
     TCPSocket *requestSocket = new TCPSocket(mainWindowPointer_->winId());
 
     // Connect to a remote host
-    requestSocket->connectRemote(ip, port);
+    if (!requestSocket->connectRemote(ip, port)) {
+      qDebug("Workstation::requestFileList(); Failed to connect to remote.");
+      return;
+    }
 
+    qDebug("Workstation::requestFileList(); Assuming connection suceeded!.");
     // Send our file list to the remote host
 
 
