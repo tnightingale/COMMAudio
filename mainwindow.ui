@@ -27,7 +27,7 @@
    <widget class="QPushButton" name="playButton">
     <property name="geometry">
      <rect>
-      <x>330</x>
+      <x>460</x>
       <y>520</y>
       <width>93</width>
       <height>28</height>
@@ -40,7 +40,7 @@
    <widget class="QPushButton" name="stopButton">
     <property name="geometry">
      <rect>
-      <x>210</x>
+      <x>250</x>
       <y>520</y>
       <width>93</width>
       <height>28</height>
@@ -50,20 +50,7 @@
      <string>Stop</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pauseButton">
-    <property name="geometry">
-     <rect>
-      <x>450</x>
-      <y>520</y>
-      <width>93</width>
-      <height>28</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Pause</string>
-    </property>
-   </widget>
-   <widget class="QListWidget" name="remoteListWidget_2">
+   <widget class="QListWidget" name="remoteListWidget">
     <property name="geometry">
      <rect>
       <x>460</x>
