@@ -81,6 +81,14 @@ void MainWindow::on_action_Visible_toggled(bool status)
     }
 }
 
+void MainWindow::on_action_Join_Multicast_triggered()
+{
+    if (joinServer_.exec() == QDialog::Accepted)
+    {
+
+    }
+}
+
 /*
 -- FUNCTION: on_clientListWidget_itemDoubleClicked
 --
@@ -163,6 +171,15 @@ void MainWindow::on_playButton_clicked()
             break;
         case Phonon::LoadingState:
             qDebug("Loading");
+            break;
+        case Phonon::PlayingState:
+            break;
+        case Phonon::BufferingState:
+            break;
+        case Phonon::StoppedState:
+            break;
+        case Phonon::PausedState:
+            break;
         }
     }
 }

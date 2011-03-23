@@ -17,15 +17,18 @@ SOURCES	 += main.cpp \
             socket.cpp \
             tcpsocket.cpp \
             udpsocket.cpp \
+            joinserver.cpp \
     audiocomponent.cpp
 
 HEADERS  += mainwindow.h \
             socket.h \
             tcpsocket.h \
             udpsocket.h \
+            joinserver.h \
     audiocomponent.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    joinServer.ui
 
 INCLUDEPATH += "C:/OpenAL 1.1 SDK/include"
 
