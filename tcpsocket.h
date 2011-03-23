@@ -66,7 +66,7 @@ public:
      *
      * @author Tom Nightingale
      */
-    bool connectRemote(PSOCKADDR_IN pSockAddr);
+    bool connectRemote(QString address, int port);
 
 signals:
     /**

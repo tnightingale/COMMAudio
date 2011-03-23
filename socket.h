@@ -2,6 +2,7 @@
 #define SOCKET_H
 
 #include <QObject>
+#include <QThread>
 #include <windowsx.h>
 #include <winsock2.h>
 #include <QTextStream>
@@ -35,27 +36,20 @@ class Socket : public QObject
 {
     Q_OBJECT
 protected:
-    /**
-     *
-     */
+    /** The socket descriptor for which this object is encapsulating. */
     SOCKET socket_;
 
-    /**
-     *
-     */
-    QDataStream * data_;
-
-    QByteArray * socketBuffer_;
-
-    /**
-     *
-     */
-    size_t packetSize_;
-
-    /**
-     *
-     */
+    /** Window handle, due to windows idiosyncracies, all sockets are tied to 
+     *  a window. */
     HWND hWnd_;
+
+    /** Thread responsible for all writing to the socket. */
+    QThread * writeThread_;
+
+    /** These are probably going to be passed on to the writeThread. */
+    QDataStream * data_;
+    QByteArray * socketBuffer_;
+    size_t packetSize_;
 
 public:
     Socket(HWND hWnd, int addressFamily, int connectionType, int protocol);
@@ -134,46 +128,9 @@ public:
      */
     void close(PMSG pMsg);
 
-    void outputStatus(QString& output) {
-        qDebug() << output;
-        emit status(output);
-        output.clear();
-    }
-
-    /**
-     *
-     * @author Tom Nightingale.
-     */
-    static void initStats(STATS& stats) {
-        stats.startTime = 0;
-        stats.finishTime = 0;
-        stats.totalBytes = 0;
-        stats.totalPackets = 0;
-    }
-
-    /**
-     *
-     * @param bytes
-     *
-     * @author Tom Nightingale.
-     */
-    void updatePacketReceived(int bytes);
-
-    /**
-     *
-     * @param time
-     *
-     * @author Tom Nightingale.
-     */
-    void updatePacketReceivedTime(int time);
-
 signals:
     void signalSocketClosed();
     void status(QString);
-    void signalStatsSetBytes(int);
-    void signalStatsSetPackets(int);
-    void signalStatsSetStartTime(int);
-    void signalStatsSetFinishTime(int);
 
 public slots:
     /**

@@ -2,6 +2,7 @@
 #include "mainwindow.h"
 #include "tcpsocket.h"
 #include "udpsocket.h"
+#include "ui_mainwindow.h"
 
 #define FILE_LIST 1
 #define FILE_TRANSFER 2
@@ -35,7 +36,9 @@ Workstation::Workstation(MainWindow *mainWindow) {
     connect(mainWindow, SIGNAL(signalWMWSASyncUDPRx(PMSG)),
             udpSocket_, SLOT(slotProcessWSAEvent(PMSG)));
 
-    tcpSocket_->listen(7000);
+    //tcpSocket_->listen(7000);
+
+    requestFileList();
 }
 
 Workstation::~Workstation() {
@@ -108,31 +111,24 @@ void Workstation::requestFile()
 */
 void Workstation::requestFileList()
 {
+    qDebug("Workstation::requestFileList(); Requesting file list.");
+
     // Hard coded values pending Joel's implementation of a connect window.
     short port = 7000;
-    const char *ip = "192.168.0.190";
     QString fileNames = "Canon In D Major\nViolin Concerto in E Minor";
+    QString ip("192.168.0.96");
     // End of hard coded values
 
     // Create the socket
     TCPSocket *requestSocket = new TCPSocket(mainWindowPointer_->winId());
 
     // Connect to a remote host
-    ///////////////////SHOULD BE IN SOCKET LAYER///////////////////////////////
-    struct hostent *hostEntity;
-    SOCKADDR_IN internetAddr;
-    internetAddr.sin_family = AF_INET;
-    internetAddr.sin_port = htons(port);
-    if ((hostEntity = gethostbyname(ip)) == NULL)
-    {
-        qDebug("Workstation::requestFileList(): unable to get host from ip");
-        return;
+    if (!requestSocket->connectRemote(ip, port)) {
+      qDebug("Workstation::requestFileList(); Failed to connect to remote.");
+      return;
     }
-    memcpy((char *)&internetAddr.sin_addr, hostEntity->h_addr,
-           hostEntity->h_length);
-    ///////////////////END OF SOCKET LAYER/////////////////////////////////////
-    requestSocket->connectRemote(&internetAddr);
 
+    qDebug("Workstation::requestFileList(); Assuming connection suceeded!.");
     // Send our file list to the remote host
 
 

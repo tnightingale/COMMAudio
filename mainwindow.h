@@ -24,6 +24,13 @@ public:
     QString findFullPath(QString filename);
 
     /**
+     * Returns the window's Ui interface.
+     *
+     * @author Tom Nightingale
+     */
+    Ui::MainWindow* getUi() { return ui; }
+
+    /**
      * Expose the windows message loop for us to respond to socket events.
      * The first of many attrocities...
      *

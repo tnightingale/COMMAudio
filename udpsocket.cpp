@@ -13,9 +13,6 @@ UDPSocket::UDPSocket(HWND hWnd)
 }
 
 void UDPSocket::send(PMSG pMsg) {
-    QString output;
-    QTextStream log(&output, QIODevice::WriteOnly);
-
     int err = 0;
     int result = 0;
     int num = 0;
@@ -30,30 +27,21 @@ void UDPSocket::send(PMSG pMsg) {
     winsockBuff.len = getPacketSize();
     bytesRead = winsockBuff.len;
 
-    emit signalStatsSetStartTime(GetTickCount());
-
     while (data_->status() == QDataStream::Ok) {
         ol = (WSAOVERLAPPED*) calloc(1, sizeof(WSAOVERLAPPED));
         winsockBuff.buf = (char *) malloc(bytesToRead * sizeof(char));
         ol->hEvent = (HANDLE) winsockBuff.buf;
 
         if ((num = data_->readRawData(winsockBuff.buf, bytesToRead)) <= 0) {
-            log << "    " << "Finishing...";
-            outputStatus(output);
+            qDebug("UDPSocket()::send(); Finishing...");
             break;
         }
         winsockBuff.len = num;
         totalSent += num;
 
-        log << "    " << "Packet sent, size: " << num;
-        outputStatus(output);
-
         result = WSASendTo(pMsg->wParam, &winsockBuff, 1, &numBytesSent, 0,
                            (PSOCKADDR) &serverSockAddrIn_, sizeof(serverSockAddrIn_), ol,
                            UDPSocket::sendWorkerRoutine);
-
-        emit signalStatsSetBytes(winsockBuff.len);
-        emit signalStatsSetPackets(1);
 
         if ((err = WSAGetLastError()) > 0 && err != ERROR_IO_PENDING) {
             qDebug("UDPSocket::send(); Error: %d", err);
@@ -65,10 +53,6 @@ void UDPSocket::send(PMSG pMsg) {
         }
 
     }
-
-    emit signalStatsSetFinishTime(GetTickCount());
-    log << "Total bytes sent: " << totalSent;
-    outputStatus(output);
 }
 
 void UDPSocket::receive(PMSG pMsg) {
@@ -111,7 +95,6 @@ bool UDPSocket::slotProcessWSAEvent(PMSG pMsg) {
         case FD_READ:
             qDebug("UDPSocket::slotProcessWSAEvent: %d: FD_READ.",
                    (int) pMsg->wParam);
-            emit signalStatsSetStartTime(GetTickCount());
             receive(pMsg);
             break;
 
