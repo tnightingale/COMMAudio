@@ -23,8 +23,9 @@ MainWindow::MainWindow(QWidget *parent) :
     slider->saveGeometry();
     slider->show();
 
+    ui->tab->setStyleSheet(QString::fromUtf8("background-color: rgb(255, 255, 60);"));
    // player->startMic();
-    ui->remoteListWidget_2->setSortingEnabled(true);
+    ui->remoteListWidget->setSortingEnabled(true);
     //ui->clientListWidget->setSortingEnabled(true);
     QStringList songList = player_->getFileList();
     for (int i = 0; i < songList.size();++i){
@@ -91,6 +92,19 @@ void MainWindow::on_action_Join_Multicast_triggered()
     }
 }
 
+void MainWindow::appendToRemote(QStringList songList, QString ipAddress)
+{
+    QString fileName, songTitle;
+    for (int i = 0; i < songList.size();++i){
+       fileName = songList.at(i);
+       int n = fileName.lastIndexOf('/');
+       int s = fileName.size() - n - 1;
+       songTitle = fileName.right(s);
+       remoteList_.insert(songTitle,*new RemoteSong(songTitle, ipAddress));
+       ui->remoteListWidget->addItem(new QListWidgetItem(songTitle));
+    }
+}
+
 /*
 -- FUNCTION: on_clientListWidget_itemDoubleClicked
 --
@@ -138,9 +152,9 @@ void MainWindow::on_clientListWidget_itemDoubleClicked(QListWidgetItem* item)
 -- NOTES:
 -- combined list of clients
 */
-void MainWindow::on_remoteListWidget_2_itemDoubleClicked(QListWidgetItem* item)
+void MainWindow::on_remoteListWidget_itemDoubleClicked(QListWidgetItem* item)
 {
-
+    RemoteSong songInfo = remoteList_.value(item->text());
 }
 
 /*
@@ -163,19 +177,37 @@ void MainWindow::on_remoteListWidget_2_itemDoubleClicked(QListWidgetItem* item)
 */
 void MainWindow::on_playButton_clicked()
 {
-    if(player_->getState() == Phonon::StoppedState ||
-            player_->getState() == Phonon::PausedState) {
-        player_->play();
+    if(ui->playButton->text() == "Pause") {
+       ui->playButton->setText("Play");
+       player_->pause();
     } else {
-        switch(player_->getState()) {
-        case Phonon::ErrorState:
-            qDebug("Error");
-            break;
-        case Phonon::LoadingState:
-            qDebug("Loading");
-        }
+       ui->playButton->setText("Pause");
+       player_->play();
+
+       QGraphicsItem *ball = new QGraphicsEllipseItem(0, 0, 20, 20);
+
+       QTimeLine *timer = new QTimeLine(5000);
+       timer->setFrameRange(0, 100);
+
+       QGraphicsItemAnimation *animation = new QGraphicsItemAnimation;
+       animation->setItem(ball);
+       animation->setTimeLine(timer);
+
+       for (int i = 0; i < 200; ++i)
+            animation->setPosAt(i / 200.0, QPointF(i, i));
+
+       QGraphicsScene *scene = new QGraphicsScene();
+       scene->setSceneRect(0, 0, 250, 250);
+       scene->addItem(ball);
+
+       ui->visualGraphicsView->setScene(scene);
+       ui->visualGraphicsView->show();
+
+       timer->start();
+
     }
 }
+
 
 /*
 -- FUNCTION: on_stopButton_clicked
@@ -198,32 +230,6 @@ void MainWindow::on_playButton_clicked()
 void MainWindow::on_stopButton_clicked()
 {
     player_->stop();
-}
-
-
-/*
--- FUNCTION: on_pauseButton_clicked
---
--- DATE: March 21, 2011
---
--- REVISIONS: (Date and Description)
---
--- DESIGNER: Joel Stewart
---
--- PROGRAMMER: Joel Stewart
---
--- INTERFACE: void MainWindow::on_pauseButton_clicked()
---
--- RETURNS:
---
--- NOTES:
--- Pauses song
-*/
-void MainWindow::on_pauseButton_clicked()
-{
-    if(player_->getState() == Phonon::PlayingState) {
-        player_->pause();
-    }
 }
 
 bool MainWindow::winEvent(MSG * msg, long * result) {
@@ -262,3 +268,4 @@ QStringList MainWindow::getLocalFileList()
 {
     return player_->getFileList();
 }
+

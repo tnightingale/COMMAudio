@@ -19,7 +19,8 @@ SOURCES  += main.cpp \
             udpsocket.cpp \
             joinserver.cpp \
             workstation.cpp\
-            audiocomponent.cpp
+            audiocomponent.cpp \
+    remoteSong.cpp
 
 HEADERS  += mainwindow.h \
             socket.h \
@@ -27,7 +28,8 @@ HEADERS  += mainwindow.h \
             udpsocket.h \
             joinserver.h \
             workstation.h\
-            audiocomponent.h
+            audiocomponent.h \
+    remoteSong.h
 
 FORMS    += mainwindow.ui \
     joinServer.ui

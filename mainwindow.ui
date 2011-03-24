@@ -14,20 +14,10 @@
    <string>Need a fancy program name and icon</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QListWidget" name="clientListWidget">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>60</y>
-      <width>331</width>
-      <height>401</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QPushButton" name="playButton">
     <property name="geometry">
      <rect>
-      <x>330</x>
+      <x>460</x>
       <y>520</y>
       <width>93</width>
       <height>28</height>
@@ -40,7 +30,7 @@
    <widget class="QPushButton" name="stopButton">
     <property name="geometry">
      <rect>
-      <x>210</x>
+      <x>250</x>
       <y>520</y>
       <width>93</width>
       <height>28</height>
@@ -48,55 +38,6 @@
     </property>
     <property name="text">
      <string>Stop</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pauseButton">
-    <property name="geometry">
-     <rect>
-      <x>450</x>
-      <y>520</y>
-      <width>93</width>
-      <height>28</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Pause</string>
-    </property>
-   </widget>
-   <widget class="QListWidget" name="remoteListWidget_2">
-    <property name="geometry">
-     <rect>
-      <x>460</x>
-      <y>60</y>
-      <width>331</width>
-      <height>401</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label">
-    <property name="geometry">
-     <rect>
-      <x>70</x>
-      <y>15</y>
-      <width>41</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Client</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_2">
-    <property name="geometry">
-     <rect>
-      <x>570</x>
-      <y>20</y>
-      <width>51</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Remote</string>
     </property>
    </widget>
    <widget class="QTextEdit" name="currentSongEditBox">
@@ -121,6 +62,85 @@
     <property name="text">
      <string>Current Song</string>
     </property>
+   </widget>
+   <widget class="QTabWidget" name="tabWidget">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>861</width>
+      <height>451</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>1</number>
+    </property>
+    <widget class="QWidget" name="tab">
+     <attribute name="title">
+      <string>Transfer Info</string>
+     </attribute>
+     <widget class="QListWidget" name="remoteListWidget">
+      <property name="geometry">
+       <rect>
+        <x>530</x>
+        <y>20</y>
+        <width>331</width>
+        <height>401</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QListWidget" name="clientListWidget">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>20</y>
+        <width>331</width>
+        <height>401</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_2">
+      <property name="geometry">
+       <rect>
+        <x>630</x>
+        <y>0</y>
+        <width>51</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Remote</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label">
+      <property name="geometry">
+       <rect>
+        <x>70</x>
+        <y>0</y>
+        <width>41</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Client</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab_2">
+     <attribute name="title">
+      <string>Visuals</string>
+     </attribute>
+     <widget class="QGraphicsView" name="visualGraphicsView">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>851</width>
+        <height>421</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
