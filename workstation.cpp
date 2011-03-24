@@ -216,6 +216,7 @@ bool Workstation::processReceivingFile()
 
 bool Workstation::processReceivingFileList(TCPSocket *socket, QByteArray *packet)
 {
+    bool isFileListTransferComplete = false;
     // Check to see if this is the last packet
     if (*packet[packet->length() - 1] == '\n')
     {
@@ -247,10 +248,11 @@ bool Workstation::processReceivingFileList(TCPSocket *socket, QByteArray *packet
         //mainWindowPointer_->appendToRemote(fileList, socket->getIp());
 
         // Since processing of the transfer is complete, return true
-        return true;
+        isFileListTransferComplete = true;
     }
     else
     {
+        QByteArray *buffer;
         // Check to see if this is the first packet
         if (currentTransfers.contains(socket))
         {
@@ -262,8 +264,11 @@ bool Workstation::processReceivingFileList(TCPSocket *socket, QByteArray *packet
         }
         // Insert rest of received packet into the current transfers map
         currentTransfers.insert(socket, *packet);
-        return false;
+
+        // Since the transfer is not yet complete, return false
+        isFileListTransferComplete = false;
     }
+    return isFileListTransferComplete;
 }
 
 void Workstation::receiveFileList(TCPSocket *socket, QIODevice *buffer)
