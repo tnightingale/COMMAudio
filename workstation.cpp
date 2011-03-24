@@ -257,13 +257,17 @@ bool Workstation::processReceivingFileList(TCPSocket *socket, QByteArray *packet
         if (currentTransfers.contains(socket))
         {
             // Since a buffer already exists, add to it
+            *buffer = currentTransfers.value(socket);
+            buffer->append(*packet);
         }
         else
         {
-            // Create the entry in the transfers map
+            // Assign the packet to the buffer
+            *buffer = *packet;
         }
-        // Insert rest of received packet into the current transfers map
-        currentTransfers.insert(socket, *packet);
+
+        // Insert the buffer into the map
+        currentTransfers.insert(socket, *buffer);
 
         // Since the transfer is not yet complete, return false
         isFileListTransferComplete = false;
