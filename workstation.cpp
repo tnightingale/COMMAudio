@@ -219,15 +219,47 @@ bool Workstation::processReceivingFileList(TCPSocket *socket, QByteArray *packet
     // Check to see if this is the last packet
     if (*packet[packet->length() - 1] == '\n')
     {
-        QStringList fileList;
-        QDataStream stream(*packet);
-        stream >> fileList;
+        // Get rid of the newline character
+        packet->truncate(packet->length() - 1);
 
-       //mainWindowPointer_->appendToRemote(fileList, socket->getIp());
+        QDataStream *stream;
+        QStringList fileList;
+
+        // Check to see if we already have already received data
+        if (currentTransfers.contains(socket))
+        {
+            // Get the existing QByteArray out and load it into the stream
+            stream = new QDataStream(currentTransfers.value(socket));
+
+            // Append the last packet to the stream
+            *stream << *packet;
+        }
+        else
+        {
+            // Load the packet into the stream
+            stream = new QDataStream(*packet);
+        }
+
+        // Stream the packet back into a QStringList
+        *stream >> fileList;
+
+        // Send the file list to the main window for procesing
+        //mainWindowPointer_->appendToRemote(fileList, socket->getIp());
+
+        // Since processing of the transfer is complete, return true
         return true;
     }
     else
     {
+        // Check to see if this is the first packet
+        if (currentTransfers.contains(socket))
+        {
+            // Since a buffer already exists, add to it
+        }
+        else
+        {
+            // Create the entry in the transfers map
+        }
         // Insert rest of received packet into the current transfers map
         currentTransfers.insert(socket, *packet);
         return false;
