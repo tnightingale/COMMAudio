@@ -19,6 +19,7 @@ private:
     MainWindow *mainWindowPointer_;
 
     // Functions
+    QByteArray dataStreamFileList();
     void sendFile();
     void sendFileList();
     // Create, send back socket information,
@@ -32,8 +33,13 @@ public slots:
     void requestFileList();
     // Triggered by sockets, so signal is coming from a socket
     void processConnection(TCPSocket*);
+    void decodeControlMessage(TCPSocket*, QByteArray*);
     void receiveUDP();
-    void receiveFile();
+    void receiveFile(TCPSocket*, QByteArray*);
+    void receiveFileList(TCPSocket*, QByteArray*);
+
+signals:
+    void signalFileListUpdate(QStringList*);
 
 public:
     Workstation(MainWindow *mainWindow);

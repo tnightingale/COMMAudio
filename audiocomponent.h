@@ -14,14 +14,21 @@ class AudioComponent : public QObject
 public:
     explicit AudioComponent(QObject *parent = 0);
 
+    Phonon::MediaObject* getPlaylist(){
+        return playlist_;
+    }
+
     void addSong(QString filename);
     void setSourceFolder();
     QDir getSourceFolder(){
         return sourceFolder_;
     }
-    QFileInfoList getFileList();
+    QStringList getFileList();
     void startMic();
-
+    QList<Phonon::MediaSource> getQueue();
+    void addSongToBegining(QString filename);
+    void setCurrentSong(QString fileName);
+    Phonon::State getState();
 
 private:
     Phonon::MediaObject* playlist_;

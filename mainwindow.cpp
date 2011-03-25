@@ -1,25 +1,49 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "audiocomponent.h"
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    QString fileName;
+    QString songTitle;
 
     ui->setupUi(this);
+    ui->currentSongEditBox->setReadOnly(true);
 
-    AudioComponent* player = new AudioComponent(this);
+    player_ = new AudioComponent(this);
     /*player->addSong("./test.raw");
     player->play();*/
-    //player->setSourceFolder();
+    player_->setSourceFolder();
 
-    player->startMic();
+    Phonon::SeekSlider *slider = new Phonon::SeekSlider(this);
+    slider->setMediaObject(player_->getPlaylist());
+    slider->setGeometry(180,490,450,19);
+    slider->saveGeometry();
+    slider->show();
 
-/*    for (int i = 0; i < player->getFileList().size();++i){
+   // player->startMic();
+    ui->remoteListWidget_2->setSortingEnabled(true);
+    //ui->clientListWidget->setSortingEnabled(true);
+    QStringList songList = player_->getFileList();
+    for (int i = 0; i < songList.size();++i){
 
-       player->addSong(player->getFileList().at(i).filePath());
+       fileName = songList.at(i);
+       player_->addSong(fileName);
+       int n = fileName.lastIndexOf('/');
+       int s = fileName.size() - n - 1;
+       songTitle = fileName.right(s);
+       ui->clientListWidget->addItem(new QListWidgetItem(songTitle));
 
-    }*/
+    }
+    if(songList.size() > 0) {
+        fileName = songList.at(0);
+        int n = fileName.lastIndexOf('/');
+        int s = fileName.size() - n - 1;
+        songTitle = fileName.right(s);
+        ui->currentSongEditBox->setText(songTitle);
+    }
     //working player code for wav files. will play following 3 files from internet in succession
 
 
@@ -34,6 +58,17 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+QString MainWindow::findFullPath(QString filename) {
+    QString fullPath;
+    for (int i = 0; i < player_->getFileList().size();++i){
+       fullPath = player_->getFileList().at(i);
+       if(fullPath.contains(filename)) {
+           return fullPath;
+       }
+    }
+    return NULL;
+}
+
 void MainWindow::on_action_Visible_toggled(bool status)
 {
     if (status)
@@ -45,6 +80,141 @@ void MainWindow::on_action_Visible_toggled(bool status)
     {
         // Either close the socket here or find a way to hide it
         return;
+    }
+}
+
+/*
+-- FUNCTION: on_clientListWidget_itemDoubleClicked
+--
+-- DATE: March 21, 2011
+--
+-- REVISIONS: (Date and Description)
+--
+-- DESIGNER: Joel Stewart
+--
+-- PROGRAMMER: Joel Stewart
+--
+-- INTERFACE: void MainWindow::on_clientListWidget_itemDoubleClicked(QListWidgetItem* item)
+--
+-- RETURNS:
+--
+-- NOTES:
+-- allows clicking on a song in the item list
+*/
+void MainWindow::on_clientListWidget_itemDoubleClicked(QListWidgetItem* item)
+{
+    player_->stop();
+    QString dataClicked = item->text();
+    QString fullPath = findFullPath(dataClicked);
+    player_->setCurrentSong(fullPath);
+    ui->currentSongEditBox->setText(dataClicked);
+    qDebug(qPrintable(item->text()));
+    player_->play();
+}
+
+/*
+-- FUNCTION: on_remoteListWidget_itemDoubleClicked
+--
+-- DATE: March 21, 2011
+--
+-- REVISIONS: (Date and Description)
+--
+-- DESIGNER: Joel Stewart
+--
+-- PROGRAMMER: Joel Stewart
+--
+-- INTERFACE: void MainWindow::on_remoteListWidget_itemDoubleClicked(QListWidgetItem* item)
+--
+-- RETURNS:
+--
+-- NOTES:
+-- combined list of clients
+*/
+void MainWindow::on_remoteListWidget_2_itemDoubleClicked(QListWidgetItem* item)
+{
+
+}
+
+/*
+-- FUNCTION: on_playButton_clicked
+--
+-- DATE: March 21, 2011
+--
+-- REVISIONS: (Date and Description)
+--
+-- DESIGNER: Joel Stewart
+--
+-- PROGRAMMER: Joel Stewart
+--
+-- INTERFACE: void MainWindow::on_playButton_clicked()
+--
+-- RETURNS:
+--
+-- NOTES:
+-- Plays song
+*/
+void MainWindow::on_playButton_clicked()
+{
+    if(player_->getState() == Phonon::StoppedState ||
+            player_->getState() == Phonon::PausedState) {
+        player_->play();
+    } else {
+        switch(player_->getState()) {
+        case Phonon::ErrorState:
+            qDebug("Error");
+            break;
+        case Phonon::LoadingState:
+            qDebug("Loading");
+        }
+    }
+}
+
+/*
+-- FUNCTION: on_stopButton_clicked
+--
+-- DATE: March 21, 2011
+--
+-- REVISIONS: (Date and Description)
+--
+-- DESIGNER: Joel Stewart
+--
+-- PROGRAMMER: Joel Stewart
+--
+-- INTERFACE: void MainWindow::on_stopButton_clicked()
+--
+-- RETURNS:
+--
+-- NOTES:
+-- Stops song
+*/
+void MainWindow::on_stopButton_clicked()
+{
+    player_->stop();
+}
+
+
+/*
+-- FUNCTION: on_pauseButton_clicked
+--
+-- DATE: March 21, 2011
+--
+-- REVISIONS: (Date and Description)
+--
+-- DESIGNER: Joel Stewart
+--
+-- PROGRAMMER: Joel Stewart
+--
+-- INTERFACE: void MainWindow::on_pauseButton_clicked()
+--
+-- RETURNS:
+--
+-- NOTES:
+-- Pauses song
+*/
+void MainWindow::on_pauseButton_clicked()
+{
+    if(player_->getState() == Phonon::PlayingState) {
+        player_->pause();
     }
 }
 
@@ -62,3 +232,25 @@ bool MainWindow::winEvent(MSG * msg, long * result) {
     return false;
 }
 
+/*
+-- FUNCTION: getLocalFileList
+--
+-- DATE: March 21, 2011
+--
+-- REVISIONS: (Date and Description)
+--
+-- DESIGNER: Luke Queenan
+--
+-- PROGRAMMER: Luke Queenan
+--
+-- INTERFACE: QStringList MainWindow::getLocalFileList()
+--
+-- RETURNS: The local filelist stored in the audio player
+--
+-- NOTES:
+-- Gets the local filelist stored in the audio player in main window.
+*/
+QStringList MainWindow::getLocalFileList()
+{
+    return player_->getFileList();
+}

@@ -2,13 +2,17 @@
 #include <QFileDialog>
 #include <QTimer>
 #include <QByteArray>
+#include <QDirIterator>
+#include <al.h>
+#include <alc.h>
+
 AudioComponent::AudioComponent(QObject *parent) :
     QObject(parent)
 {
     playlist_ = new Phonon::MediaObject(this);
     output_ = new Phonon::AudioOutput(Phonon::MusicCategory,this);
     Phonon::createPath(playlist_,output_);
-
+    playlist_->setTransitionTime(-100);
 
 
 }
@@ -16,20 +20,35 @@ AudioComponent::AudioComponent(QObject *parent) :
 void AudioComponent::setSourceFolder(){
     QString Folder = QFileDialog::getExistingDirectory(0,"Source Directory",".",QFileDialog::ShowDirsOnly);
     sourceFolder_ = QDir(Folder);
-    /*
-    QFileDialog dialog(this,NULL);
-    dialog.setFileMode(QFileDialog::Directory);
-    dialog.setViewMode(QFileDialog::Detail);
-    QStringList fileNames;
-    if(dialog.exec()){
-        fileNames = dialog.selectedFiles();
-    }*/
+
 }
-QFileInfoList AudioComponent::getFileList(){
+QStringList AudioComponent::getFileList(){
+    QStringList stuff;
     QStringList filters;
     filters<< "*.wav" << "*.mp3";
-    return sourceFolder_.entryInfoList(filters,QDir::Files,QDir::Name);
+    sourceFolder_.setNameFilters(filters);
+    QDirIterator it(sourceFolder_, QDirIterator::Subdirectories);
+    while (it.hasNext()) {
+         stuff += it.next();//.entryInfoList(filters,QDir::Files,QDir::Name);
+    }
 
+    return stuff;
+}
+
+Phonon::State AudioComponent::getState(){
+    return playlist_->state();
+}
+
+QList<Phonon::MediaSource> AudioComponent::getQueue() {
+    return playlist_->queue();
+}
+
+void AudioComponent::addSongToBegining(QString filename) {
+    QList<Phonon::MediaSource> queue = playlist_->queue();
+}
+
+void AudioComponent::setCurrentSong(QString fileName){
+    playlist_->setCurrentSource(fileName);
 }
 
 void AudioComponent::addSong(QString filename) {
@@ -73,19 +92,30 @@ void AudioComponent::startMic(){
     if(!inputBuffer_->open(QIODevice::ReadWrite)){
         qWarning("unable to open buffer");
     }
-    allBuffers_.append(inputBuffer_);
+
     input_->start(inputBuffer_);
 }
 void AudioComponent::stopMic(){
-    QAudioOutput* output;
-    /*input_->stop();
+    //QAudioOutput* output;
+
+    //allBuffers_.append(inputBuffer_);
+    input_->stop();
     //outputFile.close();
-    delete input_;
+   // delete input_;
     qWarning()<<"done recording";
-    startMic();
+    //startMic();
     //outputFile.setFileName("./test.wav");
-    //outputFile.open(QIODevice::ReadOnly);*/
-    //if(allBuffers_.size()>10){
+    //outputFile.open(QIODevice::ReadOnly);
+
+
+    playlist_->enqueue(inputBuffer_);
+    delete input_;
+    input_ = new QAudioInput(format,NULL);
+    inputBuffer_ = new QBuffer(new QByteArray());
+
+    input_->start(inputBuffer_);
+    playlist_->play();
+   /* if(allBuffers_.size()>10){
         QAudioDeviceInfo info( QAudioDeviceInfo::defaultOutputDevice());
         if (!info.isFormatSupported(format));{
             qWarning()<<"format not supported";
@@ -99,5 +129,5 @@ void AudioComponent::stopMic(){
         }
         buffer_->seek(0);
         output->start(buffer_);
-    //}
+    }*/
 }

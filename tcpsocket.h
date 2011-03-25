@@ -45,7 +45,7 @@ public:
     void connect(PMSG pMsg);
 
     /**
-     * 
+     *
      * @param bytesToRead
      *
      * @author Tom Nightingale
@@ -84,7 +84,7 @@ signals:
      *
      * @author Tom Nightingale
      */
-    void signalDataReceived(int socket, QByteArray * buffer);
+    void signalDataReceived(TCPSocket *tcpSocket, QByteArray * buffer);
 
 public slots:
     /**
