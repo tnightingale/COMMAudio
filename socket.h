@@ -2,7 +2,7 @@
 #define SOCKET_H
 
 #include <QObject>
-#include <QThread>
+#include <QBuffer>
 #include <windowsx.h>
 #include <winsock2.h>
 #include <QTextStream>
@@ -32,9 +32,8 @@ typedef struct _STATS_ {
     DWORD finishTime;
 } STATS, *PSTATS;
 
-class Socket : public QObject
-{
-    Q_OBJECT
+class Socket : public QIODevice {
+  Q_OBJECT
 protected:
     /** The socket descriptor for which this object is encapsulating. */
     SOCKET socket_;
@@ -43,13 +42,18 @@ protected:
      *  a window. */
     HWND hWnd_;
 
-    /** Thread responsible for all writing to the socket. */
-    QThread * writeThread_;
+    /** The internal output buffer for writing data. */
+    QBuffer* outputBuffer_;
+
+    /** The internal input buffer for reading data. */
+    QBuffer* inputBuffer_;
 
     /** These are probably going to be passed on to the writeThread. */
-    QDataStream * data_;
     QByteArray * socketBuffer_;
     size_t packetSize_;
+
+    virtual qint64 readData(char * data, qint64 maxSize);
+    virtual qint64 writeData(const char * data, qint64 maxSize);
 
 public:
     Socket(HWND hWnd, int addressFamily, int connectionType, int protocol);
@@ -58,8 +62,6 @@ public:
     virtual ~Socket() {
         qDebug("Socket::~Socket()");
         closesocket(socket_);
-
-        delete data_;
     }
 
     /**
@@ -67,32 +69,6 @@ public:
      * @author Tom Nightingale.
      */
     SOCKET getSocket() { return socket_; }
-
-    /**
-     *
-     * @param dataSource
-     *
-     * @author Tom Nightingale.
-     */
-    void setDataStream(QByteArray * qba) {
-        data_ = new QDataStream(qba, QIODevice::ReadOnly);
-    }
-
-    /**
-     *
-     * @author Tom Nightingale.
-     */
-    void setDataStream(QFile * file) {
-        data_ = new QDataStream(file);
-    }
-
-    /**
-     *
-     * @author Tom Nightingale.
-     */
-    QDataStream * getDataStream() {
-        return data_;
-    }
 
     /**
      *

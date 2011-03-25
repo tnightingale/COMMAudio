@@ -27,6 +27,7 @@ void UDPSocket::send(PMSG pMsg) {
     winsockBuff.len = getPacketSize();
     bytesRead = winsockBuff.len;
 
+/*
     while (data_->status() == QDataStream::Ok) {
         ol = (WSAOVERLAPPED*) calloc(1, sizeof(WSAOVERLAPPED));
         winsockBuff.buf = (char *) malloc(bytesToRead * sizeof(char));
@@ -53,6 +54,7 @@ void UDPSocket::send(PMSG pMsg) {
         }
 
     }
+*/
 }
 
 void UDPSocket::receive(PMSG pMsg) {

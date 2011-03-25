@@ -61,6 +61,7 @@ public:
     static void CALLBACK recvWorkerRoutine(DWORD error, DWORD bytesTransferred,
                                            LPWSAOVERLAPPED overlapped,
                                            DWORD inFlags) {
+/*
         QString output;
         QTextStream log(&output, QIODevice::WriteOnly);
 
@@ -84,6 +85,7 @@ public:
 
         free(data);
         free(overlapped);
+*/
     }
 
     /**

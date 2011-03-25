@@ -1,7 +1,8 @@
 #include "socket.h"
 
 Socket::Socket(HWND hWnd, int addressFamily, int connectionType, int protocol)
-: data_(NULL), hWnd_(hWnd) {
+: hWnd_(hWnd), outputBuffer_(new QBuffer()), inputBuffer_(new QBuffer()) {
+
     if ((socket_ = WSASocket(addressFamily, connectionType, protocol, NULL, 0,
                              WSA_FLAG_OVERLAPPED)) == INVALID_SOCKET) {
         int err = WSAGetLastError();
@@ -13,9 +14,32 @@ Socket::Socket(HWND hWnd, int addressFamily, int connectionType, int protocol)
             this, SLOT(deleteLater()));
 }
 
-Socket::Socket(SOCKET socket, HWND hWnd) {
-    socket_ = socket;
-    hWnd_ = hWnd;
+Socket::Socket(SOCKET socket, HWND hWnd)
+: socket_(socket), hWnd_(hWnd), outputBuffer_(new QBuffer()), 
+  inputBuffer_(new QBuffer()) { }
+
+qint64 Socket::readData(char * data, qint64 maxSize) {
+    qint64 bytesRead = 0;
+
+    // Mutex lock here.
+    inputBuffer_->open(QBuffer::ReadOnly);
+    bytesRead = inputBuffer_->read(data, maxSize);
+    inputBuffer_->close();
+    // Mutex unlock.
+
+    return bytesRead;
+}
+
+qint64 Socket::writeData(const char * data, qint64 maxSize) {
+    qint64 bytesWritten = 0;
+
+    // Mutex lock here.
+    outputBuffer_->open(QBuffer::WriteOnly);
+    bytesWritten = outputBuffer_->write(data, maxSize);
+    outputBuffer_->close();
+    // Mutex unlock.
+
+    return bytesWritten;
 }
 
 bool Socket::listen(PSOCKADDR_IN pSockAddr) {

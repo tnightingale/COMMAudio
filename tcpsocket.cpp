@@ -52,6 +52,7 @@ void TCPSocket::send(PMSG pMsg) {
     winsockBuff.buf = socketBuffer_->data();
     winsockBuff.len = socketBuffer_->size();
 
+/*
     while (data_->status() == QDataStream::Ok) {
         ol = (WSAOVERLAPPED*) calloc(1, sizeof(WSAOVERLAPPED));
         ol->hEvent = (HANDLE) winsockBuff.buf;
@@ -78,12 +79,14 @@ void TCPSocket::send(PMSG pMsg) {
     if (data_->status() == QDataStream::Ok) {
         ::shutdown(socket_, SD_SEND);
     }
+*/
 }
 
 void TCPSocket::receive(PMSG pMsg) {
     int err = 0;
     DWORD flags = 0;
     DWORD numReceived = 0;
+    int bytesWritten = 0;
     WSABUF winsockBuff;
 
     winsockBuff.len = MAXUDPDGRAMSIZE;
@@ -98,11 +101,23 @@ void TCPSocket::receive(PMSG pMsg) {
         }
     }
 
-    QByteArray * buffer = new QByteArray(winsockBuff.buf, winsockBuff.len);
+    
+    while (numReceived < 0) {
+        // Lock mutex here.
+        inputBuffer_->open(QBuffer::WriteOnly);
+        bytesWritten = inputBuffer_->write(winsockBuff.buf, numReceived);
+        numReceived -= bytesWritten;
+        inputBuffer_->close();
+        // Unlock mutex.
+
+        if (numReceived == 0) {
+            break;
+        }
+    }
+
     delete[] winsockBuff.buf;
 
-    qDebug("Rx: %s", buffer->constData());
-    emit signalDataReceived(socket_, buffer);
+    emit readyRead();
 }
 
 void TCPSocket::connect(PMSG) {
@@ -113,12 +128,15 @@ void TCPSocket::connect(PMSG) {
 }
 
 int TCPSocket::loadBuffer(size_t bytesToRead) {
+/*
     socketBuffer_ = new QByteArray(bytesToRead, '\0');
     if (data_->atEnd()) {
         qDebug("TCPSocket::loadBuffer(); data->atend()");
         return 0;
     }
     return data_->readRawData(socketBuffer_->data(), bytesToRead);
+*/
+    return 0;
 }
 
 bool TCPSocket::listen(int port) {
