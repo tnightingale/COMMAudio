@@ -14,13 +14,13 @@ MainWindow::MainWindow(QWidget *parent) :
     /*player->addSong("./test.raw");
     player->play();*/
     player_->setSourceFolder();
-
+/*
     Phonon::SeekSlider *slider = new Phonon::SeekSlider(this);
     slider->setMediaObject(player_->getPlaylist());
     slider->setGeometry(180,490,450,19);
     slider->saveGeometry();
     slider->show();
-
+*/
    // player->startMic();
     ui->remoteListWidget_2->setSortingEnabled(true);
     //ui->clientListWidget->setSortingEnabled(true);
@@ -42,6 +42,7 @@ MainWindow::MainWindow(QWidget *parent) :
         songTitle = fileName.right(s);
         ui->currentSongEditBox->setText(songTitle);
     }
+    //player_->startMic();
     //working player code for wav files. will play following 3 files from internet in succession
 
 
@@ -153,7 +154,8 @@ void MainWindow::on_remoteListWidget_2_itemDoubleClicked(QListWidgetItem* item)
 */
 void MainWindow::on_playButton_clicked()
 {
-    if(player_->getState() == Phonon::StoppedState ||
+    player_->play();
+    /*if(player_->getState() == Phonon::StoppedState ||
             player_->getState() == Phonon::PausedState) {
         player_->play();
     } else {
@@ -164,7 +166,7 @@ void MainWindow::on_playButton_clicked()
         case Phonon::LoadingState:
             qDebug("Loading");
         }
-    }
+    }*/
 }
 
 /*
@@ -211,8 +213,9 @@ void MainWindow::on_stopButton_clicked()
 */
 void MainWindow::on_pauseButton_clicked()
 {
-    if(player_->getState() == Phonon::PlayingState) {
+    player_->pause();
+    /*if(player_->getState() == Phonon::PlayingState) {
         player_->pause();
-    }
+    }*/
 }
 

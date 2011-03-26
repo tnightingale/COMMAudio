@@ -7,6 +7,9 @@
 #include <QAudioInput>
 #include <QAudioOutput>
 #include <QBuffer>
+#include <QtMultimediaKit/QMediaPlayer>
+#include <QtMultimediaKit/QMediaPlaylist>
+#include <QtMultimediaKit/QMediaObject>
 
 class AudioComponent : public QObject
 {
@@ -14,9 +17,6 @@ class AudioComponent : public QObject
 public:
     explicit AudioComponent(QObject *parent = 0);
 
-    Phonon::MediaObject* getPlaylist(){
-        return playlist_;
-    }
 
     void addSong(QString filename);
     void setSourceFolder();
@@ -24,15 +24,17 @@ public:
         return sourceFolder_;
     }
     QStringList getFileList();
-    void startMic();
-    QList<Phonon::MediaSource> getQueue();
+
+    QList<QMediaContent> getQueue();
     void addSongToBegining(QString filename);
     void setCurrentSong(QString fileName);
-    Phonon::State getState();
+    //Phonon::State getState();
 
 private:
-    Phonon::MediaObject* playlist_;
-    Phonon::AudioOutput* output_;
+    QMediaPlayer* player_;
+    QMediaPlaylist* playlist_;
+    //Phonon::MediaObject* playlist_;
+    //Phonon::AudioOutput* output_;
     QDir sourceFolder_;
 
 
@@ -48,6 +50,10 @@ public slots:
 void play();
 void pause();
 void stop();
+void next();
+void previous();
+
+void startMic();
 void stopMic();
 
 };
