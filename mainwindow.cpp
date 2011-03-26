@@ -1,5 +1,10 @@
+
+
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "audiocomponent.h"
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -42,7 +47,6 @@ MainWindow::MainWindow(QWidget *parent) :
         songTitle = fileName.right(s);
         ui->currentSongEditBox->setText(songTitle);
     }
-    //player_->startMic();
     //working player code for wav files. will play following 3 files from internet in succession
 
 
@@ -154,11 +158,10 @@ void MainWindow::on_remoteListWidget_2_itemDoubleClicked(QListWidgetItem* item)
 */
 void MainWindow::on_playButton_clicked()
 {
-    player_->play();
-    /*if(player_->getState() == Phonon::StoppedState ||
-            player_->getState() == Phonon::PausedState) {
+    if(player_->getState() == QMediaPlayer::StoppedState ||
+            player_->getState() == QMediaPlayer::PausedState) {
         player_->play();
-    } else {
+    }/* else {
         switch(player_->getState()) {
         case Phonon::ErrorState:
             qDebug("Error");
@@ -213,9 +216,45 @@ void MainWindow::on_stopButton_clicked()
 */
 void MainWindow::on_pauseButton_clicked()
 {
-    player_->pause();
-    /*if(player_->getState() == Phonon::PlayingState) {
+    if(player_->getState() == QMediaPlayer::PlayingState) {
         player_->pause();
-    }*/
+    }
+}
+
+bool MainWindow::winEvent(MSG * msg, long * result) {
+    switch (msg->message) {
+        case WM_WSAASYNC_TCP:
+            emit signalWMWSASyncTCPRx(msg);
+            return true;
+
+        case WM_WSAASYNC_UDP:
+            emit signalWMWSASyncUDPRx(msg);
+            return true;
+    }
+
+    return false;
+}
+
+/*
+-- FUNCTION: getLocalFileList
+--
+-- DATE: March 21, 2011
+--
+-- REVISIONS: (Date and Description)
+--
+-- DESIGNER: Luke Queenan
+--
+-- PROGRAMMER: Luke Queenan
+--
+-- INTERFACE: QStringList MainWindow::getLocalFileList()
+--
+-- RETURNS: The local filelist stored in the audio player
+--
+-- NOTES:
+-- Gets the local filelist stored in the audio player in main window.
+*/
+QStringList MainWindow::getLocalFileList()
+{
+    return player_->getFileList();
 }
 

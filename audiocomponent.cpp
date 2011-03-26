@@ -42,9 +42,9 @@ QStringList AudioComponent::getFileList(){
     return stuff;
 }
 
-/*Phonon::State AudioComponent::getState(){
-//    return playlist_->state();
-}*/
+QMediaPlayer::State AudioComponent::getState(){
+    return player_->state();
+}
 
 QList<QMediaContent> AudioComponent::getQueue() {
     QList<QMediaContent> temp;

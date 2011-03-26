@@ -28,7 +28,7 @@ public:
     QList<QMediaContent> getQueue();
     void addSongToBegining(QString filename);
     void setCurrentSong(QString fileName);
-    //Phonon::State getState();
+    QMediaPlayer::State getState();
 
 private:
     QMediaPlayer* player_;

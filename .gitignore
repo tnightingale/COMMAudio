@@ -22,3 +22,5 @@ Makefile*
 *.app
 ui_*
 qrc_*
+/debug
+object_script*
