@@ -3,8 +3,6 @@
 #include <QTimer>
 #include <QByteArray>
 #include <QDirIterator>
-#include <al.h>
-#include <alc.h>
 #include <QAudioDeviceInfo>
 #include <QUrl>
 
