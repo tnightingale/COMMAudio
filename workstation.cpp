@@ -129,11 +129,19 @@ void Workstation::requestFileList()
 
     qDebug("Workstation::requestFileList(); Assuming connection suceeded!.");
 
-    // Send our own file list to the other client
+    // Get our local file list and convert it to a data stream
     QStringList fileList = mainWindowPointer_->getLocalFileList();
     QByteArray byteArray;
     QDataStream *stream = new QDataStream(byteArray);
     *stream << fileList;
+
+    // Create the control packet
+    *stream >> byteArray;
+    byteArray.insert(0, FILE_LIST);
+    byteArray.append('\n');
+    *stream << byteArray;
+
+    // Send our own file list to the other client
     //socket->write(*stream);
 
     // Connect the signal for receiving the other client's file list
@@ -304,6 +312,14 @@ void Workstation::receiveFileListController(TCPSocket *socket, QIODevice *buffer
         QByteArray byteArray;
         QDataStream *stream = new QDataStream(byteArray);
         *stream << fileList;
+
+        // Create the control packet
+        *stream >> byteArray;
+        byteArray.insert(0, FILE_LIST);
+        byteArray.append('\n');
+        *stream << byteArray;
+
+        // Send our own file list to the other client
         //socket->write(*stream);
     }
 }
