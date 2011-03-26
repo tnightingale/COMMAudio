@@ -231,7 +231,7 @@ QByteArray Workstation::dataStreamFileList()
     /*QDataStream *stream = new QDataStream(fileList);
 
     *returnValue << *stream;
-/*
+
     QByteArray *byteArray = new QByteArray();
     QDataStream *s = new QDataStream(mainWindowPointer_->getLocalFileList());
     *s >> *byteArray;
