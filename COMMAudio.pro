@@ -7,6 +7,8 @@
 QT       += core gui \
             phonon \
             multimedia
+CONFIG += mobility
+MOBILITY = multimedia
 
 TARGET    = COMMAudio
 TEMPLATE  = app
@@ -35,3 +37,4 @@ FORMS    += mainwindow.ui \
     joinServer.ui
 
 LIBS += C:/Qt/2010.05/mingw/lib/libws2_32.a
+
