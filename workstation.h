@@ -43,7 +43,7 @@ public slots:
     void processConnection(TCPSocket*);
     void decodeControlMessage(TCPSocket*, QIODevice*);
     void receiveUDP();
-    void receiveFile(TCPSocket*, QIODevice*);
+    void receiveFileController(TCPSocket*, QIODevice*);
     void receiveFileListController(TCPSocket*, QIODevice*);
     void requestFileListController(TCPSocket*, QIODevice*);
 

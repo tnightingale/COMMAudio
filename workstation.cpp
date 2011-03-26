@@ -204,7 +204,7 @@ void Workstation::decodeControlMessage(TCPSocket *socket, QIODevice *buffer)
         currentTransfers.insert(socket, packet.right(packet.length() - 1));
         // Connect the signal for the type of transfer
         connect(socket, SIGNAL(signalDataReceived(TCPSocket*,QByteArray*)),
-                this, SLOT(receiveFile(TCPSocket*, QByteArray*)));
+                this, SLOT(receiveFileController(TCPSocket*, QIODevice*)));
         break;
     case VOICE_CHAT:
         // Connect to voice chat here
@@ -222,7 +222,7 @@ void Workstation::receiveUDP()
 
 }
 
-void Workstation::receiveFile(TCPSocket*, QIODevice*)
+void Workstation::receiveFileController(TCPSocket*, QIODevice*)
 {
 
 }
@@ -337,5 +337,8 @@ void Workstation::requestFileListController(TCPSocket *socket, QIODevice *buffer
         // Disconnect this slot from the received packet signal
         disconnect(socket, SIGNAL(signalDataReceived(TCPSocket*,QByteArray*)),
                    this, SLOT(receiveFileList(TCPSocket*,QByteArray*)));
+
+        // Close the socket
+        //socket->close();
     }
 }

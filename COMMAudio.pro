@@ -34,7 +34,4 @@ HEADERS  += mainwindow.h \
 FORMS    += mainwindow.ui \
     joinServer.ui
 
-INCLUDEPATH += "C:/OpenAL 1.1 SDK/include"
-
 LIBS += C:/Qt/2010.05/mingw/lib/libws2_32.a
-LIBS += "C:/OpenAL 1.1 SDK/libs/Win32/OpenAL32.lib"
