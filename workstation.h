@@ -24,7 +24,6 @@ private:
     QMap <TCPSocket*, QByteArray> currentTransfers;
 
     // Functions
-    QByteArray dataStreamFileList();
     void sendFile();
     void sendFileList();
     // Create, send back socket information,
@@ -45,7 +44,7 @@ public slots:
     void decodeControlMessage(TCPSocket*, QIODevice*);
     void receiveUDP();
     void receiveFile(TCPSocket*, QIODevice*);
-    void receiveFileList(TCPSocket*, QIODevice*);
+    void receiveFileListController(TCPSocket*, QIODevice*);
 
 signals:
     void signalFileListUpdate(QStringList*);
