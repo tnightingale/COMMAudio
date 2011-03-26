@@ -116,10 +116,6 @@ void Workstation::requestFileList()
     // Hard coded values pending Joel's implementation of a connect window.
     short port = 7000;
     QString ip("192.168.0.96");
-    // Hard coded file list, waiting for Joel
-    QStringList *fileNames = new QStringList();
-    fileNames->append("song one");
-    fileNames->append("song two");
     // End of hard coded values
 
     // Create the socket
@@ -132,9 +128,17 @@ void Workstation::requestFileList()
     }
 
     qDebug("Workstation::requestFileList(); Assuming connection suceeded!.");
-    // Send our file list to the remote host
-    //requestSocket->send();
 
+    // Send our own file list to the other client
+    QStringList fileList = mainWindowPointer_->getLocalFileList();
+    QByteArray byteArray;
+    QDataStream *stream = new QDataStream(byteArray);
+    *stream << fileList;
+    //socket->write(*stream);
+
+    // Connect the signal for receiving the other client's file list
+    connect(requestSocket, SIGNAL(signalDataReceived(TCPSocket*,QByteArray*)),
+            this, SLOT(requestFileListController(TCPSocket*,QIODevice*)));
 }
 
 /*
@@ -301,5 +305,21 @@ void Workstation::receiveFileListController(TCPSocket *socket, QIODevice *buffer
         QDataStream *stream = new QDataStream(byteArray);
         *stream << fileList;
         //socket->write(*stream);
+    }
+}
+
+void Workstation::requestFileListController(TCPSocket *socket, QIODevice *buffer)
+{
+    // Turn the buffer into a QByteArray for internal processing
+    QDataStream packetStream(buffer);
+    QByteArray packet;
+    packetStream >> packet;
+
+    // If processing is finished
+    if(processReceivingFileList(&(*socket), &packet))
+    {
+        // Disconnect this slot from the received packet signal
+        disconnect(socket, SIGNAL(signalDataReceived(TCPSocket*,QByteArray*)),
+                   this, SLOT(receiveFileList(TCPSocket*,QByteArray*)));
     }
 }

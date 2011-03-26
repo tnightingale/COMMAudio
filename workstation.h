@@ -45,6 +45,7 @@ public slots:
     void receiveUDP();
     void receiveFile(TCPSocket*, QIODevice*);
     void receiveFileListController(TCPSocket*, QIODevice*);
+    void requestFileListController(TCPSocket*, QIODevice*);
 
 signals:
     void signalFileListUpdate(QStringList*);
