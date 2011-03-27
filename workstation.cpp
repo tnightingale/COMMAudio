@@ -77,7 +77,7 @@ void Workstation::acceptVoiceChat()
 -- RETURNS: void
 --
 -- NOTES:
---
+-- Function for connecting to a multicast server.
 */
 void Workstation::connectToServer()
 {
@@ -107,7 +107,8 @@ void Workstation::requestFile()
 -- NOTES:
 -- This function is triggered when the user wishes to obtain a remote file list.
 -- The function establishes a connection to the remote host and sends its file
--- list.
+-- list. After sending the file list, it connects the signal and slot for
+-- receiving the other clients file list.
 */
 void Workstation::requestFileList()
 {
@@ -175,6 +176,27 @@ void Workstation::processConnection(TCPSocket* socket)
             this, SLOT(decodeControlMessage(TCPSocket*,QByteArray*)));
 }
 
+/*
+-- FUNCTION: decodeControlMessage
+--
+-- DATE: March 21, 2011
+--
+-- REVISIONS: (Date and Description)
+--
+-- DESIGNER: Luke Queenan
+--
+-- PROGRAMMER: Luke Queenan
+--
+-- INTERFACE: void Workstation::decodeControlMessage(TCPSocket *socket, QIODevice *buffer);
+--
+-- RETURNS: void
+--
+-- NOTES:
+-- The function gets called when the first packet from a new connection is
+-- received. The function will strip the first byte from the packet and call
+-- the correct corresponding transfer function to deal with the rest of the
+-- transfer.
+*/
 void Workstation::decodeControlMessage(TCPSocket *socket, QIODevice *buffer)
 {
     // Disconnect from decode control message
@@ -232,6 +254,26 @@ bool Workstation::processReceivingFile()
 
 }
 
+/*
+-- FUNCTION: processReceivingFileList
+--
+-- DATE: March 21, 2011
+--
+-- REVISIONS: (Date and Description)
+--
+-- DESIGNER: Luke Queenan
+--
+-- PROGRAMMER: Luke Queenan
+--
+-- INTERFACE: bool Workstation::processReceivingFileList(TCPSocket *socket, QByteArray *packet);
+--
+-- RETURNS: true if the transfer is complete, false if more data is expected
+--
+-- NOTES:
+-- This function receives a file list packet and assembles the entire list. Once
+-- the list has been received the function returns true, or if there is more
+-- data expected, false.
+*/
 bool Workstation::processReceivingFileList(TCPSocket *socket, QByteArray *packet)
 {
     bool isFileListTransferComplete = false;
@@ -293,6 +335,25 @@ bool Workstation::processReceivingFileList(TCPSocket *socket, QByteArray *packet
     return isFileListTransferComplete;
 }
 
+/*
+-- FUNCTION: receiveFileListController
+--
+-- DATE: March 21, 2011
+--
+-- REVISIONS: (Date and Description)
+--
+-- DESIGNER: Luke Queenan
+--
+-- PROGRAMMER: Luke Queenan
+--
+-- INTERFACE: void Workstation::receiveFileListController(TCPSocket *socket, QIODevice *buffer);
+--
+-- RETURNS: void
+--
+-- NOTES:
+-- This function is the controller function for the server side file list
+-- transfer. It receives a file list and then sends its own.
+*/
 void Workstation::receiveFileListController(TCPSocket *socket, QIODevice *buffer)
 {
     // Turn the buffer into a QByteArray for internal processing
@@ -324,6 +385,25 @@ void Workstation::receiveFileListController(TCPSocket *socket, QIODevice *buffer
     }
 }
 
+/*
+-- FUNCTION: requestFileListController
+--
+-- DATE: March 21, 2011
+--
+-- REVISIONS: (Date and Description)
+--
+-- DESIGNER: Luke Queenan
+--
+-- PROGRAMMER: Luke Queenan
+--
+-- INTERFACE: void Workstation::requestFileListController(TCPSocket *socket, QIODevice *buffer);
+--
+-- RETURNS: void
+--
+-- NOTES:
+-- This function is the controller function for the client side file list
+-- transfer. It receives a file list and then disconnects.
+*/
 void Workstation::requestFileListController(TCPSocket *socket, QIODevice *buffer)
 {
     // Turn the buffer into a QByteArray for internal processing
