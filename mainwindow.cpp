@@ -28,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent) :
     visualization(40);
     timer_->setPaused(true);
     ui->tab->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 0, 0);color: white;"));
-    //ui->tab_2->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 0, 0);color: white;"));
+    ui->tab_2->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 0, 0);color: white;"));
    // player->startMic();
     ui->remoteListWidget->setSortingEnabled(true);
     //ui->clientListWidget->setSortingEnabled(true);
@@ -361,3 +361,13 @@ QStringList MainWindow::getLocalFileList()
     return player_->getFileList();
 }
 
+
+void MainWindow::on_talkButton_pressed()
+{
+    player_->startMic();
+}
+
+void MainWindow::on_talkButton_released()
+{
+    player_->stopMic();
+}
