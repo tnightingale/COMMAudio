@@ -51,6 +51,7 @@ Workstation::Workstation(MainWindow *mainWindow) {
     {
         tcpSocket_->listen(7001);
     }
+
     tcpSocket_->moveToThread(thread);
 
     thread->start();
@@ -132,7 +133,11 @@ void Workstation::requestFileList(QString ip, short port)
 
     // Create the socket
     TCPSocket *requestSocket = new TCPSocket(mainWindowPointer_->winId());
-    requestSocket->open(QIODevice::ReadWrite);
+    if (!requestSocket->open(QIODevice::ReadWrite))
+    {
+        qDebug("Workstation::requestFileList(); could not open request socket");
+        return;
+    }
 
     // Connect to a remote host
     if (!requestSocket->connectRemote(ip, port)) {
@@ -156,9 +161,11 @@ void Workstation::requestFileList(QString ip, short port)
     // Send our own file list to the other client
     requestSocket->write(byteArray);
 
-     qDebug("Workstation::requestFileList(); Sent file list");
+    qDebug("Workstation::requestFileList(); Sent file list");
 
-     //currentTransfers.insert(requestSocket);
+    // Put the socket into the current transfers map
+    currentTransfers.value(requestSocket);
+
     // Connect the signal for receiving the other client's file list
     connect(requestSocket, SIGNAL(signalDataReceived(TCPSocket*)),
             this, SLOT(requestFileListController(TCPSocket*)));
