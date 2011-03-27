@@ -76,22 +76,6 @@ public:
 
     /**
      *
-     * @param packetSize
-     *
-     * @author Tom Nightingale
-     */
-    void setPacketSize(size_t packetSize) {
-        packetSize_ = packetSize;
-    }
-
-    /**
-     *
-     * @author Tom Nightingale.
-     */
-    size_t getPacketSize() { return packetSize_; }
-
-    /**
-     *
      * @param pSockAddr
      *
      * @return

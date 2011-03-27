@@ -16,7 +16,7 @@ bool TCPSocket::open(OpenMode mode) {
             break;
 
         case QIODevice::WriteOnly:
-            flags |= FD_WRITE;
+            flags |= FD_CONNECT | FD_WRITE;
             break;
 
         case QIODevice::ReadWrite:
@@ -70,7 +70,7 @@ void TCPSocket::send(PMSG pMsg) {
     int result = 0;
     DWORD numSent = 0;
     int num = 0;
-    size_t bytesToRead = getPacketSize();
+    size_t bytesToRead = PACKETSIZE;
 
     WSABUF winsockBuff;
 
@@ -79,7 +79,6 @@ void TCPSocket::send(PMSG pMsg) {
         return;
     }
 
-    // NOTE: need to check the validity of using bytesToRead.
     winsockBuff.buf = nextTxBuff_->data();
     winsockBuff.len = nextTxBuff_->size();
 
@@ -151,7 +150,7 @@ void TCPSocket::receive(PMSG pMsg) {
 }
 
 void TCPSocket::connect(PMSG) {
-    if (loadBuffer(getPacketSize()) < 0) {
+    if (loadBuffer(PACKETSIZE) < 0) {
         qDebug("TCPSocket::connect(); Cannot read from data source!");
         throw "TCPSocket::connect(); Cannot read from data source!";
     }
@@ -159,15 +158,23 @@ void TCPSocket::connect(PMSG) {
 
 int TCPSocket::loadBuffer(size_t bytesToRead) {
     // Lock mutex here
-    nextTxBuff_ = new QByteArray(bytesToRead, '\0');
-    if (outputBuffer_->atEnd()) {
-        qDebug("TCPSocket::loadBuffer(); data->atEnd()");
+    if (outputBuffer_->bytesAvailable() == 0) {
         return 0;
     }
+    nextTxBuff_ = new QByteArray(bytesToRead, '\0');
     // TODO: I had problems with this, might need to call 
     //       QByteArray::readRawData().
+    outputBuffer_->open(QIODevice::ReadOnly);
     int bytesRead = outputBuffer_->read(nextTxBuff_->data(), bytesToRead);
+    outputBuffer_->close();
+    
+    // Removing stuff that was read from the buffer.
+    QByteArray buffer = outputBuffer_->buffer();
+    buffer.remove(0, bytesRead);
+    outputBuffer_->setData(buffer);
     // Unlock mutex.
+
+    nextTxBuff_->resize(bytesRead);
     return bytesRead;
 }
 
@@ -225,6 +232,10 @@ void TCPSocket::slotProcessWSAEvent(int wParam, int lParam) {
     msg.wParam = wParam;
     msg.lParam = lParam;
     PMSG pMsg = &msg;
+
+    if (pMsg->wParam != socket_) {
+        return;
+    }
 
     if (WSAGETSELECTERROR(pMsg->lParam)) {
         qDebug("TCPSocket::slotProcessWSAEvent(): %d: Socket failed. Error: %d",

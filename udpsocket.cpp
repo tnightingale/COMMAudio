@@ -17,14 +17,14 @@ void UDPSocket::send(PMSG pMsg) {
     int result = 0;
     int num = 0;
     size_t bytesRead = 0;
-    size_t bytesToRead = getPacketSize();
+    size_t bytesToRead = PACKETSIZE;
     size_t totalSent = 0;
 
     DWORD numBytesSent = 0;
     WSAOVERLAPPED* ol;
     WSABUF winsockBuff;
 
-    winsockBuff.len = getPacketSize();
+    winsockBuff.len = PACKETSIZE;
     bytesRead = winsockBuff.len;
 
 /*
