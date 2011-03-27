@@ -8,7 +8,7 @@ QT       += core gui \
             phonon \
             multimedia
 CONFIG += mobility
-MOBILITY = multimedia
+MOBILITY += multimedia
 
 TARGET    = COMMAudio
 TEMPLATE  = app
