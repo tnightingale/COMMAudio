@@ -12,6 +12,8 @@ Socket::Socket(HWND hWnd, int addressFamily, int connectionType, int protocol)
 
     connect(this, SIGNAL(signalSocketClosed()),
             this, SLOT(deleteLater()));
+
+    QIODevice::open(QIODevice::ReadWrite);
 }
 
 Socket::Socket(SOCKET socket, HWND hWnd)
@@ -21,6 +23,7 @@ Socket::Socket(SOCKET socket, HWND hWnd)
     connect(this, SIGNAL(signalSocketClosed()),
             this, SLOT(deleteLater()));
 
+    QIODevice::open(QIODevice::ReadWrite);
 }
 
 qint64 Socket::readData(char * data, qint64 maxSize) {
@@ -31,6 +34,11 @@ qint64 Socket::readData(char * data, qint64 maxSize) {
     inputBuffer_->open(QBuffer::ReadOnly);
     bytesRead = inputBuffer_->read(data, maxSize);
     inputBuffer_->close();
+
+    // Removing stuff that was read from the buffer.
+    QByteArray buffer = inputBuffer_->buffer();
+    buffer.remove(0, bytesRead);
+    inputBuffer_->setData(buffer);
     // Mutex unlock.
 
     return bytesRead;
@@ -63,6 +71,7 @@ bool Socket::listen(PSOCKADDR_IN pSockAddr) {
 
 void Socket::close(PMSG pMsg) {
     shutdown(pMsg->wParam, SD_SEND);
+    QIODevice::close();
     emit signalSocketClosed();
 }
 

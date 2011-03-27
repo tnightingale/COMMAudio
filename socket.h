@@ -48,8 +48,12 @@ protected:
     /** The internal input buffer for reading data. */
     QBuffer* inputBuffer_;
 
+    /** This tracks the next block of data to transmit. Needs to be persistent
+     *  incase WSASend() returns with WSAEWOULDBLOCK and block needs to be
+     *  resent */
+    QByteArray* nextTxBuff_;
+
     /** These are probably going to be passed on to the writeThread. */
-    QByteArray * socketBuffer_;
     size_t packetSize_;
 
     virtual qint64 readData(char * data, qint64 maxSize);

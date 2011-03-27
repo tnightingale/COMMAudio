@@ -37,6 +37,9 @@ void TCPSocket::accept(PMSG pMsg) {
     }
 
     TCPSocket * clientSocket = new TCPSocket(newSocket, hWnd_);
+    QObject::connect(clientSocket, SIGNAL(signalDataReceived(TCPSocket*)),
+                     this, SIGNAL(signalDataReceived(TCPSocket*)));
+
     emit signalClientConnected(clientSocket);
 }
 
@@ -49,6 +52,9 @@ void TCPSocket::send(PMSG pMsg) {
 
     WSABUF winsockBuff;
 
+    // NOTE: need to check the validity of using bytesToRead.
+    winsockBuff.buf = nextTxBuff_->data();
+    winsockBuff.len = nextTxBuff_->size();
 
     // TODO: I think i should actually be checking something here, like the 
     //       outputBuffer_ status or something.
@@ -64,7 +70,7 @@ void TCPSocket::send(PMSG pMsg) {
             return;
         }
 
-        delete socketBuffer_;
+        delete nextTxBuff_;
         if ((num = loadBuffer(bytesToRead)) <= 0) {
             qDebug("TCPSocket::send(); Finishing...");
             break;
@@ -125,15 +131,17 @@ void TCPSocket::connect(PMSG) {
 }
 
 int TCPSocket::loadBuffer(size_t bytesToRead) {
-/*
-    socketBuffer_ = new QByteArray(bytesToRead, '\0');
-    if (data_->atEnd()) {
-        qDebug("TCPSocket::loadBuffer(); data->atend()");
+    // Lock mutex here
+    nextTxBuff_ = new QByteArray(bytesToRead, '\0');
+    if (outputBuffer_->atEnd()) {
+        qDebug("TCPSocket::loadBuffer(); data->atEnd()");
         return 0;
     }
-    return data_->readRawData(socketBuffer_->data(), bytesToRead);
-*/
-    return 0;
+    // TODO: I had problems with this, might need to call 
+    //       QByteArray::readRawData().
+    int bytesRead = outputBuffer_->read(nextTxBuff_->data(), bytesToRead);
+    // Unlock mutex.
+    return bytesRead;
 }
 
 bool TCPSocket::listen(int port) {
