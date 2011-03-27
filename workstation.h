@@ -1,4 +1,5 @@
 #include <QObject>
+#include <QThread>
 
 class MainWindow;
 class TCPSocket;
@@ -33,10 +34,10 @@ public slots:
     void requestFileList();
     // Triggered by sockets, so signal is coming from a socket
     void processConnection(TCPSocket*);
-    void decodeControlMessage(TCPSocket*, QByteArray*);
+    void decodeControlMessage(TCPSocket*);
     void receiveUDP();
-    void receiveFile(TCPSocket*, QByteArray*);
-    void receiveFileList(TCPSocket*, QByteArray*);
+    void receiveFile(TCPSocket*);
+    void receiveFileList(TCPSocket*);
 
 signals:
     void signalFileListUpdate(QStringList*);

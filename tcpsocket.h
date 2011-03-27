@@ -2,6 +2,7 @@
 #define TCPSOCKET_H
 
 #include <QObject>
+#include <QByteArray>
 #include <QDebug>
 #include "socket.h"
 
@@ -84,36 +85,15 @@ signals:
      *
      * @author Tom Nightingale
      */
-    void signalDataReceived(TCPSocket *tcpSocket, QByteArray * buffer);
+    void signalDataReceived(TCPSocket *tcpSocket);
 
 public slots:
     /**
      *
      * @param pMsg
      *
-     * @return
-     *
      * @author Tom Nightingale.
      */
-    bool slotProcessWSAEvent(PMSG pMsg);
-
-public:
-    /**
-     *
-     * @param error
-     *
-     * @author Tom Nightingale
-     */
-    static void CALLBACK sendWorkerRoutine(DWORD error, DWORD bytesTransferred,
-                                           LPWSAOVERLAPPED overlapped,
-                                           DWORD inFlags) {
-        if (error != 0) {
-          qDebug("I/O operation failed with error %d\n", (int) error);
-          return;
-        }
-
-        free(overlapped);
-    }
 };
 
 #endif // TCPSOCKET_H

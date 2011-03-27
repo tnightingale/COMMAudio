@@ -18,6 +18,8 @@ Workstation::Workstation(MainWindow *mainWindow) {
         throw "Workstation::Workstation(): Missing WINSOCK2 DLL.";
     }
 
+    QThread * thread = new QThread();
+
     // Save a pointer to the window
     mainWindowPointer_ = mainWindow;
 
@@ -31,14 +33,18 @@ Workstation::Workstation(MainWindow *mainWindow) {
     // Connect signal and slot for processing a new connection
     connect(tcpSocket_, SIGNAL(signalClientConnected(TCPSocket*)),
             this, SLOT(processConnection(TCPSocket*)));
+    connect(tcpSocket_, SIGNAL(signalDataReceived(TCPSocket*)),
+            this, SLOT(decodeControlMessage(TCPSocket*)));
 
     udpSocket_ = new UDPSocket(mainWindow->winId());
     connect(mainWindow, SIGNAL(signalWMWSASyncUDPRx(PMSG)),
             udpSocket_, SLOT(slotProcessWSAEvent(PMSG)));
 
-    //tcpSocket_->listen(7000);
+    tcpSocket_->listen(7000);
+    tcpSocket_->moveToThread(thread);
 
-    requestFileList();
+    thread->start();
+    //requestFileList();
 }
 
 Workstation::~Workstation() {
@@ -158,26 +164,36 @@ void Workstation::requestFileList()
 */
 void Workstation::processConnection(TCPSocket* socket)
 {
-    // Connect the socket's receive signal to
-    connect(socket, SIGNAL(signalDataReceived(TCPSocket*,QByteArray*)),
-            this, SLOT(decodeControlMessage(TCPSocket*,QByteArray*)));
+    qDebug("Workstation::processConnection(); processing connection.");
+
+    // Connect the socket to the window's message loop.
+    if (!connect(mainWindowPointer_, SIGNAL(signalWMWSASyncTCPRx(int, int)),
+                 socket, SLOT(slotProcessWSAEvent(int, int)))) {
+        qDebug("Workstation::processConnection(); connect(signalWMWSASyncTCPRx()) failed.");
+    }
 }
 
-void Workstation::decodeControlMessage(TCPSocket *socket, QByteArray *buffer)
+void Workstation::decodeControlMessage(TCPSocket *socket)
 {
+    qDebug("Workstation::decodeControlMessage(); Decoding...");
     // Disconnect from decode control message
-    disconnect(socket, SIGNAL(signalDataReceived(TCPSocket*,QByteArray*)),
-               this, SLOT(decodeControlMessage(TCPSocket*,QByteArray*)));
+    //disconnect(socket, SIGNAL(signalDataReceived(TCPSocket*)),
+    //           this, SLOT(decodeControlMessage(TCPSocket*)));
+
+    QByteArray data = socket->readAll();
+    qDebug() << "Workstation::decodeControlMessage(); DataRx: " << data;
+
     // Check for type of message
+    /*
     switch (*buffer[0])
     {
     case FILE_LIST:
-        connect(socket, SIGNAL(signalDataReceived(TCPSocket*,QByteArray*)),
-                this, SLOT(receiveFileList(TCPSocket*, QByteArray*)));
+        //connect(socket, SIGNAL(signalDataReceived(TCPSocket*)),
+        //        this, SLOT(receiveFileList(TCPSocket*)));
         break;
     case FILE_TRANSFER:
-        connect(socket, SIGNAL(signalDataReceived(TCPSocket*,QByteArray*)),
-                this, SLOT(receiveFile(TCPSocket*, QByteArray*)));
+        //connect(socket, SIGNAL(signalDataReceived(TCPSocket*)),
+        //        this, SLOT(receiveFile(TCPSocket*)));
         break;
     case VOICE_CHAT:
         // Connect to voice chat here
@@ -187,6 +203,7 @@ void Workstation::decodeControlMessage(TCPSocket *socket, QByteArray *buffer)
         //socket->close();
         break;
     }
+    */
 
 }
 
@@ -195,13 +212,14 @@ void Workstation::receiveUDP()
 
 }
 
-void Workstation::receiveFile(TCPSocket*, QByteArray*)
+void Workstation::receiveFile(TCPSocket*)
 {
 
 }
 
-void Workstation::receiveFileList(TCPSocket *socket, QByteArray *packet)
+void Workstation::receiveFileList(TCPSocket *socket)
 {
+/*
     // Create the local storage for the packet
     QStringList *fileList = new QStringList();
     QDataStream *stream = new QDataStream(*packet);
@@ -220,6 +238,7 @@ void Workstation::receiveFileList(TCPSocket *socket, QByteArray *packet)
     stream = new QDataStream(*sendBuffer);
     *stream << *fileList;
     //socket->send();
+*/
 
 }
 

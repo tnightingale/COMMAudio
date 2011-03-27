@@ -39,7 +39,7 @@ public:
      *
      * @author Tom Nightingale
      */
-    bool winEvent(MSG * msg, long * result);
+    bool winEvent(PMSG msg, long * result);
 
     QStringList getLocalFileList();
 

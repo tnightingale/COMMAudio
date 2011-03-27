@@ -60,7 +60,7 @@ public:
     Socket(SOCKET socket, HWND hWnd);
 
     virtual ~Socket() {
-        qDebug("Socket::~Socket()");
+        qDebug("Socket::~Socket() %d", (int) socket_);
         closesocket(socket_);
     }
 
@@ -113,11 +113,9 @@ public slots:
      *
      * @param pMsg
      *
-     * @return
-     *
      * @author Tom Nightingale.
      */
-    virtual bool slotProcessWSAEvent(PMSG pMsg);
+    virtual void slotProcessWSAEvent(PMSG pMsg);
 
 };
 

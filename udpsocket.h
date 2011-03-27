@@ -45,8 +45,6 @@ public slots:
      *
      * @param pMsg
      *
-     * @return
-     *
      * @author Tom Nightingale.
      */
     bool slotProcessWSAEvent(PMSG pMsg);

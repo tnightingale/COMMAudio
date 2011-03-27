@@ -62,20 +62,25 @@ void Socket::close(PMSG pMsg) {
 
 
 
-bool Socket::slotProcessWSAEvent(PMSG pMsg) {
+void Socket::slotProcessWSAEvent(PMSG pMsg) {
     if (WSAGETSELECTERROR(pMsg->lParam)) {
         qDebug("Socket::slotProcessWSAEvent(): %d: Socket failed with error %d",
               (int) pMsg->wParam, WSAGETSELECTERROR(pMsg->lParam));
-        return false;
+        return;
+    }
+
+    if (pMsg->wParam != socket_) {
+        return;
     }
 
     switch (WSAGETSELECTEVENT(pMsg->lParam)) {
 
         case FD_CLOSE:
-            qDebug("Socket::slotProcessWSAEvent: %d: FD_CLOSE.", (int) pMsg->wParam);
+            qDebug("Socket::slotProcessWSAEvent(); %d: FD_CLOSE.", 
+                   (int) pMsg->wParam);
             close(pMsg);
             break;
     }
 
-    return true;
+    return;
 }

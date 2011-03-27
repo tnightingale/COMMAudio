@@ -218,7 +218,7 @@ void MainWindow::on_pauseButton_clicked()
     }
 }
 
-bool MainWindow::winEvent(MSG * msg, long * result) {
+bool MainWindow::winEvent(PMSG msg, long * result) {
     switch (msg->message) {
         case WM_WSAASYNC_TCP:
             emit signalWMWSASyncTCPRx(msg);

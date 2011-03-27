@@ -111,5 +111,5 @@ bool UDPSocket::slotProcessWSAEvent(PMSG pMsg) {
             break;
     }
 
-    return true;
+    return;
 }
