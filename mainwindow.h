@@ -12,6 +12,7 @@
 #include "joinserver.h"
 #include "ui_joinserver.h"
 #include "remoteSong.h"
+#include "listenthread.h"
 #include <QGraphicsView>
 #include <QGraphicsItem>
 #include <QTimeLine>
@@ -59,9 +60,7 @@ public:
      */
     void appendToRemote(QStringList songList, QString ipAddress);
 
-    QRectF rect (int r);
-
-    void setupRot (QTimeLine *timeline, QGraphicsItem *item);
+    void visualization(int n);
 
     QStringList getLocalFileList();
 
@@ -74,10 +73,12 @@ private:
     TCPSocket *controlSocket_;
     AudioComponent* player_;
     JoinServer joinServer_;
+    JoinServer requestPlaylist_;
     QMap<QString,RemoteSong> remoteList_;
 
 private slots:
     void on_action_Join_Multicast_triggered();
+    void on_action_Request_Playlist_triggered();
     void on_action_Visible_toggled(bool status);
     void on_clientListWidget_itemDoubleClicked(QListWidgetItem* item);
     void on_playButton_clicked();

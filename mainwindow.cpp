@@ -1,6 +1,3 @@
-
-
-
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "audiocomponent.h"
@@ -25,11 +22,9 @@ MainWindow::MainWindow(QWidget *parent) :
     slider->setGeometry(180,490,450,19);
     slider->saveGeometry();
     slider->show();
-
 */
 
-
-    ui->tab->setStyleSheet(QString::fromUtf8("background-color: rgb(255, 255, 60);"));
+    ui->tab->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 0, 0);color: white;"));
 
    // player->startMic();
     ui->remoteListWidget->setSortingEnabled(true);
@@ -97,6 +92,51 @@ void MainWindow::on_action_Join_Multicast_triggered()
     {
 
     }
+}
+
+void MainWindow::on_action_Request_Playlist_triggered()
+{
+    if (requestPlaylist_.exec() == QDialog::Accepted)
+    {
+
+    }
+}
+
+void MainWindow::visualization(int n) {
+    QGraphicsRectItem *rect = new QGraphicsRectItem(0,0,n,n);
+    QGraphicsEllipseItem *innerball = new QGraphicsEllipseItem(150, 150, 20, 20);
+
+    QBrush fillBrush(Qt::red);
+    innerball->setBrush(fillBrush);
+
+    fillBrush.setColor(Qt::blue);
+    rect->setBrush(fillBrush);
+
+    QTimeLine *timer = new QTimeLine(5000);
+    timer->setCurveShape(QTimeLine::SineCurve);
+    timer->setFrameRange(0, 100);
+
+    QGraphicsItemAnimation *animation = new QGraphicsItemAnimation;
+    QGraphicsItemAnimation *animation2 = new QGraphicsItemAnimation;
+    animation->setItem(rect);
+    animation2->setItem(innerball);
+    animation->setTimeLine(timer);
+    animation2->setTimeLine(timer);
+
+    for (int i = 0; i < 200; ++i) {
+        animation->setScaleAt(i/200.0,1,i%5);
+         animation2->setScaleAt(i/200.0,i%2,i%2);
+    }
+
+    QGraphicsScene *scene = new QGraphicsScene();
+    scene->setSceneRect(0, 0, 840, 410);
+    scene->addItem(rect);
+    scene->addItem(innerball);
+
+    ui->visualGraphicsView->setScene(scene);
+    ui->visualGraphicsView->show();
+
+    timer->start();
 }
 
 void MainWindow::appendToRemote(QStringList songList, QString ipAddress)
@@ -191,28 +231,7 @@ void MainWindow::on_playButton_clicked()
     } else {
        ui->playButton->setText("Pause");
        player_->play();
-
-       QGraphicsItem *ball = new QGraphicsEllipseItem(0, 0, 20, 20);
-
-       QTimeLine *timer = new QTimeLine(5000);
-       timer->setFrameRange(0, 100);
-
-       QGraphicsItemAnimation *animation = new QGraphicsItemAnimation;
-       animation->setItem(ball);
-       animation->setTimeLine(timer);
-
-       for (int i = 0; i < 200; ++i)
-            animation->setPosAt(i / 200.0, QPointF(i, i));
-
-       QGraphicsScene *scene = new QGraphicsScene();
-       scene->setSceneRect(0, 0, 250, 250);
-       scene->addItem(ball);
-
-       ui->visualGraphicsView->setScene(scene);
-       ui->visualGraphicsView->show();
-
-       timer->start();
-
+       visualization(4);
     }
 
 }
@@ -239,6 +258,7 @@ void MainWindow::on_playButton_clicked()
 void MainWindow::on_stopButton_clicked()
 {
     player_->stop();
+    ui->playButton->setText("Play");
 }
 
 
