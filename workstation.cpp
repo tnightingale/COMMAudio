@@ -42,6 +42,10 @@ Workstation::Workstation(MainWindow *mainWindow) {
     connect(mainWindow, SIGNAL(signalWMWSASyncUDPRx(int, int)),
             udpSocket_, SLOT(slotProcessWSAEvent(int, int)));
 
+    // Connect the GUI button signals to the functions in here
+    connect(mainWindow, SIGNAL(requestPlaylist(QString, short)),
+            this, SLOT(requestFileList(QString, short)));
+
     // Listen on the TCP socket for other client connections
     tcpSocket_->listen(7000);
     tcpSocket_->moveToThread(thread);
@@ -119,13 +123,13 @@ void Workstation::requestFile()
 -- list. After sending the file list, it connects the signal and slot for
 -- receiving the other clients file list.
 */
-void Workstation::requestFileList()
+void Workstation::requestFileList(QString ip, short port)
 {
     qDebug("Workstation::requestFileList(); Requesting file list.");
 
     // Hard coded values pending Joel's implementation of a connect window.
-    short port = 7000;
-    QString ip("192.168.0.96");
+    //short port = 7000;
+    //QString ip("192.168.0.96");
     // End of hard coded values
 
     // Create the socket

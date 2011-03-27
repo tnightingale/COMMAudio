@@ -66,6 +66,8 @@ public:
 signals:
     void signalWMWSASyncTCPRx(int, int);
     void signalWMWSASyncUDPRx(int, int);
+    void requestPlaylist(QString, short);
+    void requestFile(QString, QString);
 
 private:
     Ui::MainWindow *ui;

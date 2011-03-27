@@ -35,11 +35,11 @@ private:
 
 
 public slots:
-    // Triggered by user, so signal is coming from a button
+    // Triggered by GUI buttons
     void connectToServer();
     void requestFile();
-    void requestFileList();
-    // Triggered by sockets, so signal is coming from a socket
+    void requestFileList(QString, short);
+    // Triggered by sockets
     void processConnection(TCPSocket*);
     void decodeControlMessage(TCPSocket*);
     void receiveUDP();
@@ -53,4 +53,5 @@ signals:
 public:
     Workstation(MainWindow *mainWindow);
     virtual ~Workstation();
+
 };

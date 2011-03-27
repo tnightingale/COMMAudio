@@ -3,8 +3,8 @@
 #include "audiocomponent.h"
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow)
+        QMainWindow(parent),
+        ui(new Ui::MainWindow)
 {
     QString fileName;
     QString songTitle;
@@ -16,7 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
     /*player->addSong("./test.raw");
     player->play();*/
     player_->setSourceFolder();
-/*
+    /*
     Phonon::SeekSlider *slider = new Phonon::SeekSlider(this);
     slider->setMediaObject(player_->getPlaylist());
     slider->setGeometry(180,490,450,19);
@@ -26,20 +26,19 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->tab->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 0, 0);color: white;"));
 
-   // player->startMic();
+    // player->startMic();
     ui->remoteListWidget->setSortingEnabled(true);
     //ui->clientListWidget->setSortingEnabled(true);
     QStringList songList = player_->getFileList();
     for (int i = 0; i < songList.size();++i){
-
-       fileName = songList.at(i);
-       player_->addSong(fileName);
-       int n = fileName.lastIndexOf('/');
-       int s = fileName.size() - n - 1;
-       songTitle = fileName.right(s);
-       ui->clientListWidget->addItem(new QListWidgetItem(songTitle));
-
+        fileName = songList.at(i);
+        player_->addSong(fileName);
+        int n = fileName.lastIndexOf('/');
+        int s = fileName.size() - n - 1;
+        songTitle = fileName.right(s);
+        ui->clientListWidget->addItem(new QListWidgetItem(songTitle));
     }
+
     if(songList.size() > 0) {
         fileName = songList.at(0);
         int n = fileName.lastIndexOf('/');
@@ -54,6 +53,7 @@ MainWindow::MainWindow(QWidget *parent) :
     player->addSong("http://www.dailywav.com/0311/spiteMe.wav");
     player->addSong("http://www.dailywav.com/0311/convictionsBourbon.wav");*/
     //player->play();
+
 }
 
 MainWindow::~MainWindow()
@@ -64,10 +64,10 @@ MainWindow::~MainWindow()
 QString MainWindow::findFullPath(QString filename) {
     QString fullPath;
     for (int i = 0; i < player_->getFileList().size();++i){
-       fullPath = player_->getFileList().at(i);
-       if(fullPath.contains(filename)) {
-           return fullPath;
-       }
+        fullPath = player_->getFileList().at(i);
+        if(fullPath.contains(filename)) {
+            return fullPath;
+        }
     }
     return NULL;
 }
@@ -98,7 +98,8 @@ void MainWindow::on_action_Request_Playlist_triggered()
 {
     if (requestPlaylist_.exec() == QDialog::Accepted)
     {
-
+        emit requestPlaylist(requestPlaylist_.getIp(),
+                             requestPlaylist_.getPort());
     }
 }
 
@@ -125,7 +126,7 @@ void MainWindow::visualization(int n) {
 
     for (int i = 0; i < 200; ++i) {
         animation->setScaleAt(i/200.0,1,i%5);
-         animation2->setScaleAt(i/200.0,i%2,i%2);
+        animation2->setScaleAt(i/200.0,i%2,i%2);
     }
 
     QGraphicsScene *scene = new QGraphicsScene();
@@ -143,12 +144,12 @@ void MainWindow::appendToRemote(QStringList songList, QString ipAddress)
 {
     QString fileName, songTitle;
     for (int i = 0; i < songList.size();++i){
-       fileName = songList.at(i);
-       int n = fileName.lastIndexOf('/');
-       int s = fileName.size() - n - 1;
-       songTitle = fileName.right(s);
-       remoteList_.insert(songTitle,*new RemoteSong(songTitle, ipAddress));
-       ui->remoteListWidget->addItem(new QListWidgetItem(songTitle));
+        fileName = songList.at(i);
+        int n = fileName.lastIndexOf('/');
+        int s = fileName.size() - n - 1;
+        songTitle = fileName.right(s);
+        remoteList_.insert(songTitle,*new RemoteSong(songTitle, ipAddress));
+        ui->remoteListWidget->addItem(new QListWidgetItem(songTitle));
     }
 }
 
@@ -202,6 +203,7 @@ void MainWindow::on_clientListWidget_itemDoubleClicked(QListWidgetItem* item)
 void MainWindow::on_remoteListWidget_itemDoubleClicked(QListWidgetItem* item)
 {
     RemoteSong songInfo = remoteList_.value(item->text());
+    emit requestFile(songInfo.getIp(), songInfo.getFilePath());
 }
 
 /*
@@ -226,12 +228,12 @@ void MainWindow::on_playButton_clicked()
 {
 
     if(ui->playButton->text() == "Pause") {
-       ui->playButton->setText("Play");
-       player_->pause();
+        ui->playButton->setText("Play");
+        player_->pause();
     } else {
-       ui->playButton->setText("Pause");
-       player_->play();
-       visualization(4);
+        ui->playButton->setText("Pause");
+        player_->play();
+        visualization(4);
     }
 
 }
@@ -264,13 +266,13 @@ void MainWindow::on_stopButton_clicked()
 
 bool MainWindow::winEvent(PMSG msg, long * result) {
     switch (msg->message) {
-        case WM_WSAASYNC_TCP:
-            emit signalWMWSASyncTCPRx(msg->wParam, msg->lParam);
-            return true;
+    case WM_WSAASYNC_TCP:
+        emit signalWMWSASyncTCPRx(msg->wParam, msg->lParam);
+        return true;
 
-        case WM_WSAASYNC_UDP:
-            emit signalWMWSASyncUDPRx(msg->wParam, msg->lParam);
-            return true;
+    case WM_WSAASYNC_UDP:
+        emit signalWMWSASyncUDPRx(msg->wParam, msg->lParam);
+        return true;
     }
 
     return false;
