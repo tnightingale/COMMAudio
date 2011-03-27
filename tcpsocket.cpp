@@ -74,6 +74,11 @@ void TCPSocket::send(PMSG pMsg) {
 
     WSABUF winsockBuff;
 
+    if (nextTxBuff_ == NULL && loadBuffer(bytesToRead) == 0) {
+        qDebug("TCPSocket::send(); Nothing to send.");
+        return;
+    }
+
     // NOTE: need to check the validity of using bytesToRead.
     winsockBuff.buf = nextTxBuff_->data();
     winsockBuff.len = nextTxBuff_->size();

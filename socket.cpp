@@ -1,7 +1,8 @@
 #include "socket.h"
 
 Socket::Socket(HWND hWnd, int addressFamily, int connectionType, int protocol)
-: hWnd_(hWnd), outputBuffer_(new QBuffer()), inputBuffer_(new QBuffer()) {
+: hWnd_(hWnd), outputBuffer_(new QBuffer()), inputBuffer_(new QBuffer()),
+  nextTxBuff_(NULL) {
 
     if ((socket_ = WSASocket(addressFamily, connectionType, protocol, NULL, 0,
                              WSA_FLAG_OVERLAPPED)) == INVALID_SOCKET) {
@@ -16,7 +17,7 @@ Socket::Socket(HWND hWnd, int addressFamily, int connectionType, int protocol)
 
 Socket::Socket(SOCKET socket, HWND hWnd)
 : socket_(socket), hWnd_(hWnd), outputBuffer_(new QBuffer()), 
-  inputBuffer_(new QBuffer()) {
+  inputBuffer_(new QBuffer()), nextTxBuff_(NULL) {
 
     connect(this, SIGNAL(signalSocketClosed()),
             this, SLOT(deleteLater()));
