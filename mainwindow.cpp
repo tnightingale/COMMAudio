@@ -242,14 +242,14 @@ void MainWindow::on_stopButton_clicked()
 }
 
 
-bool MainWindow::winEvent(MSG * msg, long * result) {
+bool MainWindow::winEvent(PMSG msg, long * result) {
     switch (msg->message) {
         case WM_WSAASYNC_TCP:
-            emit signalWMWSASyncTCPRx(msg);
+            emit signalWMWSASyncTCPRx(msg->wParam, msg->lParam);
             return true;
 
         case WM_WSAASYNC_UDP:
-            emit signalWMWSASyncUDPRx(msg);
+            emit signalWMWSASyncUDPRx(msg->wParam, msg->lParam);
             return true;
     }
 

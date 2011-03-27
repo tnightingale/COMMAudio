@@ -47,7 +47,7 @@ public:
      *
      * @author Tom Nightingale
      */
-    bool winEvent(MSG * msg, long * result);
+    bool winEvent(PMSG msg, long * result);
 
     /**
      * adds to the QMap
@@ -66,8 +66,8 @@ public:
     QStringList getLocalFileList();
 
 signals:
-    void signalWMWSASyncTCPRx(PMSG);
-    void signalWMWSASyncUDPRx(PMSG);
+    void signalWMWSASyncTCPRx(int, int);
+    void signalWMWSASyncUDPRx(int, int);
 
 private:
     Ui::MainWindow *ui;

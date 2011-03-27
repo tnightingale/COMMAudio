@@ -1,5 +1,5 @@
 #include <QObject>
-#include <QIODevice>
+#include <QThread>
 #include <QMap>
 
 class MainWindow;
@@ -41,11 +41,11 @@ public slots:
     void requestFileList();
     // Triggered by sockets, so signal is coming from a socket
     void processConnection(TCPSocket*);
-    void decodeControlMessage(TCPSocket*, QIODevice*);
+    void decodeControlMessage(TCPSocket*);
     void receiveUDP();
-    void receiveFileController(TCPSocket*, QIODevice*);
-    void receiveFileListController(TCPSocket*, QIODevice*);
-    void requestFileListController(TCPSocket*, QIODevice*);
+    void receiveFileController(TCPSocket*);
+    void receiveFileListController(TCPSocket*);
+    void requestFileListController(TCPSocket*);
 
 signals:
     void signalFileListUpdate(QStringList*);
