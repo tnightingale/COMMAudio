@@ -184,11 +184,17 @@ bool TCPSocket::connectRemote(QString address, int port) {
     return true;
 }
 
-bool TCPSocket::slotProcessWSAEvent(PMSG pMsg) {
+//void TCPSocket::slotProcessWSAEvent(PMSG pMsg) {
+void TCPSocket::slotProcessWSAEvent(int wParam, int lParam) {
+    MSG msg;
+    msg.wParam = wParam;
+    msg.lParam = lParam;
+    PMSG pMsg = &msg;
+
     if (WSAGETSELECTERROR(pMsg->lParam)) {
         qDebug("TCPSocket::slotProcessWSAEvent(): %d: Socket failed. Error: %d",
               (int) pMsg->wParam, WSAGETSELECTERROR(pMsg->lParam));
-        return false;
+        return;
     }
 
     switch (WSAGETSELECTEVENT(pMsg->lParam)) {

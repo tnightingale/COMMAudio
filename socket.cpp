@@ -16,9 +16,15 @@ Socket::Socket(HWND hWnd, int addressFamily, int connectionType, int protocol)
 
 Socket::Socket(SOCKET socket, HWND hWnd)
 : socket_(socket), hWnd_(hWnd), outputBuffer_(new QBuffer()), 
-  inputBuffer_(new QBuffer()) { }
+  inputBuffer_(new QBuffer()) {
+
+    connect(this, SIGNAL(signalSocketClosed()),
+            this, SLOT(deleteLater()));
+
+}
 
 qint64 Socket::readData(char * data, qint64 maxSize) {
+    qDebug("Socket::readData(); Reading %d bytes", maxSize);
     qint64 bytesRead = 0;
 
     // Mutex lock here.

@@ -44,8 +44,8 @@ public:
     QStringList getLocalFileList();
 
 signals:
-    void signalWMWSASyncTCPRx(PMSG);
-    void signalWMWSASyncUDPRx(PMSG);
+    void signalWMWSASyncTCPRx(int, int);
+    void signalWMWSASyncUDPRx(int, int);
 
 private:
     Ui::MainWindow *ui;

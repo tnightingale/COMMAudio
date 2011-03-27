@@ -94,6 +94,8 @@ public slots:
      *
      * @author Tom Nightingale.
      */
+    //void slotProcessWSAEvent(PMSG pMsg);
+    void slotProcessWSAEvent(int, int);
 };
 
 #endif // TCPSOCKET_H

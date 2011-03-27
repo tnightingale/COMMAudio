@@ -47,7 +47,7 @@ public slots:
      *
      * @author Tom Nightingale.
      */
-    bool slotProcessWSAEvent(PMSG pMsg);
+    void slotProcessWSAEvent(int socket, int lParam);
 
 public:
     /**

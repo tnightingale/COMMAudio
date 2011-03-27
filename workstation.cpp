@@ -27,8 +27,8 @@ Workstation::Workstation(MainWindow *mainWindow) {
     tcpSocket_ = new TCPSocket(mainWindow->winId());
 
     // Connect signal and slot for WSA events
-    connect(mainWindow, SIGNAL(signalWMWSASyncTCPRx(PMSG)),
-            tcpSocket_, SLOT(slotProcessWSAEvent(PMSG)));
+    connect(mainWindow, SIGNAL(signalWMWSASyncTCPRx(int, int)),
+            tcpSocket_, SLOT(slotProcessWSAEvent(int, int)));
 
     // Connect signal and slot for processing a new connection
     connect(tcpSocket_, SIGNAL(signalClientConnected(TCPSocket*)),
@@ -37,8 +37,8 @@ Workstation::Workstation(MainWindow *mainWindow) {
             this, SLOT(decodeControlMessage(TCPSocket*)));
 
     udpSocket_ = new UDPSocket(mainWindow->winId());
-    connect(mainWindow, SIGNAL(signalWMWSASyncUDPRx(PMSG)),
-            udpSocket_, SLOT(slotProcessWSAEvent(PMSG)));
+    connect(mainWindow, SIGNAL(signalWMWSASyncUDPRx(int, int)),
+            udpSocket_, SLOT(slotProcessWSAEvent(int, int)));
 
     tcpSocket_->listen(7000);
     tcpSocket_->moveToThread(thread);
