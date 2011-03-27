@@ -90,6 +90,8 @@ signals:
     void signalDataReceived(TCPSocket *tcpSocket);
 
 public slots:
+    void slotWriteData(qint64);
+
     /**
      *
      * @param pMsg

@@ -42,7 +42,21 @@ bool TCPSocket::open(OpenMode mode) {
         return false;
     }
 
+    QIODevice::connect(this, SIGNAL(readyWrite(qint64)),
+                       this, SLOT(slotWriteData(qint64)));
+
     return QIODevice::open(mode);
+}
+
+void TCPSocket::slotWriteData(qint64 bytesToWrite) {
+    if (loadBuffer(bytesToWrite) < 0) {
+        return;
+    }
+    MSG msg;
+    msg.wParam = socket_;
+    msg.lParam = 0;
+    PMSG pMsg = &msg;
+    send(pMsg);
 }
 
 void TCPSocket::accept(PMSG pMsg) {
@@ -97,6 +111,7 @@ void TCPSocket::send(PMSG pMsg) {
         }
 
         delete nextTxBuff_;
+        nextTxBuff_ = NULL;
         if ((num = loadBuffer(bytesToRead)) <= 0) {
             qDebug("TCPSocket::send(); Finishing...");
             break;
@@ -105,7 +120,7 @@ void TCPSocket::send(PMSG pMsg) {
     }
 
     //if (data_->status() == QDataStream::Ok) {
-        ::shutdown(socket_, SD_SEND);
+    //    ::shutdown(socket_, SD_SEND);
     //}
 }
 

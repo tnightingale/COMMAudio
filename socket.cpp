@@ -50,6 +50,8 @@ qint64 Socket::writeData(const char * data, qint64 maxSize) {
     outputBuffer_->close();
     // Mutex unlock.
 
+    emit readyWrite(bytesWritten);
+
     return bytesWritten;
 }
 
@@ -62,6 +64,8 @@ bool Socket::listen(PSOCKADDR_IN pSockAddr) {
                WSAGetLastError());
         return false;
     }
+    
+    qDebug("Socket::listen(); listening to port %d", ntohs(pSockAddr->sin_port));
 
     return true;
 }

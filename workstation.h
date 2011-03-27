@@ -15,6 +15,8 @@ private:
 
     /**  */
     UDPSocket *udpSocket_;
+    
+    QThread* socketThread_;
 
     /* Pointer to the main window. This is used to access the window handle for
     when we create new sockets.*/

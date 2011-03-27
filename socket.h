@@ -94,6 +94,7 @@ public:
 
 signals:
     void signalSocketClosed();
+    void readyWrite(qint64);
     void status(QString);
 
 public slots:
