@@ -24,8 +24,11 @@ MainWindow::MainWindow(QWidget *parent) :
     slider->show();
 */
 
+    timer_ = new QTimeLine(50000);
+    visualization(40);
+    timer_->setPaused(true);
     ui->tab->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 0, 0);color: white;"));
-
+    //ui->tab_2->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 0, 0);color: white;"));
    // player->startMic();
     ui->remoteListWidget->setSortingEnabled(true);
     //ui->clientListWidget->setSortingEnabled(true);
@@ -103,40 +106,96 @@ void MainWindow::on_action_Request_Playlist_triggered()
 }
 
 void MainWindow::visualization(int n) {
-    QGraphicsRectItem *rect = new QGraphicsRectItem(0,0,n,n);
-    QGraphicsEllipseItem *innerball = new QGraphicsEllipseItem(150, 150, 20, 20);
+    QGraphicsRectItem *rect = new QGraphicsRectItem(0,0,80,n);
+    QGraphicsRectItem *rect2 = new QGraphicsRectItem(85,0,80,n);
+    QGraphicsRectItem *rect3 = new QGraphicsRectItem(170,0,80,n);
+    QGraphicsRectItem *rect4 = new QGraphicsRectItem(255,0,80,n);
+    QGraphicsRectItem *rect5 = new QGraphicsRectItem(340,0,80,n);
+    QGraphicsRectItem *rect6 = new QGraphicsRectItem(425,0,80,n);
+    QGraphicsRectItem *rect7 = new QGraphicsRectItem(510,0,80,n);
+    QGraphicsRectItem *rect8 = new QGraphicsRectItem(595,0,80,n);
+    QGraphicsRectItem *rect9 = new QGraphicsRectItem(680,0,80,n);
 
     QBrush fillBrush(Qt::red);
-    innerball->setBrush(fillBrush);
-
-    fillBrush.setColor(Qt::blue);
     rect->setBrush(fillBrush);
+    rect2->setBrush(fillBrush);
+    rect3->setBrush(fillBrush);
+    rect4->setBrush(fillBrush);
+    rect5->setBrush(fillBrush);
+    rect6->setBrush(fillBrush);
+    rect7->setBrush(fillBrush);
+    rect8->setBrush(fillBrush);
+    rect9->setBrush(fillBrush);
 
-    QTimeLine *timer = new QTimeLine(5000);
-    timer->setCurveShape(QTimeLine::SineCurve);
-    timer->setFrameRange(0, 100);
+    timer_->setCurveShape(QTimeLine::SineCurve);
+    timer_->setLoopCount(0);
+    timer_->setFrameRange(0, 100);
 
     QGraphicsItemAnimation *animation = new QGraphicsItemAnimation;
     QGraphicsItemAnimation *animation2 = new QGraphicsItemAnimation;
-    animation->setItem(rect);
-    animation2->setItem(innerball);
-    animation->setTimeLine(timer);
-    animation2->setTimeLine(timer);
+    QGraphicsItemAnimation *animation3 = new QGraphicsItemAnimation;
+    QGraphicsItemAnimation *animation4 = new QGraphicsItemAnimation;
+    QGraphicsItemAnimation *animation5 = new QGraphicsItemAnimation;
+    QGraphicsItemAnimation *animation6 = new QGraphicsItemAnimation;
+    QGraphicsItemAnimation *animation7 = new QGraphicsItemAnimation;
+    QGraphicsItemAnimation *animation8 = new QGraphicsItemAnimation;
+    QGraphicsItemAnimation *animation9 = new QGraphicsItemAnimation;
 
-    for (int i = 0; i < 200; ++i) {
-        animation->setScaleAt(i/200.0,1,i%5);
-         animation2->setScaleAt(i/200.0,i%2,i%2);
+    animation->setItem(rect);
+    animation->setTimeLine(timer_);
+
+    animation2->setItem(rect2);
+    animation2->setTimeLine(timer_);
+
+    animation3->setItem(rect3);
+    animation3->setTimeLine(timer_);
+
+    animation4->setItem(rect4);
+    animation4->setTimeLine(timer_);
+
+    animation5->setItem(rect5);
+    animation5->setTimeLine(timer_);
+
+    animation6->setItem(rect6);
+    animation6->setTimeLine(timer_);
+
+    animation7->setItem(rect7);
+    animation7->setTimeLine(timer_);
+
+    animation8->setItem(rect8);
+    animation8->setTimeLine(timer_);
+
+    animation9->setItem(rect9);
+    animation9->setTimeLine(timer_);
+
+    for (int i = 0; i < 100.0; ++i) {
+        animation->setScaleAt(i/100.0,1,i%9);
+        animation2->setScaleAt(i/100.0,1,i%7);
+        animation3->setScaleAt(i/100.0,1,i%5);
+        animation4->setScaleAt(i/100.0,1,i%4);
+        animation5->setScaleAt(i/100.0,1,i%9);
+        animation6->setScaleAt(i/100.0,1,i%7);
+        animation7->setScaleAt(i/100.0,1,i%5);
+        animation8->setScaleAt(i/100.0,1,i%7);
+        animation9->setScaleAt(i/100.0,1,i%9);
     }
 
     QGraphicsScene *scene = new QGraphicsScene();
     scene->setSceneRect(0, 0, 840, 410);
     scene->addItem(rect);
-    scene->addItem(innerball);
+    scene->addItem(rect2);
+    scene->addItem(rect3);
+    scene->addItem(rect4);
+    scene->addItem(rect5);
+    scene->addItem(rect6);
+    scene->addItem(rect7);
+    scene->addItem(rect8);
+    scene->addItem(rect9);
 
     ui->visualGraphicsView->setScene(scene);
     ui->visualGraphicsView->show();
 
-    timer->start();
+    timer_->start();
 }
 
 void MainWindow::appendToRemote(QStringList songList, QString ipAddress)
@@ -179,6 +238,7 @@ void MainWindow::on_clientListWidget_itemDoubleClicked(QListWidgetItem* item)
     ui->currentSongEditBox->setText(dataClicked);
     qDebug(qPrintable(item->text()));
     player_->play();
+    timer_->setPaused(false);
 }
 
 /*
@@ -228,10 +288,11 @@ void MainWindow::on_playButton_clicked()
     if(ui->playButton->text() == "Pause") {
        ui->playButton->setText("Play");
        player_->pause();
+       timer_->setPaused(true);
     } else {
        ui->playButton->setText("Pause");
        player_->play();
-       visualization(4);
+       timer_->setPaused(false);
     }
 
 }
@@ -259,6 +320,7 @@ void MainWindow::on_stopButton_clicked()
 {
     player_->stop();
     ui->playButton->setText("Play");
+    timer_->setPaused(true);
 }
 
 

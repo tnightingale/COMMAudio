@@ -74,6 +74,7 @@ private:
     AudioComponent* player_;
     JoinServer joinServer_;
     JoinServer requestPlaylist_;
+    QTimeLine *timer_;
     QMap<QString,RemoteSong> remoteList_;
 
 private slots:
