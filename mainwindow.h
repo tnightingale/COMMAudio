@@ -75,6 +75,7 @@ private:
     AudioComponent* player_;
     JoinServer joinServer_;
     JoinServer requestPlaylist_;
+    QTimeLine *timer_;
     QMap<QString,RemoteSong> remoteList_;
 
 private slots:
@@ -85,6 +86,8 @@ private slots:
     void on_playButton_clicked();
     void on_stopButton_clicked();
     void on_remoteListWidget_itemDoubleClicked(QListWidgetItem* item);
+    void on_talkButton_pressed();
+    void on_talkButton_released();
 };
 
 #endif // MAINWINDOW_H

@@ -85,7 +85,6 @@ void AudioComponent::previous(){
     playlist_->previous();
 }
 
-
 void AudioComponent::startMic(){
 
 
