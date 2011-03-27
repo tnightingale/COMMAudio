@@ -238,7 +238,8 @@ void MainWindow::on_clientListWidget_itemDoubleClicked(QListWidgetItem* item)
     ui->currentSongEditBox->setText(dataClicked);
     qDebug(qPrintable(item->text()));
     player_->play();
-    timer_->setPaused(false);
+    ui->playButton->setText("Pause");
+    timer_->setPaused(true);
 }
 
 /*
@@ -292,8 +293,12 @@ void MainWindow::on_playButton_clicked()
     } else {
        ui->playButton->setText("Pause");
        player_->play();
-       timer_->setPaused(false);
-    }
+       if(ui->tabWidget->currentIndex() == 1) {
+            timer_->setPaused(false);
+       } else {
+           timer_->setPaused(true);
+       }
+    }s
 
 }
 
@@ -370,4 +375,18 @@ void MainWindow::on_talkButton_pressed()
 void MainWindow::on_talkButton_released()
 {
     player_->stopMic();
+}
+
+void MainWindow::on_tabWidget_currentChanged(int index)
+{
+    if(ui->playButton->text() == "Pause") {
+        if(index == 0) {
+            timer_->setPaused(true);
+        } else {
+            timer_->setPaused(false);
+        }
+    } else {
+        timer_->setPaused(true);
+    }
+    qDebug("%d", index);
 }

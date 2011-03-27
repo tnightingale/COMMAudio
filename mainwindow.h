@@ -87,6 +87,7 @@ private slots:
     void on_remoteListWidget_itemDoubleClicked(QListWidgetItem* item);
     void on_talkButton_pressed();
     void on_talkButton_released();
+    void on_tabWidget_currentChanged(int index);
 };
 
 #endif // MAINWINDOW_H
