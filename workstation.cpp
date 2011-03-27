@@ -132,8 +132,8 @@ void Workstation::requestFileList()
 
     // Connect to a remote host
     if (!requestSocket->connectRemote(ip, port)) {
-      qDebug("Workstation::requestFileList(); Failed to connect to remote.");
-      return;
+        qDebug("Workstation::requestFileList(); Failed to connect to remote.");
+        return;
     }
 
     qDebug("Workstation::requestFileList(); Assuming connection suceeded!.");
@@ -220,11 +220,12 @@ void Workstation::decodeControlMessage(TCPSocket *socket)
     QByteArray packet = socket->readAll();
     qDebug() << "Workstation::decodeControlMessage(); DataRx: " << packet;
 
-    // Strip the first byte off the packet
+    // Store then strip the first byte off the packet
+    char messageType = packet[0];
     packet.remove(0, 1);
 
     // Check for type of message
-    switch (packet[0])
+    switch (messageType)
     {
     case FILE_LIST:
         // Connect the signal in case we receive more data
