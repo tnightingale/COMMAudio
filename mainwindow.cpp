@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :
     slider->saveGeometry();
     slider->show();
 
-    ui->tab->setStyleSheet(QString::fromUtf8("background-color: rgb(255, 255, 60);"));
+    ui->tab->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 0, 0);color: white;"));
    // player->startMic();
     ui->remoteListWidget->setSortingEnabled(true);
     //ui->clientListWidget->setSortingEnabled(true);
@@ -184,21 +184,37 @@ void MainWindow::on_playButton_clicked()
        ui->playButton->setText("Pause");
        player_->play();
 
-       QGraphicsItem *ball = new QGraphicsEllipseItem(0, 0, 20, 20);
+       QGraphicsEllipseItem *ball = new QGraphicsEllipseItem(100, 100, 100, 100);
+       QGraphicsEllipseItem *innerball = new QGraphicsEllipseItem(150, 150, 20, 20);
+
+       QBrush fillBrush(Qt::red);
+       innerball->setBrush(fillBrush);
+
+       fillBrush.setColor(Qt::blue);
+       ball->setBrush(fillBrush);
 
        QTimeLine *timer = new QTimeLine(5000);
+       timer->setCurveShape(QTimeLine::SineCurve);
        timer->setFrameRange(0, 100);
 
        QGraphicsItemAnimation *animation = new QGraphicsItemAnimation;
+       QGraphicsItemAnimation *animation2 = new QGraphicsItemAnimation;
        animation->setItem(ball);
+       animation2->setItem(innerball);
        animation->setTimeLine(timer);
+       animation2->setTimeLine(timer);
 
-       for (int i = 0; i < 200; ++i)
-            animation->setPosAt(i / 200.0, QPointF(i, i));
+      // animation->setScaleAt(0,0,0);
+       //animation2->setScaleAt(0,0,0);
+       for (int i = 0; i < 200; ++i) {
+            animation->setScaleAt(i/200.0,i%2,i%2);
+            animation2->setScaleAt(i/200.0,i%2,i%2);
+       }
 
        QGraphicsScene *scene = new QGraphicsScene();
-       scene->setSceneRect(0, 0, 250, 250);
+       scene->setSceneRect(0, 0, 840, 410);
        scene->addItem(ball);
+       scene->addItem(innerball);
 
        ui->visualGraphicsView->setScene(scene);
        ui->visualGraphicsView->show();
