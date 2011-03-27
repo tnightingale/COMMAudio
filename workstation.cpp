@@ -8,7 +8,8 @@
 #define FILE_TRANSFER 2
 #define VOICE_CHAT 3
 
-Workstation::Workstation(MainWindow *mainWindow) {
+Workstation::Workstation(MainWindow* mainWindow)
+: socketThread_(new QThread()), mainWindowPointer_(mainWindow) {
     int err = 0;
     WSADATA wsaData;
     WORD wVersionRequested = MAKEWORD(2,2);
@@ -18,18 +19,12 @@ Workstation::Workstation(MainWindow *mainWindow) {
         throw "Workstation::Workstation(): Missing WINSOCK2 DLL.";
     }
 
-    QThread * thread = new QThread();
-
-    // Save a pointer to the window
-    mainWindowPointer_ = mainWindow;
-
-    // Create TCP socket to listen for requests
+    // Open TCP socket for reading and writing.
     tcpSocket_ = new TCPSocket(mainWindow->winId());
-    tcpSocket_->open(QIODevice::ReadWrite);
-
     // Connect signal and slot for WSA events
     connect(mainWindow, SIGNAL(signalWMWSASyncTCPRx(int, int)),
             tcpSocket_, SLOT(slotProcessWSAEvent(int, int)));
+    tcpSocket_->open(QIODevice::ReadWrite);
 
     // Connect signal and slot for processing a new connection
     connect(tcpSocket_, SIGNAL(signalClientConnected(TCPSocket*)),
@@ -37,7 +32,7 @@ Workstation::Workstation(MainWindow *mainWindow) {
     connect(tcpSocket_, SIGNAL(signalDataReceived(TCPSocket*)),
             this, SLOT(decodeControlMessage(TCPSocket*)));
 
-    // Create UDP socket for voice chat and multicast
+    // Connect signal and slot for WSA events.
     udpSocket_ = new UDPSocket(mainWindow->winId());
     connect(mainWindow, SIGNAL(signalWMWSASyncUDPRx(int, int)),
             udpSocket_, SLOT(slotProcessWSAEvent(int, int)));
@@ -52,9 +47,10 @@ Workstation::Workstation(MainWindow *mainWindow) {
         tcpSocket_->listen(7001);
     }
 
-    tcpSocket_->moveToThread(thread);
+    tcpSocket_->moveToThread(socketThread_);
 
-    thread->start();
+    socketThread_->start();
+
 }
 
 Workstation::~Workstation() {
