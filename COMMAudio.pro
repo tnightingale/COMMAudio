@@ -7,7 +7,7 @@
 QT       += core gui \
             phonon \
             multimedia
-CONFIG += mobility
+CONFIG   += mobility
 MOBILITY += multimedia
 
 TARGET    = COMMAudio
@@ -22,7 +22,7 @@ SOURCES  += main.cpp \
             joinserver.cpp \
             workstation.cpp\
             audiocomponent.cpp \
-    remoteSong.cpp
+            remoteSong.cpp
 
 HEADERS  += mainwindow.h \
             socket.h \
@@ -31,10 +31,10 @@ HEADERS  += mainwindow.h \
             joinserver.h \
             workstation.h\
             audiocomponent.h \
-    remoteSong.h
+            remoteSong.h
 
 FORMS    += mainwindow.ui \
-    joinServer.ui
+            joinServer.ui
 
-LIBS += C:/Qt/2010.05/mingw/lib/libws2_32.a
+LIBS     += C:/Qt/2010.05/mingw/lib/libws2_32.a
 
