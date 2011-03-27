@@ -331,7 +331,6 @@ void Workstation::requestFileListController(TCPSocket *socket, QIODevice *buffer
     QByteArray packet;
     packetStream >> packet;
 
-
     // If processing is finished
     if(processReceivingFileList(&(*socket), &packet))
     {
