@@ -16,7 +16,7 @@ Socket::Socket(HWND hWnd, int addressFamily, int connectionType, int protocol)
 }
 
 Socket::Socket(SOCKET socket, HWND hWnd)
-: socket_(socket), hWnd_(hWnd), outputBuffer_(new QBuffer()), 
+: socket_(socket), hWnd_(hWnd), outputBuffer_(new QBuffer()),
   inputBuffer_(new QBuffer()), nextTxBuff_(NULL) {
 
     connect(this, SIGNAL(signalSocketClosed()),
@@ -58,7 +58,7 @@ bool Socket::listen(PSOCKADDR_IN pSockAddr) {
 
     if ((err = bind(socket_, (PSOCKADDR) pSockAddr, sizeof(SOCKADDR))
         == SOCKET_ERROR)) {
-        qDebug("Socket::startServer(): Can't bind to socket. Error: %d",
+        qDebug("Socket::listen(): Can't bind to socket. Error: %d",
                WSAGetLastError());
         return false;
     }
@@ -88,7 +88,7 @@ void Socket::slotProcessWSAEvent(PMSG pMsg) {
     switch (WSAGETSELECTEVENT(pMsg->lParam)) {
 
         case FD_CLOSE:
-            qDebug("Socket::slotProcessWSAEvent(); %d: FD_CLOSE.", 
+            qDebug("Socket::slotProcessWSAEvent(); %d: FD_CLOSE.",
                    (int) pMsg->wParam);
             close(pMsg);
             break;

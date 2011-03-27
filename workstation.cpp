@@ -47,7 +47,10 @@ Workstation::Workstation(MainWindow *mainWindow) {
             this, SLOT(requestFileList(QString, short)));
 
     // Listen on the TCP socket for other client connections
-    tcpSocket_->listen(7000);
+    if(!tcpSocket_->listen(7000))
+    {
+        tcpSocket_->listen(7001);
+    }
     tcpSocket_->moveToThread(thread);
 
     thread->start();
@@ -127,11 +130,6 @@ void Workstation::requestFileList(QString ip, short port)
 {
     qDebug("Workstation::requestFileList(); Requesting file list.");
 
-    // Hard coded values pending Joel's implementation of a connect window.
-    //short port = 7000;
-    //QString ip("192.168.0.96");
-    // End of hard coded values
-
     // Create the socket
     TCPSocket *requestSocket = new TCPSocket(mainWindowPointer_->winId());
 
@@ -140,6 +138,8 @@ void Workstation::requestFileList(QString ip, short port)
         qDebug("Workstation::requestFileList(); Failed to connect to remote.");
         return;
     }
+
+    requestSocket->open(QIODevice::ReadWrite);
 
     qDebug("Workstation::requestFileList(); Assuming connection suceeded!.");
 
@@ -157,6 +157,7 @@ void Workstation::requestFileList(QString ip, short port)
     // Send our own file list to the other client
     requestSocket->write(byteArray);
 
+     qDebug("Workstation::requestFileList(); Sent file list");
     // Connect the signal for receiving the other client's file list
     connect(requestSocket, SIGNAL(signalDataReceived(TCPSocket*)),
             this, SLOT(requestFileListController(TCPSocket*)));
@@ -286,7 +287,8 @@ bool Workstation::processReceivingFile()
 --
 -- PROGRAMMER: Luke Queenan
 --
--- INTERFACE: bool Workstation::processReceivingFileList(TCPSocket *socket, QByteArray *packet);
+-- INTERFACE: bool Workstation::processReceivingFileList(TCPSocket *socket,
+--            QByteArray *packet);
 --
 -- RETURNS: true if the transfer is complete, false if more data is expected
 --
@@ -424,6 +426,7 @@ void Workstation::receiveFileListController(TCPSocket *socket)
 */
 void Workstation::requestFileListController(TCPSocket *socket)
 {
+    qDebug("Workstation::requestFileListController(); Receiving other file list");
     // Read the packet from the socket
     QByteArray packet = socket->readAll();
 

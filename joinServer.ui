@@ -35,7 +35,7 @@
         <string>000.000.000.000; </string>
        </property>
        <property name="text">
-        <string>192.168.0.190</string>
+        <string>192.168.0.185</string>
        </property>
       </widget>
      </item>
@@ -52,7 +52,7 @@
         <string>99999; </string>
        </property>
        <property name="text">
-        <string>8929</string>
+        <string>7000</string>
        </property>
        <property name="maxLength">
         <number>5</number>
