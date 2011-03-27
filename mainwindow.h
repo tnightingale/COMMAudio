@@ -12,7 +12,6 @@
 #include "joinserver.h"
 #include "ui_joinserver.h"
 #include "remoteSong.h"
-#include "listenthread.h"
 #include <QGraphicsView>
 #include <QGraphicsItem>
 #include <QTimeLine>
