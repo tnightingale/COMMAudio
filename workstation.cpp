@@ -235,11 +235,11 @@ void Workstation::decodeControlMessage(TCPSocket *socket)
         receiveFileListController(&(*socket));
         break;
     case FILE_TRANSFER:
-        // Insert rest of received packet into the current transfers map
-        currentTransfers.insert(socket, packet.right(packet.length() - 1));
         // Connect the signal for the type of transfer
         connect(socket, SIGNAL(signalDataReceived(TCPSocket*)),
                 this, SLOT(receiveFileController(TCPSocket*)));
+        // Call function now to deal with rest of packet
+        receiveFileController(&(*socket));
         break;
     case VOICE_CHAT:
         // Connect to voice chat here
@@ -263,7 +263,8 @@ void Workstation::receiveFileController(TCPSocket*)
 
 bool Workstation::processReceivingFile()
 {
-
+    // Insert rest of received packet into the current transfers map
+    //currentTransfers.insert(socket, packet.right(packet.length() - 1));
 }
 
 /*
