@@ -7,6 +7,8 @@
 QT       += core gui \
             phonon \
             multimedia
+CONFIG += mobility
+MOBILITY += multimedia
 
 TARGET    = COMMAudio
 TEMPLATE  = app
@@ -17,19 +19,21 @@ SOURCES  += main.cpp \
             socket.cpp \
             tcpsocket.cpp \
             udpsocket.cpp \
+            joinserver.cpp \
             workstation.cpp\
-            audiocomponent.cpp
+            audiocomponent.cpp \
+    remoteSong.cpp
 
 HEADERS  += mainwindow.h \
             socket.h \
             tcpsocket.h \
             udpsocket.h \
+            joinserver.h \
             workstation.h\
-            audiocomponent.h
+            audiocomponent.h \
+    remoteSong.h
 
-FORMS    += mainwindow.ui
-
-INCLUDEPATH += "C:/OpenAL 1.1 SDK/include"
+FORMS    += mainwindow.ui \
+    joinServer.ui
 
 LIBS += C:/Qt/2010.05/mingw/lib/libws2_32.a
-#LIBS += "C:/OpenAL 1.1 SDK/libs/Win32/OpenAL32.lib"

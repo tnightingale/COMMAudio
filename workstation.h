@@ -1,5 +1,6 @@
 #include <QObject>
 #include <QThread>
+#include <QMap>
 
 class MainWindow;
 class TCPSocket;
@@ -19,13 +20,19 @@ private:
     when we create new sockets.*/
     MainWindow *mainWindowPointer_;
 
+    // Collection for file transfers
+    QMap <TCPSocket*, QByteArray> currentTransfers;
+
     // Functions
-    QByteArray dataStreamFileList();
     void sendFile();
     void sendFileList();
     // Create, send back socket information,
     // create buffer, connect signals/slots
     void acceptVoiceChat();
+
+    bool processReceivingFile();
+    bool processReceivingFileList(TCPSocket*, QByteArray*);
+
 
 public slots:
     // Triggered by user, so signal is coming from a button
@@ -36,8 +43,9 @@ public slots:
     void processConnection(TCPSocket*);
     void decodeControlMessage(TCPSocket*);
     void receiveUDP();
-    void receiveFile(TCPSocket*);
-    void receiveFileList(TCPSocket*);
+    void receiveFileController(TCPSocket*);
+    void receiveFileListController(TCPSocket*);
+    void requestFileListController(TCPSocket*);
 
 signals:
     void signalFileListUpdate(QStringList*);
