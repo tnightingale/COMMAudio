@@ -1,7 +1,8 @@
 #include "socket.h"
 
 Socket::Socket(HWND hWnd, int addressFamily, int connectionType, int protocol)
-: data_(NULL), hWnd_(hWnd) {
+: hWnd_(hWnd), outputBuffer_(new QBuffer()), inputBuffer_(new QBuffer()) {
+
     if ((socket_ = WSASocket(addressFamily, connectionType, protocol, NULL, 0,
                              WSA_FLAG_OVERLAPPED)) == INVALID_SOCKET) {
         int err = WSAGetLastError();
@@ -11,11 +12,48 @@ Socket::Socket(HWND hWnd, int addressFamily, int connectionType, int protocol)
 
     connect(this, SIGNAL(signalSocketClosed()),
             this, SLOT(deleteLater()));
+
+    QIODevice::open(QIODevice::ReadWrite);
 }
 
-Socket::Socket(SOCKET socket, HWND hWnd) {
-    socket_ = socket;
-    hWnd_ = hWnd;
+Socket::Socket(SOCKET socket, HWND hWnd)
+: socket_(socket), hWnd_(hWnd), outputBuffer_(new QBuffer()), 
+  inputBuffer_(new QBuffer()) {
+
+    connect(this, SIGNAL(signalSocketClosed()),
+            this, SLOT(deleteLater()));
+
+    QIODevice::open(QIODevice::ReadWrite);
+}
+
+qint64 Socket::readData(char * data, qint64 maxSize) {
+    qDebug("Socket::readData(); Reading %d bytes", maxSize);
+    qint64 bytesRead = 0;
+
+    // Mutex lock here.
+    inputBuffer_->open(QBuffer::ReadOnly);
+    bytesRead = inputBuffer_->read(data, maxSize);
+    inputBuffer_->close();
+
+    // Removing stuff that was read from the buffer.
+    QByteArray buffer = inputBuffer_->buffer();
+    buffer.remove(0, bytesRead);
+    inputBuffer_->setData(buffer);
+    // Mutex unlock.
+
+    return bytesRead;
+}
+
+qint64 Socket::writeData(const char * data, qint64 maxSize) {
+    qint64 bytesWritten = 0;
+
+    // Mutex lock here.
+    outputBuffer_->open(QBuffer::WriteOnly);
+    bytesWritten = outputBuffer_->write(data, maxSize);
+    outputBuffer_->close();
+    // Mutex unlock.
+
+    return bytesWritten;
 }
 
 bool Socket::listen(PSOCKADDR_IN pSockAddr) {
@@ -33,25 +71,31 @@ bool Socket::listen(PSOCKADDR_IN pSockAddr) {
 
 void Socket::close(PMSG pMsg) {
     shutdown(pMsg->wParam, SD_SEND);
+    QIODevice::close();
     emit signalSocketClosed();
 }
 
 
 
-bool Socket::slotProcessWSAEvent(PMSG pMsg) {
+void Socket::slotProcessWSAEvent(PMSG pMsg) {
     if (WSAGETSELECTERROR(pMsg->lParam)) {
         qDebug("Socket::slotProcessWSAEvent(): %d: Socket failed with error %d",
               (int) pMsg->wParam, WSAGETSELECTERROR(pMsg->lParam));
-        return false;
+        return;
+    }
+
+    if (pMsg->wParam != socket_) {
+        return;
     }
 
     switch (WSAGETSELECTEVENT(pMsg->lParam)) {
 
         case FD_CLOSE:
-            qDebug("Socket::slotProcessWSAEvent: %d: FD_CLOSE.", (int) pMsg->wParam);
+            qDebug("Socket::slotProcessWSAEvent(); %d: FD_CLOSE.", 
+                   (int) pMsg->wParam);
             close(pMsg);
             break;
     }
 
-    return true;
+    return;
 }

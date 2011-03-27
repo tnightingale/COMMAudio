@@ -27,6 +27,7 @@ void UDPSocket::send(PMSG pMsg) {
     winsockBuff.len = getPacketSize();
     bytesRead = winsockBuff.len;
 
+/*
     while (data_->status() == QDataStream::Ok) {
         ol = (WSAOVERLAPPED*) calloc(1, sizeof(WSAOVERLAPPED));
         winsockBuff.buf = (char *) malloc(bytesToRead * sizeof(char));
@@ -53,6 +54,7 @@ void UDPSocket::send(PMSG pMsg) {
         }
 
     }
+*/
 }
 
 void UDPSocket::receive(PMSG pMsg) {
@@ -79,16 +81,21 @@ void UDPSocket::receive(PMSG pMsg) {
     }
 }
 
-bool UDPSocket::slotProcessWSAEvent(PMSG pMsg) {
+void UDPSocket::slotProcessWSAEvent(int socket, int lParam) {
+    MSG msg;
+    msg.wParam = socket;
+    msg.lParam = lParam;
+    PMSG pMsg = &msg;
+
     if (WSAGETSELECTERROR(pMsg->lParam)) {
         qDebug("UDPSocket::slotProcessWSAEvent(): %d: Socket failed. Error: %d",
               (int) pMsg->wParam, WSAGETSELECTERROR(pMsg->lParam));
-        return false;
+        return;
     }
 
     // Filtering out messages for other sockets / protocols.
     if (pMsg->wParam != socket_) {
-        return false;
+        return;
     }
 
     switch (WSAGETSELECTEVENT(pMsg->lParam)) {
@@ -109,5 +116,5 @@ bool UDPSocket::slotProcessWSAEvent(PMSG pMsg) {
             break;
     }
 
-    return true;
+    return;
 }

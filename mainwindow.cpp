@@ -1,3 +1,6 @@
+
+
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "audiocomponent.h"
@@ -16,14 +19,16 @@ MainWindow::MainWindow(QWidget *parent) :
     /*player->addSong("./test.raw");
     player->play();*/
     player_->setSourceFolder();
-
+/*
     Phonon::SeekSlider *slider = new Phonon::SeekSlider(this);
     slider->setMediaObject(player_->getPlaylist());
     slider->setGeometry(180,490,450,19);
     slider->saveGeometry();
     slider->show();
+*/
 
     ui->tab->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 0, 0);color: white;"));
+
    // player->startMic();
     ui->remoteListWidget->setSortingEnabled(true);
     //ui->clientListWidget->setSortingEnabled(true);
@@ -177,6 +182,7 @@ void MainWindow::on_remoteListWidget_itemDoubleClicked(QListWidgetItem* item)
 */
 void MainWindow::on_playButton_clicked()
 {
+
     if(ui->playButton->text() == "Pause") {
        ui->playButton->setText("Play");
        player_->pause();
@@ -222,6 +228,7 @@ void MainWindow::on_playButton_clicked()
        timer->start();
 
     }
+
 }
 
 
@@ -248,14 +255,15 @@ void MainWindow::on_stopButton_clicked()
     player_->stop();
 }
 
-bool MainWindow::winEvent(MSG * msg, long * result) {
+
+bool MainWindow::winEvent(PMSG msg, long * result) {
     switch (msg->message) {
         case WM_WSAASYNC_TCP:
-            emit signalWMWSASyncTCPRx(msg);
+            emit signalWMWSASyncTCPRx(msg->wParam, msg->lParam);
             return true;
 
         case WM_WSAASYNC_UDP:
-            emit signalWMWSASyncUDPRx(msg);
+            emit signalWMWSASyncUDPRx(msg->wParam, msg->lParam);
             return true;
     }
 

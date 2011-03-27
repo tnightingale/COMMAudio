@@ -1,5 +1,0 @@
-1. Download OpenAl http://connect.creativelabs.com/openal/Downloads/Forms/AllItems.aspx OpenAL11CoreSDK
-2. run default install instruction
-3. move C:/ProgramFiles/OpenAL 1.1 SDK folder to C:/ drive
-
-this should work so we all have the same setup :D

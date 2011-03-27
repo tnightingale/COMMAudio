@@ -45,11 +45,9 @@ public slots:
      *
      * @param pMsg
      *
-     * @return
-     *
      * @author Tom Nightingale.
      */
-    bool slotProcessWSAEvent(PMSG pMsg);
+    void slotProcessWSAEvent(int socket, int lParam);
 
 public:
     /**
@@ -61,6 +59,7 @@ public:
     static void CALLBACK recvWorkerRoutine(DWORD error, DWORD bytesTransferred,
                                            LPWSAOVERLAPPED overlapped,
                                            DWORD inFlags) {
+/*
         QString output;
         QTextStream log(&output, QIODevice::WriteOnly);
 
@@ -84,6 +83,7 @@ public:
 
         free(data);
         free(overlapped);
+*/
     }
 
     /**
