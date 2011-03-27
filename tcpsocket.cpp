@@ -1,26 +1,48 @@
 #include "tcpsocket.h"
 
 TCPSocket::TCPSocket(HWND hWnd)
-: Socket(hWnd, AF_INET, SOCK_STREAM, IPPROTO_TCP) {
-    int err = 0;
-    int flags = FD_CONNECT | FD_READ | FD_ACCEPT | FD_CLOSE;
-
-    if ((err = WSAAsyncSelect(socket_, hWnd, WM_WSAASYNC_TCP, flags))
-                              == SOCKET_ERROR) {
-        qDebug("TCPSocket::TCPSocket(): Error setting up async select.");
-        throw "TCPSocket::TCPSocket(): Error setting up async select.";
-    }
-}
+: Socket(hWnd, AF_INET, SOCK_STREAM, IPPROTO_TCP) {}
 
 TCPSocket::TCPSocket(SOCKET socket, HWND hWnd)
-: Socket(socket, hWnd) {
-    int err = 0;
-    int flags = FD_READ | FD_CLOSE;
+: Socket(socket, hWnd) {}
 
-    if ((err = WSAAsyncSelect(socket, hWnd, WM_WSAASYNC_TCP, flags))
-                              == SOCKET_ERROR) {
-        qDebug("TCPSocket::TCPSocket(): Error setting up async select.");
+bool TCPSocket::open(OpenMode mode) {
+    int err = 0;
+    int flags = FD_CLOSE;
+
+    switch (mode) {
+        case QIODevice::ReadOnly:
+            flags |= FD_READ;
+            break;
+
+        case QIODevice::WriteOnly:
+            flags |= FD_WRITE;
+            break;
+
+        case QIODevice::ReadWrite:
+             flags |= FD_CONNECT | FD_READ | FD_WRITE | FD_ACCEPT;
+            break;
+
+        case QIODevice::NotOpen:
+             flags = 0;
+            break;
+
+        case QIODevice::Append:
+        case QIODevice::Truncate:
+        case QIODevice::Text:
+        case QIODevice::Unbuffered:
+        default:
+            return false;
+            break;
     }
+
+    if ((err = WSAAsyncSelect(socket_, hWnd_, WM_WSAASYNC_TCP, flags))
+                              == SOCKET_ERROR) {
+        qDebug("TCPSocket::open(): Error setting up async select.");
+        return false;
+    }
+
+    return QIODevice::open(mode);
 }
 
 void TCPSocket::accept(PMSG pMsg) {

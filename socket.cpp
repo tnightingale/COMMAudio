@@ -12,8 +12,6 @@ Socket::Socket(HWND hWnd, int addressFamily, int connectionType, int protocol)
 
     connect(this, SIGNAL(signalSocketClosed()),
             this, SLOT(deleteLater()));
-
-    QIODevice::open(QIODevice::ReadWrite);
 }
 
 Socket::Socket(SOCKET socket, HWND hWnd)
@@ -22,8 +20,6 @@ Socket::Socket(SOCKET socket, HWND hWnd)
 
     connect(this, SIGNAL(signalSocketClosed()),
             this, SLOT(deleteLater()));
-
-    QIODevice::open(QIODevice::ReadWrite);
 }
 
 qint64 Socket::readData(char * data, qint64 maxSize) {

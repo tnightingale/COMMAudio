@@ -13,6 +13,8 @@ public:
     TCPSocket(HWND hWnd);
     TCPSocket(SOCKET socket, HWND hWnd);
 
+    virtual bool open(OpenMode mode);
+
     /**
      *
      * @param pMsg

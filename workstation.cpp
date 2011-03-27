@@ -25,6 +25,7 @@ Workstation::Workstation(MainWindow *mainWindow) {
 
     // Create TCP socket to listen for requests
     tcpSocket_ = new TCPSocket(mainWindow->winId());
+    tcpSocket_->open(QIODevice::ReadWrite);
 
     // Connect signal and slot for WSA events
     connect(mainWindow, SIGNAL(signalWMWSASyncTCPRx(int, int)),
@@ -184,6 +185,9 @@ void Workstation::processConnection(TCPSocket* socket)
     if (!connect(mainWindowPointer_, SIGNAL(signalWMWSASyncTCPRx(int, int)),
                  socket, SLOT(slotProcessWSAEvent(int, int)))) {
         qDebug("Workstation::processConnection(); connect(signalWMWSASyncTCPRx()) failed.");
+    }
+    if (!socket->open(QIODevice::ReadWrite)) {
+        qDebug("Workstation::processConnection(); could not open client socket.");
     }
 }
 
