@@ -45,7 +45,7 @@ qint64 Socket::writeData(const char * data, qint64 maxSize) {
     qint64 bytesWritten = 0;
 
     // Mutex lock here.
-    outputBuffer_->open(QBuffer::WriteOnly);
+    outputBuffer_->open(QBuffer::Append);
     bytesWritten = outputBuffer_->write(data, maxSize);
     outputBuffer_->close();
     // Mutex unlock.
