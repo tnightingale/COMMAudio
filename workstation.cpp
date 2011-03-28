@@ -129,11 +129,6 @@ void Workstation::requestFileList(QString ip, short port)
 
     // Create the socket
     TCPSocket *requestSocket = new TCPSocket(mainWindowPointer_->winId());
-    if (!requestSocket->open(QIODevice::ReadWrite))
-    {
-        qDebug("Workstation::requestFileList(); could not open request socket");
-        return;
-    }
 
     // Connect to a remote host
     if (!requestSocket->connectRemote(ip, port)) {
@@ -142,6 +137,9 @@ void Workstation::requestFileList(QString ip, short port)
     }
 
     qDebug("Workstation::requestFileList(); Assuming connection suceeded!.");
+
+    requestSocket->moveToThread(socketThread_);
+    requestSocket->open(QIODevice::ReadWrite);
 
     // Get our local file list and convert it to a data stream
     QStringList fileList = mainWindowPointer_->getLocalFileList();
