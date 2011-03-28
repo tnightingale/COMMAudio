@@ -145,19 +145,21 @@ void Workstation::requestFileList(QString ip, short port)
     // Get our local file list and convert it to a data stream
     QStringList fileList = mainWindowPointer_->getLocalFileList();
     QByteArray byteArray;
-    QDataStream stream(&byteArray, QIODevice::ReadWrite);
-    foreach(const QString filePath, fileList)
-    {
-        stream << (filePath + '\n');
-    }
+    QDataStream stream(&byteArray, QIODevice::WriteOnly);
+    stream << fileList.toSet();
 
-    QDataStream s;
+
+/*    QDataStream s(&byteArray, QIODevice::ReadOnly);
     QStringList test;
     QString temp;
-    s << byteArray;
-    s >> temp;
 
-    test = temp.split('\n');
+    while ()
+    {
+        test.append(temp);
+    }*/
+    //s >> temp;
+
+    //test = temp.split('\n');
 
     //stream << fileList[0];
 
@@ -322,9 +324,9 @@ bool Workstation::processReceivingFileList(TCPSocket *socket, QByteArray *packet
         packet->truncate(packet->length() - 1);
 
         QDataStream *stream;
-        QStringList fileList;
+        QSet<QString> fileSet;
 
-        // Check to see if we already have already received data
+        // Check to see if we have already received data
         if (currentTransfers.contains(socket))
         {
             // Get the existing QByteArray out and load it into the stream
@@ -340,7 +342,7 @@ bool Workstation::processReceivingFileList(TCPSocket *socket, QByteArray *packet
         }
 
         // Stream the packet back into a QStringList
-        *stream >> fileList;
+        *stream >> fileSet;
 
         // Send the file list to the main window for procesing
         //mainWindowPointer_->appendToRemote(fileList, socket->getIp());
@@ -407,11 +409,10 @@ void Workstation::receiveFileListController(TCPSocket *socket)
         // Send our own file list to the other client
         QStringList fileList = mainWindowPointer_->getLocalFileList();
         QByteArray byteArray;
-        QDataStream *stream = new QDataStream(byteArray);
-        *stream << fileList;
+        QDataStream stream(&byteArray, QIODevice::WriteOnly);
+        stream << fileList.toSet();
 
         // Create the control packet
-        *stream >> byteArray;
         byteArray.insert(0, FILE_LIST);
         byteArray.append('\n');
 
