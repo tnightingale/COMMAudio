@@ -5,7 +5,8 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    slider_(0)
+    slider_(0),
+    muted_(false)
 {
     QString fileName;
     QString songTitle;
@@ -24,6 +25,13 @@ MainWindow::MainWindow(QWidget *parent) :
     slider->saveGeometry();
     slider->show();
 */
+
+    ui->playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+    ui->stopButton->setIcon(style()->standardIcon(QStyle::SP_MediaStop));
+    ui->nextButton->setIcon(style()->standardIcon(QStyle::SP_MediaSkipForward));
+    ui->previousButton->setIcon(style()->standardIcon(QStyle::SP_MediaSkipBackward));
+    ui->muteToolButton->setIcon(style()->standardIcon(QStyle::SP_MediaVolume));
+
     playerlink_ = player_->getPlayer();
     connect(playerlink_, SIGNAL(durationChanged(qint64)), SLOT(durationChanged(qint64)));
     connect(playerlink_, SIGNAL(positionChanged(qint64)), SLOT(positionChanged(qint64)));
@@ -320,10 +328,12 @@ void MainWindow::on_playButton_clicked()
 
     if(ui->playButton->text() == "Pause") {
        ui->playButton->setText("Play");
+       ui->playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
        player_->pause();
        timer_->setPaused(true);
     } else {
        ui->playButton->setText("Pause");
+       ui->playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPause));
        player_->play();
        if(ui->tabWidget->currentIndex() == 1) {
             timer_->setPaused(false);
@@ -443,7 +453,21 @@ void MainWindow::on_previousButton_clicked()
     ui->currentSongEditBox->setText(songTitle);
 }
 
-void MainWindow::on_verticalSlider_sliderMoved(int volume)
+void MainWindow::on_muteToolButton_clicked()
+{
+    if(muted_) {
+        ui->muteToolButton->setIcon(style()->standardIcon(QStyle::SP_MediaVolume));
+        muted_ = false;
+        playerlink_->setMuted(false);
+    } else {
+        muted_ = true;
+        playerlink_->setMuted(true);
+        ui->muteToolButton->setIcon(style()->standardIcon(QStyle::SP_MediaVolumeMuted));
+    }
+
+}
+
+void MainWindow::on_horizontalSlider_valueChanged(int volume)
 {
     playerlink_->setVolume(volume);
     ui->volumeLcdNumber->display(volume);

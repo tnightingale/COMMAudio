@@ -78,6 +78,7 @@ private:
     JoinServer joinServer_;
     JoinServer requestPlaylist_;
     QTimeLine *timer_;
+    bool muted_;
     QMap<QString,RemoteSong> remoteList_;
 
 private slots:
@@ -96,7 +97,8 @@ private slots:
     void on_tabWidget_currentChanged(int index);
     void on_nextButton_clicked();
     void on_previousButton_clicked();
-    void on_verticalSlider_sliderMoved(int volume);
+    void on_muteToolButton_clicked();
+    void on_horizontalSlider_valueChanged(int volume);
 };
 
 #endif // MAINWINDOW_H
