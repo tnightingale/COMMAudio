@@ -152,7 +152,6 @@ void Workstation::requestFileList(QString ip, short port)
     QDataStream s(&byteArray, QIODevice::ReadOnly);
     QSet<QString> test;
     QStringList temp;
-
     s >> temp;
 //*/
     // Create the control packet
@@ -264,7 +263,7 @@ void Workstation::decodeControlMessage(TCPSocket *socket)
         break;
     default:
         // Since the message is not recognized, close the connection
-        //socket->close();
+        delete socket;
         break;
     }
 }
