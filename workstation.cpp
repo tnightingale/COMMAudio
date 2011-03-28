@@ -148,21 +148,13 @@ void Workstation::requestFileList(QString ip, short port)
     QDataStream stream(&byteArray, QIODevice::WriteOnly);
     stream << fileList.toSet();
 
+/* Stream out test
+    QDataStream s(&byteArray, QIODevice::ReadOnly);
+    QSet<QString> test;
+    QStringList temp;
 
-/*    QDataStream s(&byteArray, QIODevice::ReadOnly);
-    QStringList test;
-    QString temp;
-
-    while ()
-    {
-        test.append(temp);
-    }*/
-    //s >> temp;
-
-    //test = temp.split('\n');
-
-    //stream << fileList[0];
-
+    s >> temp;
+//*/
     // Create the control packet
     byteArray.insert(0, FILE_LIST);
     byteArray.append('\n');
@@ -324,7 +316,7 @@ bool Workstation::processReceivingFileList(TCPSocket *socket, QByteArray *packet
         packet->truncate(packet->length() - 1);
 
         QDataStream *stream;
-        QSet<QString> fileSet;
+        QStringList fileSet;
 
         // Check to see if we have already received data
         if (currentTransfers.contains(socket))
