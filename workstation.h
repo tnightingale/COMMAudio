@@ -5,6 +5,7 @@
 class MainWindow;
 class TCPSocket;
 class UDPSocket;
+class FileData;
 
 class Workstation : public QObject {
   Q_OBJECT
@@ -15,7 +16,7 @@ private:
 
     /**  */
     UDPSocket *udpSocket_;
-    
+
     QThread* socketThread_;
 
     /* Pointer to the main window. This is used to access the window handle for

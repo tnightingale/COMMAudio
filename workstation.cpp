@@ -3,6 +3,7 @@
 #include "tcpsocket.h"
 #include "udpsocket.h"
 #include "ui_mainwindow.h"
+#include "filedata.h"
 
 #define FILE_LIST 1
 #define FILE_TRANSFER 2

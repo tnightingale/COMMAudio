@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QFile>
 
-class filedata : public QObject
+class FileData : public QObject
 {
     Q_OBJECT
 private:
@@ -12,8 +12,8 @@ private:
     QByteArray data_;
 
 public:
-    explicit filedata(QObject *parent = 0);
-    explicit filedata(QObject *parent, QString name, QByteArray data);
+    explicit FileData(QObject *parent = 0);
+    explicit FileData(QObject *parent, QString name, QByteArray data);
     void setName(QString name) {
         name_ = name;
     }

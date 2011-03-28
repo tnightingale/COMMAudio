@@ -1,17 +1,17 @@
 #include "filedata.h"
 #include <QDataStream>
-filedata::filedata(QObject *parent) :
+FileData::FileData(QObject *parent) :
     QObject(parent)
 {
 }
 
-filedata::filedata(QObject *parent, QString name, QByteArray data) : QObject(parent){
+FileData::FileData(QObject *parent, QString name, QByteArray data) : QObject(parent){
     name_ = name;
     data_ = data;
 }
 
 
-bool filedata::writeToFile() {
+bool FileData::writeToFile() {
     QString path = "./" + name_;
     QFile file(path);
     if(!file.open(QIODevice::WriteOnly)){
@@ -22,7 +22,7 @@ bool filedata::writeToFile() {
     file.close();
     return TRUE;
 }
-bool filedata::readFromFile() {
+bool FileData::readFromFile() {
     QString path = "./" + name_;
     QFile file(path);
     if(!file.open(QIODevice::ReadOnly)){
