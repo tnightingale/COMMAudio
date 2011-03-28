@@ -129,7 +129,8 @@ void Workstation::requestFileList(QString ip, short port)
 
     // Create the socket
     TCPSocket *requestSocket = new TCPSocket(mainWindowPointer_->winId());
-
+    connect(mainWindowPointer_, SIGNAL(signalWMWSASyncTCPRx(int,int)),
+            requestSocket, SLOT(slotProcessWSAEvent(int,int)));
     // Connect to a remote host
     if (!requestSocket->connectRemote(ip, port)) {
         qDebug("Workstation::requestFileList(); Failed to connect to remote.");
