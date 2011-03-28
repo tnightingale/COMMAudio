@@ -145,11 +145,23 @@ void Workstation::requestFileList(QString ip, short port)
     // Get our local file list and convert it to a data stream
     QStringList fileList = mainWindowPointer_->getLocalFileList();
     QByteArray byteArray;
-    QDataStream *stream = new QDataStream(byteArray);
-    *stream << fileList;
+    QDataStream stream(&byteArray, QIODevice::ReadWrite);
+    foreach(const QString filePath, fileList)
+    {
+        stream << (filePath + '\n');
+    }
+
+    QDataStream s;
+    QStringList test;
+    QString temp;
+    s << byteArray;
+    s >> temp;
+
+    test = temp.split('\n');
+
+    //stream << fileList[0];
 
     // Create the control packet
-    *stream >> byteArray;
     byteArray.insert(0, FILE_LIST);
     byteArray.append('\n');
 

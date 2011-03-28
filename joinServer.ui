@@ -35,7 +35,7 @@
         <string>000.000.000.000; </string>
        </property>
        <property name="text">
-        <string>192.168.0.185</string>
+        <string>127.0.0.1</string>
        </property>
       </widget>
      </item>
