@@ -7,6 +7,9 @@
 class FileData : public QObject
 {
     Q_OBJECT
+
+
+
 private:
     QString name_;
     QByteArray data_;
@@ -27,12 +30,20 @@ public:
         return data_;
     }
 
+    void append(QByteArray data) {
+        data_.append(data);
+    }
+
     bool writeToFile();
     bool readFromFile();
+
+
+
 signals:
 
 public slots:
 
 };
+
 
 #endif // FILEDATA_H
