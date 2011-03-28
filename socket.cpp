@@ -1,7 +1,8 @@
 #include "socket.h"
 
 Socket::Socket(HWND hWnd, int addressFamily, int connectionType, int protocol)
-: hWnd_(hWnd), outputBuffer_(new QBuffer()), inputBuffer_(new QBuffer()) {
+: hWnd_(hWnd), outputBuffer_(new QBuffer()), inputBuffer_(new QBuffer()),
+  nextTxBuff_(NULL) {
 
     if ((socket_ = WSASocket(addressFamily, connectionType, protocol, NULL, 0,
                              WSA_FLAG_OVERLAPPED)) == INVALID_SOCKET) {
@@ -12,18 +13,14 @@ Socket::Socket(HWND hWnd, int addressFamily, int connectionType, int protocol)
 
     connect(this, SIGNAL(signalSocketClosed()),
             this, SLOT(deleteLater()));
-
-    QIODevice::open(QIODevice::ReadWrite);
 }
 
 Socket::Socket(SOCKET socket, HWND hWnd)
-: socket_(socket), hWnd_(hWnd), outputBuffer_(new QBuffer()), 
-  inputBuffer_(new QBuffer()) {
+: socket_(socket), hWnd_(hWnd), outputBuffer_(new QBuffer()),
+  inputBuffer_(new QBuffer()), nextTxBuff_(NULL) {
 
     connect(this, SIGNAL(signalSocketClosed()),
             this, SLOT(deleteLater()));
-
-    QIODevice::open(QIODevice::ReadWrite);
 }
 
 qint64 Socket::readData(char * data, qint64 maxSize) {
@@ -48,10 +45,12 @@ qint64 Socket::writeData(const char * data, qint64 maxSize) {
     qint64 bytesWritten = 0;
 
     // Mutex lock here.
-    outputBuffer_->open(QBuffer::WriteOnly);
+    outputBuffer_->open(QBuffer::Append);
     bytesWritten = outputBuffer_->write(data, maxSize);
     outputBuffer_->close();
     // Mutex unlock.
+
+    emit readyWrite(bytesWritten);
 
     return bytesWritten;
 }
@@ -61,10 +60,12 @@ bool Socket::listen(PSOCKADDR_IN pSockAddr) {
 
     if ((err = bind(socket_, (PSOCKADDR) pSockAddr, sizeof(SOCKADDR))
         == SOCKET_ERROR)) {
-        qDebug("Socket::startServer(): Can't bind to socket. Error: %d",
+        qDebug("Socket::listen(): Can't bind to socket. Error: %d",
                WSAGetLastError());
         return false;
     }
+    
+    qDebug("Socket::listen(); listening to port %d", ntohs(pSockAddr->sin_port));
 
     return true;
 }
@@ -91,7 +92,7 @@ void Socket::slotProcessWSAEvent(PMSG pMsg) {
     switch (WSAGETSELECTEVENT(pMsg->lParam)) {
 
         case FD_CLOSE:
-            qDebug("Socket::slotProcessWSAEvent(); %d: FD_CLOSE.", 
+            qDebug("Socket::slotProcessWSAEvent(); %d: FD_CLOSE.",
                    (int) pMsg->wParam);
             close(pMsg);
             break;

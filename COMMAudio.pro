@@ -23,7 +23,7 @@ SOURCES  += main.cpp \
             workstation.cpp\
             audiocomponent.cpp \
             remoteSong.cpp \
-            listenthread.cpp
+    filedata.cpp
 
 HEADERS  += mainwindow.h \
             socket.h \
@@ -33,7 +33,7 @@ HEADERS  += mainwindow.h \
             workstation.h\
             audiocomponent.h \
             remoteSong.h \
-            listenthread.h
+    filedata.h
 
 FORMS    += mainwindow.ui \
             joinServer.ui

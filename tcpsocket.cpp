@@ -1,26 +1,62 @@
 #include "tcpsocket.h"
 
 TCPSocket::TCPSocket(HWND hWnd)
-: Socket(hWnd, AF_INET, SOCK_STREAM, IPPROTO_TCP) {
-    int err = 0;
-    int flags = FD_CONNECT | FD_READ | FD_ACCEPT | FD_CLOSE;
-
-    if ((err = WSAAsyncSelect(socket_, hWnd, WM_WSAASYNC_TCP, flags))
-                              == SOCKET_ERROR) {
-        qDebug("TCPSocket::TCPSocket(): Error setting up async select.");
-        throw "TCPSocket::TCPSocket(): Error setting up async select.";
-    }
-}
+: Socket(hWnd, AF_INET, SOCK_STREAM, IPPROTO_TCP) {}
 
 TCPSocket::TCPSocket(SOCKET socket, HWND hWnd)
-: Socket(socket, hWnd) {
-    int err = 0;
-    int flags = FD_READ | FD_CLOSE;
+: Socket(socket, hWnd) {}
 
-    if ((err = WSAAsyncSelect(socket, hWnd, WM_WSAASYNC_TCP, flags))
-                              == SOCKET_ERROR) {
-        qDebug("TCPSocket::TCPSocket(): Error setting up async select.");
+bool TCPSocket::open(OpenMode mode) {
+    int err = 0;
+    int flags = FD_CLOSE;
+
+    switch (mode) {
+        case QIODevice::ReadOnly:
+            flags |= FD_READ;
+            break;
+
+        case QIODevice::WriteOnly:
+            flags |= FD_CONNECT | FD_WRITE;
+            break;
+
+        case QIODevice::ReadWrite:
+             flags |= FD_CONNECT | FD_READ | FD_WRITE | FD_ACCEPT;
+            break;
+
+        case QIODevice::NotOpen:
+             flags = 0;
+            break;
+
+        case QIODevice::Append:
+        case QIODevice::Truncate:
+        case QIODevice::Text:
+        case QIODevice::Unbuffered:
+        default:
+            return false;
+            break;
     }
+
+    if ((err = WSAAsyncSelect(socket_, hWnd_, WM_WSAASYNC_TCP, flags))
+                              == SOCKET_ERROR) {
+        qDebug("TCPSocket::open(): Error setting up async select.");
+        return false;
+    }
+
+    QIODevice::connect(this, SIGNAL(readyWrite(qint64)),
+                       this, SLOT(slotWriteData(qint64)));
+
+    return QIODevice::open(mode);
+}
+
+void TCPSocket::slotWriteData(qint64 bytesToWrite) {
+    if (loadBuffer(bytesToWrite) < 0) {
+        return;
+    }
+    MSG msg;
+    msg.wParam = socket_;
+    msg.lParam = 0;
+    PMSG pMsg = &msg;
+    send(pMsg);
 }
 
 void TCPSocket::accept(PMSG pMsg) {
@@ -48,11 +84,15 @@ void TCPSocket::send(PMSG pMsg) {
     int result = 0;
     DWORD numSent = 0;
     int num = 0;
-    size_t bytesToRead = getPacketSize();
+    size_t bytesToRead = PACKETSIZE;
 
     WSABUF winsockBuff;
 
-    // NOTE: need to check the validity of using bytesToRead.
+    if (nextTxBuff_ == NULL && loadBuffer(bytesToRead) == 0) {
+        qDebug("TCPSocket::send(); Nothing to send.");
+        return;
+    }
+
     winsockBuff.buf = nextTxBuff_->data();
     winsockBuff.len = nextTxBuff_->size();
 
@@ -71,6 +111,7 @@ void TCPSocket::send(PMSG pMsg) {
         }
 
         delete nextTxBuff_;
+        nextTxBuff_ = NULL;
         if ((num = loadBuffer(bytesToRead)) <= 0) {
             qDebug("TCPSocket::send(); Finishing...");
             break;
@@ -79,7 +120,7 @@ void TCPSocket::send(PMSG pMsg) {
     }
 
     //if (data_->status() == QDataStream::Ok) {
-        ::shutdown(socket_, SD_SEND);
+    //    ::shutdown(socket_, SD_SEND);
     //}
 }
 
@@ -124,7 +165,7 @@ void TCPSocket::receive(PMSG pMsg) {
 }
 
 void TCPSocket::connect(PMSG) {
-    if (loadBuffer(getPacketSize()) < 0) {
+    if (loadBuffer(PACKETSIZE) < 0) {
         qDebug("TCPSocket::connect(); Cannot read from data source!");
         throw "TCPSocket::connect(); Cannot read from data source!";
     }
@@ -132,15 +173,23 @@ void TCPSocket::connect(PMSG) {
 
 int TCPSocket::loadBuffer(size_t bytesToRead) {
     // Lock mutex here
-    nextTxBuff_ = new QByteArray(bytesToRead, '\0');
-    if (outputBuffer_->atEnd()) {
-        qDebug("TCPSocket::loadBuffer(); data->atEnd()");
+    if (outputBuffer_->bytesAvailable() == 0) {
         return 0;
     }
+    nextTxBuff_ = new QByteArray(bytesToRead, '\0');
     // TODO: I had problems with this, might need to call 
     //       QByteArray::readRawData().
+    outputBuffer_->open(QIODevice::ReadOnly);
     int bytesRead = outputBuffer_->read(nextTxBuff_->data(), bytesToRead);
+    outputBuffer_->close();
+    
+    // Removing stuff that was read from the buffer.
+    QByteArray buffer = outputBuffer_->buffer();
+    buffer.remove(0, bytesRead);
+    outputBuffer_->setData(buffer);
     // Unlock mutex.
+
+    nextTxBuff_->resize(bytesRead);
     return bytesRead;
 }
 
@@ -198,6 +247,10 @@ void TCPSocket::slotProcessWSAEvent(int wParam, int lParam) {
     msg.wParam = wParam;
     msg.lParam = lParam;
     PMSG pMsg = &msg;
+
+    if (pMsg->wParam != socket_) {
+        return;
+    }
 
     if (WSAGETSELECTERROR(pMsg->lParam)) {
         qDebug("TCPSocket::slotProcessWSAEvent(): %d: Socket failed. Error: %d",

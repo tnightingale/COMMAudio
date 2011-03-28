@@ -5,6 +5,7 @@
 class MainWindow;
 class TCPSocket;
 class UDPSocket;
+class FileData;
 
 class Workstation : public QObject {
   Q_OBJECT
@@ -15,6 +16,8 @@ private:
 
     /**  */
     UDPSocket *udpSocket_;
+
+    QThread* socketThread_;
 
     /* Pointer to the main window. This is used to access the window handle for
     when we create new sockets.*/
@@ -35,11 +38,11 @@ private:
 
 
 public slots:
-    // Triggered by user, so signal is coming from a button
+    // Triggered by GUI buttons
     void connectToServer();
     void requestFile();
-    void requestFileList();
-    // Triggered by sockets, so signal is coming from a socket
+    void requestFileList(QString, short);
+    // Triggered by sockets
     void processConnection(TCPSocket*);
     void decodeControlMessage(TCPSocket*);
     void receiveUDP();
@@ -53,4 +56,5 @@ signals:
 public:
     Workstation(MainWindow *mainWindow);
     virtual ~Workstation();
+
 };

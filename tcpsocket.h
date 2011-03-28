@@ -13,6 +13,8 @@ public:
     TCPSocket(HWND hWnd);
     TCPSocket(SOCKET socket, HWND hWnd);
 
+    virtual bool open(OpenMode mode);
+
     /**
      *
      * @param pMsg
@@ -88,6 +90,8 @@ signals:
     void signalDataReceived(TCPSocket *tcpSocket);
 
 public slots:
+    void slotWriteData(qint64);
+
     /**
      *
      * @param pMsg

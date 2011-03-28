@@ -12,7 +12,6 @@
 #include "joinserver.h"
 #include "ui_joinserver.h"
 #include "remoteSong.h"
-#include "listenthread.h"
 #include <QGraphicsView>
 #include <QGraphicsItem>
 #include <QTimeLine>
@@ -67,6 +66,8 @@ public:
 signals:
     void signalWMWSASyncTCPRx(int, int);
     void signalWMWSASyncUDPRx(int, int);
+    void requestPlaylist(QString, short);
+    void requestFile(QString, QString);
 
 private:
     QSlider *slider_;
