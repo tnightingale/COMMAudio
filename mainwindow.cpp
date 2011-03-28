@@ -4,6 +4,7 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
+    slider_(0),
     ui(new Ui::MainWindow)
 {
     QString fileName;
@@ -23,6 +24,14 @@ MainWindow::MainWindow(QWidget *parent) :
     slider->saveGeometry();
     slider->show();
 */
+    playerlink_ = player_->getPlayer();
+    connect(playerlink_, SIGNAL(durationChanged(qint64)), SLOT(durationChanged(qint64)));
+    connect(playerlink_, SIGNAL(positionChanged(qint64)), SLOT(positionChanged(qint64)));
+    slider_ = new QSlider(Qt::Horizontal, this);
+    slider_->setRange(0, playerlink_->duration() / 1000);
+    slider_->setGeometry(180,490,450,19);
+    slider_->saveGeometry();
+    connect(slider_, SIGNAL(sliderMoved(int)), this, SLOT(seek(int)));
 
     timer_ = new QTimeLine(50000);
     visualization(40);
@@ -102,6 +111,23 @@ void MainWindow::on_action_Request_Playlist_triggered()
     if (requestPlaylist_.exec() == QDialog::Accepted)
     {
 
+    }
+}
+
+void MainWindow::seek(int seconds)
+{
+    playerlink_->setPosition(seconds * 1000);
+}
+
+void MainWindow::durationChanged(qint64 duration)
+{
+    slider_->setMaximum(duration / 1000);
+}
+
+void MainWindow::positionChanged(qint64 progress)
+{
+    if (!slider_->isSliderDown()) {
+        slider_->setValue(progress / 1000);
     }
 }
 
@@ -298,7 +324,7 @@ void MainWindow::on_playButton_clicked()
        } else {
            timer_->setPaused(true);
        }
-    }s
+    }
 
 }
 
@@ -389,4 +415,24 @@ void MainWindow::on_tabWidget_currentChanged(int index)
         timer_->setPaused(true);
     }
     qDebug("%d", index);
+}
+
+void MainWindow::on_nextButton_clicked()
+{
+    player_->next();
+    QString song = playerlink_->media().canonicalUrl().toString();
+    int n = song.lastIndexOf('/');
+    int s = song.size() - n - 1;
+    QString songTitle = song.right(s);
+    ui->currentSongEditBox->setText(songTitle);
+}
+
+void MainWindow::on_previousButton_clicked()
+{
+    player_->previous();
+    QString song = playerlink_->media().canonicalUrl().toString();
+    int n = song.lastIndexOf('/');
+    int s = song.size() - n - 1;
+    QString songTitle = song.right(s);
+    ui->currentSongEditBox->setText(songTitle);
 }

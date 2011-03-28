@@ -69,15 +69,20 @@ signals:
     void signalWMWSASyncUDPRx(int, int);
 
 private:
+    QSlider *slider_;
     Ui::MainWindow *ui;
     TCPSocket *controlSocket_;
     AudioComponent* player_;
+    QMediaPlayer* playerlink_;
     JoinServer joinServer_;
     JoinServer requestPlaylist_;
     QTimeLine *timer_;
     QMap<QString,RemoteSong> remoteList_;
 
 private slots:
+    void seek(int seconds);
+    void durationChanged(qint64 duration);
+    void positionChanged(qint64 progress);
     void on_action_Join_Multicast_triggered();
     void on_action_Request_Playlist_triggered();
     void on_action_Visible_toggled(bool status);
@@ -88,6 +93,8 @@ private slots:
     void on_talkButton_pressed();
     void on_talkButton_released();
     void on_tabWidget_currentChanged(int index);
+    void on_nextButton_clicked();
+    void on_previousButton_clicked();
 };
 
 #endif // MAINWINDOW_H

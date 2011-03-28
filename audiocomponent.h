@@ -29,6 +29,7 @@ public:
     void addSongToBegining(QString filename);
     void setCurrentSong(QString fileName);
     QMediaPlayer::State getState();
+    QMediaPlayer* getPlayer();
 
 private:
     QMediaPlayer* player_;

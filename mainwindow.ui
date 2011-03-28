@@ -17,7 +17,7 @@
    <widget class="QPushButton" name="playButton">
     <property name="geometry">
      <rect>
-      <x>460</x>
+      <x>390</x>
       <y>520</y>
       <width>93</width>
       <height>28</height>
@@ -30,7 +30,7 @@
    <widget class="QPushButton" name="stopButton">
     <property name="geometry">
      <rect>
-      <x>250</x>
+      <x>290</x>
       <y>520</y>
       <width>93</width>
       <height>28</height>
@@ -73,7 +73,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -141,6 +141,11 @@
       </property>
      </widget>
     </widget>
+    <widget class="QWidget" name="tab_3">
+     <attribute name="title">
+      <string>Now Playing</string>
+     </attribute>
+    </widget>
    </widget>
    <widget class="QPushButton" name="talkButton">
     <property name="geometry">
@@ -153,6 +158,32 @@
     </property>
     <property name="text">
      <string>Push to Talk</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="previousButton">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>520</y>
+      <width>93</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Previous</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="nextButton">
+    <property name="geometry">
+     <rect>
+      <x>550</x>
+      <y>520</y>
+      <width>93</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Next</string>
     </property>
    </widget>
   </widget>

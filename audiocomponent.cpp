@@ -85,6 +85,10 @@ void AudioComponent::previous(){
     playlist_->previous();
 }
 
+QMediaPlayer* AudioComponent::getPlayer() {
+    return player_;
+}
+
 void AudioComponent::startMic(){
 
 
