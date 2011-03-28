@@ -96,6 +96,7 @@ private slots:
     void on_tabWidget_currentChanged(int index);
     void on_nextButton_clicked();
     void on_previousButton_clicked();
+    void on_verticalSlider_sliderMoved(int volume);
 };
 
 #endif // MAINWINDOW_H

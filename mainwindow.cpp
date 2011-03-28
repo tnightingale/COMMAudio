@@ -36,8 +36,10 @@ MainWindow::MainWindow(QWidget *parent) :
     timer_ = new QTimeLine(50000);
     visualization(40);
     timer_->setPaused(true);
+
     ui->tab->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 0, 0);color: white;"));
     ui->tab_2->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 0, 0);color: white;"));
+    ui->volumeLcdNumber->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 0, 0);color: white;"));
    // player->startMic();
 
     ui->remoteListWidget->setSortingEnabled(true);
@@ -50,6 +52,7 @@ MainWindow::MainWindow(QWidget *parent) :
         int s = fileName.size() - n - 1;
         songTitle = fileName.right(s);
         ui->clientListWidget->addItem(new QListWidgetItem(songTitle));
+
     }
 
     if(songList.size() > 0) {
@@ -438,4 +441,10 @@ void MainWindow::on_previousButton_clicked()
     int s = song.size() - n - 1;
     QString songTitle = song.right(s);
     ui->currentSongEditBox->setText(songTitle);
+}
+
+void MainWindow::on_verticalSlider_sliderMoved(int volume)
+{
+    playerlink_->setVolume(volume);
+    ui->volumeLcdNumber->display(volume);
 }
