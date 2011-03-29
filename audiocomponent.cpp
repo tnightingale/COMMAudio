@@ -113,7 +113,7 @@ void AudioComponent::startMic(){
     qoutput_->start(micData);
     //return micData;
 }
-void AudioComponent::startMic(QIODevice stream) {
+void AudioComponent::startMic(QIODevice* stream) {
     format.setFrequency(8000);
     format.setChannels(1);
     format.setSampleSize(8);
@@ -137,5 +137,27 @@ void AudioComponent::startMic(QIODevice stream) {
 }
 
 void AudioComponent::stopMic(){
+    input_->stop();
+}
+void AudioComponent::playStream(QIODevice* stream){
+    format.setFrequency(8000);
+    format.setChannels(1);
+    format.setSampleSize(8);
+    format.setCodec("audio/pcm");
+    format.setByteOrder(QAudioFormat::LittleEndian);
+    format.setSampleType(QAudioFormat::UnSignedInt);
+
+    QAudioDeviceInfo info = QAudioDeviceInfo::defaultInputDevice();
+    if (!info.isFormatSupported(format));{
+        qWarning()<<"format not supported";
+        format = info.nearestFormat(format);
+    }
+    QStringList formatTypes = info.supportedCodecs();
+    for(int i = 0;i < formatTypes.size();++i){
+        qDebug()<< formatTypes.at(i);
+    }
+    QAudioOutput* qoutput_;
+    qoutput_ = new QAudioOutput(format,NULL);
+    qoutput_->start(stream);
 
 }
