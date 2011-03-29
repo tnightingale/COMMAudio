@@ -24,7 +24,7 @@ private:
     MainWindow *mainWindowPointer_;
 
     // Collection for file transfers
-    QMap <TCPSocket*, QByteArray> currentTransfers;
+    QMap <TCPSocket*, FileData*> currentTransfers;
 
     // Functions
     void sendFile();
