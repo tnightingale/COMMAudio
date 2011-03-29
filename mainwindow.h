@@ -10,6 +10,8 @@
 #include "tcpsocket.h"
 #include "audiocomponent.h"
 #include "joinserver.h"
+#include "colors.h"
+#include "ui_colors.h"
 #include "ui_joinserver.h"
 #include "remoteSong.h"
 #include <QGraphicsView>
@@ -63,6 +65,8 @@ public:
 
     QStringList getLocalFileList();
 
+    void backgroundColor(QString background, QString font);
+
 signals:
     void signalWMWSASyncTCPRx(int, int);
     void signalWMWSASyncUDPRx(int, int);
@@ -77,6 +81,7 @@ private:
     QMediaPlayer* playerlink_;
     JoinServer joinServer_;
     JoinServer requestPlaylist_;
+    Colors changeColor_;
     QTimeLine *timer_;
     bool muted_;
     QMap<QString,RemoteSong> remoteList_;
@@ -86,6 +91,7 @@ private slots:
     void durationChanged(qint64 duration);
     void positionChanged(qint64 progress);
     void on_action_Join_Multicast_triggered();
+    void on_action_Modify_triggered();
     void on_action_Request_Playlist_triggered();
     void on_action_Visible_toggled(bool status);
     void on_clientListWidget_itemDoubleClicked(QListWidgetItem* item);

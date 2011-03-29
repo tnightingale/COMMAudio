@@ -37,7 +37,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(playerlink_, SIGNAL(positionChanged(qint64)), SLOT(positionChanged(qint64)));
     slider_ = new QSlider(Qt::Horizontal, this);
     slider_->setRange(0, playerlink_->duration() / 1000);
-    slider_->setGeometry(180,490,450,19);
+    slider_->setGeometry(180,485,450,19);
     slider_->saveGeometry();
     connect(slider_, SIGNAL(sliderMoved(int)), this, SLOT(seek(int)));
 
@@ -45,9 +45,7 @@ MainWindow::MainWindow(QWidget *parent) :
     visualization(40);
     timer_->setPaused(true);
 
-    ui->tab->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 0, 0);color: white;"));
-    ui->tab_2->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 0, 0);color: white;"));
-    ui->volumeLcdNumber->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 0, 0);color: white;"));
+    backgroundColor("black", "White");
    // player->startMic();
 
     ui->remoteListWidget->setSortingEnabled(true);
@@ -430,7 +428,6 @@ void MainWindow::on_tabWidget_currentChanged(int index)
     } else {
         timer_->setPaused(true);
     }
-    qDebug("%d", index);
 }
 
 void MainWindow::on_nextButton_clicked()
@@ -471,4 +468,51 @@ void MainWindow::on_horizontalSlider_valueChanged(int volume)
 {
     playerlink_->setVolume(volume);
     ui->volumeLcdNumber->display(volume);
+}
+
+void MainWindow::backgroundColor(QString background, QString font) {
+    QString backColor = background, fontColor = font;
+    const QString maincolor = "* {color:" + background + ";background-color:" + font + ";}";
+    font.prepend(";color:");
+    font.append(";}");
+    QString hover = background;
+    hover.prepend("QPushButton {border-style:ridge;border-width:2px;border-color:red;background-color:");
+    hover.append(font);
+    QString sliderColor = "QSlider::groove:horizontal {background:" +  fontColor + ";position: absolute;"
+                            "border-style:solid;border-width:3px;border-color:" + backColor + ";}";
+    sliderColor += "QSlider::handle:horizontal {height: 20px;background:" + backColor + ";width:4px;"
+                    "border-style:solid;border-width:1px;border-color:" + fontColor + ";}";
+    sliderColor += "QSlider::add-page:horizontal {background:" + fontColor + ";}";
+    sliderColor += "QSlider::sub-page:horizontal {background:" + backColor + ";}";
+    sliderColor += "QSlider {border-style:groove;border-width:2px;border-color:" + backColor + ";}";
+
+    const QString sliderMods = sliderColor;
+    background = background.prepend("QWidget, QLCDNumber, * {background-color:");
+    background = background.append(font);
+    const QString color = background;
+    const QString button = hover;
+    const QString tabColor = "QTabWidget::tab-bar {background: Red;} QTabBar::tab"
+                            "{background:" + backColor + ";color:" + fontColor + ";}" + color +
+                            "QTabBar::tab:hover{background:" + fontColor + ";color:" + backColor + ";}";
+    ui->tabWidget->setStyleSheet(tabColor);
+    ui->volumeLcdNumber->setStyleSheet(color);
+    ui->playButton->setStyleSheet(button);
+    ui->stopButton->setStyleSheet(button);
+    ui->previousButton->setStyleSheet(button);
+    ui->talkButton->setStyleSheet(button);
+    ui->muteToolButton->setStyleSheet(button);
+    ui->nextButton->setStyleSheet(button);
+    slider_->setStyleSheet(sliderMods);
+    ui->horizontalSlider->setStyleSheet(sliderMods);
+    MainWindow::setStyleSheet(maincolor);
+    ui->menuBar->setStyleSheet(color + "QMenuBar::item {background:" + backColor + ";color:" + fontColor + ";}"
+                               "QMenuBar::item:selected {background:" + fontColor + ";color:" + backColor + ";}"
+                               "QMenu::item:selected {background:" + fontColor + ";color:" + backColor + ";}");
+}
+
+void MainWindow::on_action_Modify_triggered(){
+    if (changeColor_.exec() == QDialog::Accepted)
+    {
+        backgroundColor(changeColor_.getBackground(), changeColor_.getFont());
+    }
 }

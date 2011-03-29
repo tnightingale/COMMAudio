@@ -18,7 +18,7 @@
     <property name="geometry">
      <rect>
       <x>410</x>
-      <y>520</y>
+      <y>510</y>
       <width>93</width>
       <height>28</height>
      </rect>
@@ -31,7 +31,7 @@
     <property name="geometry">
      <rect>
       <x>300</x>
-      <y>520</y>
+      <y>510</y>
       <width>93</width>
       <height>28</height>
      </rect>
@@ -151,7 +151,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>520</y>
+      <y>510</y>
       <width>93</width>
       <height>28</height>
      </rect>
@@ -164,7 +164,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>520</y>
+      <y>510</y>
       <width>93</width>
       <height>28</height>
      </rect>
@@ -177,7 +177,7 @@
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>520</y>
+      <y>510</y>
       <width>93</width>
       <height>28</height>
      </rect>
@@ -190,7 +190,7 @@
     <property name="geometry">
      <rect>
       <x>790</x>
-      <y>520</y>
+      <y>510</y>
       <width>64</width>
       <height>23</height>
      </rect>
@@ -203,7 +203,7 @@
     <property name="geometry">
      <rect>
       <x>690</x>
-      <y>520</y>
+      <y>510</y>
       <width>93</width>
       <height>28</height>
      </rect>
@@ -251,7 +251,14 @@
     <addaction name="action_Visible"/>
     <addaction name="action_Host_Multicast"/>
    </widget>
+   <widget class="QMenu" name="menuColors">
+    <property name="title">
+     <string>Theme</string>
+    </property>
+    <addaction name="action_Modify"/>
+   </widget>
    <addaction name="menuConnections"/>
+   <addaction name="menuColors"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="action_Request_Playlist">
@@ -278,6 +285,101 @@
   <action name="action_Host_Multicast">
    <property name="text">
     <string>&amp;Host Multicast</string>
+   </property>
+  </action>
+  <action name="actionAqua">
+   <property name="text">
+    <string>Aqua</string>
+   </property>
+  </action>
+  <action name="actionRed">
+   <property name="text">
+    <string>Red</string>
+   </property>
+  </action>
+  <action name="actionBlack">
+   <property name="text">
+    <string>Black</string>
+   </property>
+  </action>
+  <action name="actionCrimson">
+   <property name="text">
+    <string>Crimson</string>
+   </property>
+  </action>
+  <action name="actionChocolate">
+   <property name="text">
+    <string>Chocolate</string>
+   </property>
+  </action>
+  <action name="actionDarkMagenta">
+   <property name="text">
+    <string>DarkMagenta </string>
+   </property>
+  </action>
+  <action name="actionV">
+   <property name="text">
+    <string>DeepPink </string>
+   </property>
+  </action>
+  <action name="actionForestGreen">
+   <property name="text">
+    <string>ForestGreen </string>
+   </property>
+  </action>
+  <action name="actionAqua_2">
+   <property name="text">
+    <string>Aqua</string>
+   </property>
+  </action>
+  <action name="actionRed_2">
+   <property name="text">
+    <string>Red</string>
+   </property>
+  </action>
+  <action name="actionBlack_2">
+   <property name="text">
+    <string>Black</string>
+   </property>
+  </action>
+  <action name="actionCrimson_2">
+   <property name="text">
+    <string>Crimson</string>
+   </property>
+  </action>
+  <action name="actionChocolate_2">
+   <property name="text">
+    <string>Chocolate</string>
+   </property>
+  </action>
+  <action name="actionDarkMegenta">
+   <property name="text">
+    <string>DarkMagenta</string>
+   </property>
+  </action>
+  <action name="actionDeepPink">
+   <property name="text">
+    <string>DeepPink</string>
+   </property>
+  </action>
+  <action name="actionForestGreen_2">
+   <property name="text">
+    <string>ForestGreen</string>
+   </property>
+  </action>
+  <action name="actionWhite">
+   <property name="text">
+    <string>White</string>
+   </property>
+  </action>
+  <action name="actionWhite_2">
+   <property name="text">
+    <string>White</string>
+   </property>
+  </action>
+  <action name="action_Modify">
+   <property name="text">
+    <string>Appearance</string>
    </property>
   </action>
  </widget>
