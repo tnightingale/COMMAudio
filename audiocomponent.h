@@ -54,6 +54,7 @@ void next();
 void previous();
 
 void startMic();
+void startMic(QIODevice);
 void stopMic();
 
 };
