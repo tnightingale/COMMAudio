@@ -342,8 +342,8 @@ bool Workstation::processReceivingFileList(TCPSocket *socket, QByteArray *packet
     else
     {
         // Append newly received data
-        FileData fileData = currentTransfers.value(socket);
-        fileData.append(*packet);
+        FileData *fileData = currentTransfers.value(socket);
+        fileData->append(*packet);
 
         // Since the transfer is not yet complete, return false
         isFileListTransferComplete = false;
