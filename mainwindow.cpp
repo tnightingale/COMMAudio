@@ -473,8 +473,10 @@ void MainWindow::backgroundColor(QString background, QString font) {
     font.prepend(";color:");
     font.append(";}");
     QString hover = background;
-    hover.prepend("QPushButton {border-style:ridge;border-width:2px;border-color:red;background-color:");
+    hover.prepend("QPushButton:pressed {border-style:ridge;border-width:3px;border-color:" + fontColor + ";background-color:");
     hover.append(font);
+    hover += " QPushButton {border-style:ridge;border-width:3px;border-color:" + backColor + ";background-color:" +
+                 fontColor + ";color:" + backColor + ";}";
     QString sliderColor = "QSlider::groove:horizontal {background:" +  fontColor + ";position: absolute;"
                             "border-style:solid;border-width:3px;border-color:" + backColor + ";}";
     sliderColor += "QSlider::handle:horizontal {height: 20px;background:" + backColor + ";width:4px;"
