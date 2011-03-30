@@ -73,7 +73,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -104,12 +104,12 @@
        <rect>
         <x>630</x>
         <y>0</y>
-        <width>51</width>
+        <width>91</width>
         <height>21</height>
        </rect>
       </property>
       <property name="text">
-       <string>Remote</string>
+       <string>Remote Library</string>
       </property>
      </widget>
      <widget class="QLabel" name="label">
@@ -117,12 +117,12 @@
        <rect>
         <x>70</x>
         <y>0</y>
-        <width>41</width>
+        <width>81</width>
         <height>21</height>
        </rect>
       </property>
       <property name="text">
-       <string>Client</string>
+       <string>Local Library</string>
       </property>
      </widget>
      <widget class="QTextEdit" name="songAddedEditBox">
@@ -171,6 +171,32 @@
        <string>Song Transfered</string>
       </property>
      </widget>
+     <widget class="QPushButton" name="clearLocalButton">
+      <property name="geometry">
+       <rect>
+        <x>290</x>
+        <y>350</y>
+        <width>93</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Clear</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="clearRemoteButton">
+      <property name="geometry">
+       <rect>
+        <x>760</x>
+        <y>350</y>
+        <width>93</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Clear</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">
@@ -194,8 +220,8 @@
      <widget class="QListWidget" name="playlistWidget">
       <property name="geometry">
        <rect>
-        <x>280</x>
-        <y>30</y>
+        <x>50</x>
+        <y>20</y>
         <width>241</width>
         <height>371</height>
        </rect>
@@ -204,8 +230,8 @@
      <widget class="QPushButton" name="savePlaylistButton">
       <property name="geometry">
        <rect>
-        <x>610</x>
-        <y>50</y>
+        <x>430</x>
+        <y>30</y>
         <width>111</width>
         <height>28</height>
        </rect>
@@ -217,7 +243,7 @@
      <widget class="QPushButton" name="loadPlaylistButton">
       <property name="geometry">
        <rect>
-        <x>610</x>
+        <x>440</x>
         <y>100</y>
         <width>111</width>
         <height>28</height>
@@ -225,6 +251,19 @@
       </property>
       <property name="text">
        <string>Load Playlist</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="clearPlaylistButton">
+      <property name="geometry">
+       <rect>
+        <x>200</x>
+        <y>390</y>
+        <width>93</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Clear</string>
       </property>
      </widget>
     </widget>

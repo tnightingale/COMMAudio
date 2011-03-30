@@ -521,6 +521,9 @@ void MainWindow::backgroundColor(QString background, QString font) {
     ui->addMusicButton->setStyleSheet(button);
     ui->savePlaylistButton->setStyleSheet(button);
     ui->loadPlaylistButton->setStyleSheet(button);
+    ui->clearLocalButton->setStyleSheet(button);
+    ui->clearPlaylistButton->setStyleSheet(button);
+    ui->clearRemoteButton->setStyleSheet(button);
     slider_->setStyleSheet(sliderMods);
     ui->horizontalSlider->setStyleSheet(sliderMods);
     MainWindow::setStyleSheet(maincolor);
@@ -684,4 +687,20 @@ void MainWindow::on_savePlaylistButton_clicked()
 void MainWindow::on_loadPlaylistButton_clicked()
 {
     loadlastPlaylist();
+}
+
+void MainWindow::on_clearPlaylistButton_clicked()
+{
+    ui->playlistWidget->clear();
+    playlist_->clear();
+}
+
+void MainWindow::on_clearLocalButton_clicked()
+{
+    ui->clientListWidget->clear();
+}
+
+void MainWindow::on_clearRemoteButton_clicked()
+{
+    ui->remoteListWidget->clear();
 }
