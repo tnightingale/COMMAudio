@@ -412,7 +412,7 @@ bool Workstation::processReceivingFileList(TCPSocket *socket, QByteArray *packet
         stream >> fileList;
 
         // Send the file list to the main window for procesing
-        mainWindowPointer_->appendToRemote(fileList, socket->getIp());
+        //mainWindowPointer_->appendToRemote(fileList, socket->getIp(), );
 
         // Remove the file transfer
         currentTransfers.remove(socket);

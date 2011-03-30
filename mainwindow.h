@@ -59,7 +59,7 @@ public:
      *
      * @author Joel Stewart
      */
-    void appendToRemote(QStringList songList, QString ipAddress);
+    void appendToRemote(QStringList songList, QString ipAddress, short port);
 
     void visualization(int n);
 
