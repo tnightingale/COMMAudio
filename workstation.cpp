@@ -60,9 +60,25 @@ Workstation::~Workstation() {
     // Should delete the current transfers map here too?
 }
 
-void Workstation::sendFile()
+void Workstation::sendFile(TCPSocket* socket)
 {
+    QByteArray packet = socket->readAll();
+    QString fileName(&(*packet));
+    QFile file(fileName);
+    if(!file.open(QIODevice::ReadOnly)){
+        return;
+    }
+    QDataStream fileStream(&file);
+    QByteArray byteArray;
+    QDataStream stream(&byteArray, QIODevice::WriteOnly);
+    stream << fileStream;
 
+    // Create the control packet
+    byteArray.insert(0, FILE_LIST);
+    byteArray.append('\n');
+
+    // Send our file to the other client
+    socket->write(byteArray);
 }
 
 void Workstation::sendFileList()
@@ -102,6 +118,7 @@ void Workstation::requestFile(QString ip, short port, QString songPath)
 {
     qDebug("Workstation::requestFileList(); Requesting File: %s", songPath);
 
+
     // Create the socket
     TCPSocket *requestSocket = new TCPSocket(mainWindowPointer_->winId());
     connect(mainWindowPointer_, SIGNAL(signalWMWSASyncTCPRx(int,int)),
@@ -136,7 +153,7 @@ void Workstation::requestFile(QString ip, short port, QString songPath)
 
     // Connect the signal for receiving the other client's file list
     connect(requestSocket, SIGNAL(signalDataReceived(TCPSocket*)),
-            this, SLOT(requestFileListController(TCPSocket*)));
+            this, SLOT(receiveFileController(TCPSocket*)));
 }
 
 /*
@@ -286,6 +303,13 @@ void Workstation::decodeControlMessage(TCPSocket *socket)
         receiveFileListController(&(*socket));
         break;
     case FILE_TRANSFER:
+        //shouldnt this be sending a file back not receiving one?
+        //should take rest of data -> songName
+        //no need to listen for more data on this socket.
+        //connect (socket,SIGNAL(signaldataReceived(TCPSocket*)),this,SLOT( decodeControlMessage(TCPSocket*)));
+        //currentTransfers.insert(socket, new FileData);
+        //sendFile(&(*socket));
+
         // Connect the signal for the type of transfer
         connect(socket, SIGNAL(signalDataReceived(TCPSocket*)),
                 this, SLOT(receiveFileController(TCPSocket*)));

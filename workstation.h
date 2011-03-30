@@ -27,7 +27,7 @@ private:
     QMap <TCPSocket*, FileData*> currentTransfers;
 
     // Functions
-    void sendFile();
+    void sendFile(TCPSocket* socket);
     void sendFileList();
     // Create, send back socket information,
     // create buffer, connect signals/slots
@@ -40,7 +40,7 @@ private:
 public slots:
     // Triggered by GUI buttons
     void connectToServer();
-    void requestFile(QString ip, short port, QString songName);
+    void requestFile(QString ip, QString songName);
     void requestFileList(QString, short);
     // Triggered by sockets
     void processConnection(TCPSocket*);
