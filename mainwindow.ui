@@ -17,8 +17,8 @@
    <widget class="QPushButton" name="playButton">
     <property name="geometry">
      <rect>
-      <x>460</x>
-      <y>520</y>
+      <x>410</x>
+      <y>510</y>
       <width>93</width>
       <height>28</height>
      </rect>
@@ -30,8 +30,8 @@
    <widget class="QPushButton" name="stopButton">
     <property name="geometry">
      <rect>
-      <x>250</x>
-      <y>520</y>
+      <x>300</x>
+      <y>510</y>
       <width>93</width>
       <height>28</height>
      </rect>
@@ -73,7 +73,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -82,10 +82,10 @@
      <widget class="QListWidget" name="remoteListWidget">
       <property name="geometry">
        <rect>
-        <x>530</x>
+        <x>420</x>
         <y>20</y>
-        <width>331</width>
-        <height>401</height>
+        <width>431</width>
+        <height>331</height>
        </rect>
       </property>
      </widget>
@@ -94,8 +94,8 @@
        <rect>
         <x>0</x>
         <y>20</y>
-        <width>331</width>
-        <height>401</height>
+        <width>381</width>
+        <height>331</height>
        </rect>
       </property>
      </widget>
@@ -125,6 +125,52 @@
        <string>Client</string>
       </property>
      </widget>
+     <widget class="QTextEdit" name="songAddedEditBox">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>390</y>
+        <width>381</width>
+        <height>31</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QTextEdit" name="songTransferedEditBox">
+      <property name="geometry">
+       <rect>
+        <x>420</x>
+        <y>390</y>
+        <width>431</width>
+        <height>31</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_4">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>360</y>
+        <width>161</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Last Song Added to Playlist</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_5">
+      <property name="geometry">
+       <rect>
+        <x>430</x>
+        <y>360</y>
+        <width>151</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Song Transfered</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">
@@ -141,18 +187,155 @@
       </property>
      </widget>
     </widget>
+    <widget class="QWidget" name="tab_3">
+     <attribute name="title">
+      <string>Now Playing</string>
+     </attribute>
+     <widget class="QListWidget" name="playlistWidget">
+      <property name="geometry">
+       <rect>
+        <x>280</x>
+        <y>30</y>
+        <width>241</width>
+        <height>371</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
    </widget>
    <widget class="QPushButton" name="talkButton">
     <property name="geometry">
      <rect>
-      <x>680</x>
-      <y>480</y>
+      <x>0</x>
+      <y>510</y>
       <width>93</width>
       <height>28</height>
      </rect>
     </property>
     <property name="text">
      <string>Push to Talk</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="previousButton">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>510</y>
+      <width>93</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Previous</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="nextButton">
+    <property name="geometry">
+     <rect>
+      <x>550</x>
+      <y>510</y>
+      <width>93</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Next</string>
+    </property>
+   </widget>
+   <widget class="QLCDNumber" name="volumeLcdNumber">
+    <property name="geometry">
+     <rect>
+      <x>790</x>
+      <y>510</y>
+      <width>64</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="intValue" stdset="0">
+     <number>100</number>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="muteToolButton">
+    <property name="geometry">
+     <rect>
+      <x>690</x>
+      <y>510</y>
+      <width>93</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Volume</string>
+    </property>
+   </widget>
+   <widget class="QSlider" name="horizontalSlider">
+    <property name="geometry">
+     <rect>
+      <x>690</x>
+      <y>490</y>
+      <width>160</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>100</number>
+    </property>
+    <property name="value">
+     <number>100</number>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="addMusicButton">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>450</y>
+      <width>111</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Add Music Folder</string>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="playbackBox">
+    <property name="geometry">
+     <rect>
+      <x>800</x>
+      <y>460</y>
+      <width>41</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="decimals">
+     <number>1</number>
+    </property>
+    <property name="minimum">
+     <double>-2.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>2.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.500000000000000</double>
+    </property>
+    <property name="value">
+     <double>1.000000000000000</double>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_6">
+    <property name="geometry">
+     <rect>
+      <x>710</x>
+      <y>460</y>
+      <width>81</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>PlayBack Rate</string>
     </property>
    </widget>
   </widget>
@@ -175,7 +358,14 @@
     <addaction name="action_Visible"/>
     <addaction name="action_Host_Multicast"/>
    </widget>
+   <widget class="QMenu" name="menuColors">
+    <property name="title">
+     <string>Theme</string>
+    </property>
+    <addaction name="action_Modify"/>
+   </widget>
    <addaction name="menuConnections"/>
+   <addaction name="menuColors"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="action_Request_Playlist">
@@ -202,6 +392,101 @@
   <action name="action_Host_Multicast">
    <property name="text">
     <string>&amp;Host Multicast</string>
+   </property>
+  </action>
+  <action name="actionAqua">
+   <property name="text">
+    <string>Aqua</string>
+   </property>
+  </action>
+  <action name="actionRed">
+   <property name="text">
+    <string>Red</string>
+   </property>
+  </action>
+  <action name="actionBlack">
+   <property name="text">
+    <string>Black</string>
+   </property>
+  </action>
+  <action name="actionCrimson">
+   <property name="text">
+    <string>Crimson</string>
+   </property>
+  </action>
+  <action name="actionChocolate">
+   <property name="text">
+    <string>Chocolate</string>
+   </property>
+  </action>
+  <action name="actionDarkMagenta">
+   <property name="text">
+    <string>DarkMagenta </string>
+   </property>
+  </action>
+  <action name="actionV">
+   <property name="text">
+    <string>DeepPink </string>
+   </property>
+  </action>
+  <action name="actionForestGreen">
+   <property name="text">
+    <string>ForestGreen </string>
+   </property>
+  </action>
+  <action name="actionAqua_2">
+   <property name="text">
+    <string>Aqua</string>
+   </property>
+  </action>
+  <action name="actionRed_2">
+   <property name="text">
+    <string>Red</string>
+   </property>
+  </action>
+  <action name="actionBlack_2">
+   <property name="text">
+    <string>Black</string>
+   </property>
+  </action>
+  <action name="actionCrimson_2">
+   <property name="text">
+    <string>Crimson</string>
+   </property>
+  </action>
+  <action name="actionChocolate_2">
+   <property name="text">
+    <string>Chocolate</string>
+   </property>
+  </action>
+  <action name="actionDarkMegenta">
+   <property name="text">
+    <string>DarkMagenta</string>
+   </property>
+  </action>
+  <action name="actionDeepPink">
+   <property name="text">
+    <string>DeepPink</string>
+   </property>
+  </action>
+  <action name="actionForestGreen_2">
+   <property name="text">
+    <string>ForestGreen</string>
+   </property>
+  </action>
+  <action name="actionWhite">
+   <property name="text">
+    <string>White</string>
+   </property>
+  </action>
+  <action name="actionWhite_2">
+   <property name="text">
+    <string>White</string>
+   </property>
+  </action>
+  <action name="action_Modify">
+   <property name="text">
+    <string>Appearance</string>
    </property>
   </action>
  </widget>

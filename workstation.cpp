@@ -114,10 +114,11 @@ void Workstation::connectToServer()
 
 }
 
-void Workstation::requestFile(QString ip,  QString songName) //need port number. hardcoded right now.
+void Workstation::requestFile(QString ip, short port, QString songPath)
 {
-    qDebug("Workstation::requestFileList(); Requesting file list.");
-    short port = 7000;
+    qDebug("Workstation::requestFileList(); Requesting File: %s", songPath);
+
+
     // Create the socket
     TCPSocket *requestSocket = new TCPSocket(mainWindowPointer_->winId());
     connect(mainWindowPointer_, SIGNAL(signalWMWSASyncTCPRx(int,int)),
@@ -133,19 +134,17 @@ void Workstation::requestFile(QString ip,  QString songName) //need port number.
     requestSocket->moveToThread(socketThread_);
     requestSocket->open(QIODevice::ReadWrite);
 
-    // Get our local file list and convert it to a data stream
-    //QStringList fileList = mainWindowPointer_->getLocalFileList();
+    // Convert the file path into a byte array via a stream.
     QByteArray byteArray;
     QDataStream stream(&byteArray, QIODevice::WriteOnly);
-    //stream << fileList.toSet();
-    stream << songName;
+    stream << songPath;
+
     // Create the control packet
     byteArray.insert(0, FILE_TRANSFER);
     byteArray.append('\n');
 
     // Send our own file list to the other client
     requestSocket->write(byteArray);
-
 
     qDebug("Workstation::requestFileList(); Sent file list");
 
@@ -497,7 +496,6 @@ void Workstation::receiveFileListController(TCPSocket *socket)
         stream << fileList.toSet();
 
         // Create the control packet
-        byteArray.insert(0, FILE_LIST);
         byteArray.append('\n');
 
         // Send our own file list to the other client
