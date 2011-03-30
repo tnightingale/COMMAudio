@@ -698,6 +698,8 @@ void MainWindow::on_clearPlaylistButton_clicked()
 void MainWindow::on_clearLocalButton_clicked()
 {
     ui->clientListWidget->clear();
+    songList_.clear();
+    updateMusicContent(songList_);
 }
 
 void MainWindow::on_clearRemoteButton_clicked()
