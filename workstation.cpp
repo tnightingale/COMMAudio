@@ -10,7 +10,7 @@
 #define VOICE_CHAT 3
 
 Workstation::Workstation(MainWindow* mainWindow)
-: socketThread_(new QThread()), mainWindowPointer_(mainWindow) {
+    : socketThread_(new QThread()), mainWindowPointer_(mainWindow) {
     int err = 0;
     WSADATA wsaData;
     WORD wVersionRequested = MAKEWORD(2,2);
@@ -64,27 +64,32 @@ Workstation::~Workstation() {
 
 void Workstation::sendFile(TCPSocket* socket)
 {
+    // Get file name from packet
     QByteArray packet = socket->readAll();
-    QString fileName(&(*packet));
+
+    // Create file name
+    QDataStream fileNameStream(&packet, QIODevice::ReadOnly);
+    QString fileName;
+    fileNameStream >> fileName;
+
+    // Open the file
     QFile file(fileName);
     if(!file.open(QIODevice::ReadOnly)){
+        // Should probably do something better here...
         return;
     }
-    QDataStream fileStream(&file);
+
+    // Stream in the file and stream it out into a byte array
+    QDataStream in(&file);
     QByteArray byteArray;
-    QDataStream stream(&byteArray, QIODevice::WriteOnly);
-    stream << fileStream;
+    QDataStream out(&byteArray, QIODevice::WriteOnly);
+    out << in;
 
     // Create the control packet
     byteArray.append('\n');
 
     // Send our file to the other client
     socket->write(byteArray);
-}
-
-void Workstation::sendFileList()
-{
-
 }
 
 void Workstation::acceptVoiceChat()
@@ -205,7 +210,7 @@ void Workstation::requestFileList(QString ip, short port)
     QDataStream stream(&byteArray, QIODevice::WriteOnly);
     stream << fileList.toSet();
 
-/* Stream out test
+    /* Stream out test
     QDataStream s(&byteArray, QIODevice::ReadOnly);
     QSet<QString> test;
     QStringList temp;
@@ -313,7 +318,7 @@ void Workstation::decodeControlMessage(TCPSocket *socket)
                  this, SLOT( decodeControlMessage(TCPSocket*)));
         currentTransfers.insert(socket, new FileData);
         sendFile(&(*socket));
-/*
+        /*
         // Connect the signal for the type of transfer
         connect(socket, SIGNAL(signalDataReceived(TCPSocket*)),
                 this, SLOT(receiveFileController(TCPSocket*)));
