@@ -128,6 +128,8 @@ private slots:
     void on_clearPlaylistButton_clicked();
     void on_clearLocalButton_clicked();
     void on_clearRemoteButton_clicked();
+    void on_removeButton_clicked();
+    void on_playlistWidget_currentRowChanged(int currentRow);
 };
 
 #endif // MAINWINDOW_H

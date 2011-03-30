@@ -12,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     this->setFixedSize(861,598);
     ui->currentSongEditBox->setReadOnly(true);
+    ui->currentSongEditBox_2->setReadOnly(true);
 
     this->statusBar()->setSizeGripEnabled(false);
     player_ = new AudioComponent(this);
@@ -264,6 +265,7 @@ void MainWindow::on_clientListWidget_itemDoubleClicked(QListWidgetItem* item)
         ui->songAddedEditBox->setText(dataClicked);
         if(ui->playlistWidget->count() == 1) {
             ui->currentSongEditBox->setText(dataClicked);
+            ui->currentSongEditBox_2->setText(dataClicked);
         }
         playlistData_.append(item->text());
     }
@@ -430,6 +432,7 @@ void MainWindow::on_nextButton_clicked()
         player_->gotoIndex(-1);
         ui->playlistWidget->setCurrentRow(0);
         ui->currentSongEditBox->setText(ui->playlistWidget->currentItem()->text());
+        ui->currentSongEditBox_2->setText(ui->playlistWidget->currentItem()->text());
         player_->play();
     } else {
         player_->next();
@@ -438,6 +441,7 @@ void MainWindow::on_nextButton_clicked()
         }
         ui->playlistWidget->setCurrentRow(playlist_->currentIndex());
         ui->currentSongEditBox->setText(ui->playlistWidget->currentItem()->text());
+        ui->currentSongEditBox_2->setText(ui->playlistWidget->currentItem()->text());
         player_->play();
     }
 }
@@ -450,6 +454,7 @@ void MainWindow::on_previousButton_clicked()
         player_->gotoIndex(max);
         ui->playlistWidget->setCurrentRow(max);
         ui->currentSongEditBox->setText(ui->playlistWidget->currentItem()->text());
+        ui->currentSongEditBox_2->setText(ui->playlistWidget->currentItem()->text());
         player_->play();
     } else {
         player_->previous();
@@ -459,6 +464,7 @@ void MainWindow::on_previousButton_clicked()
             ui->playlistWidget->setCurrentRow(playlist_->currentIndex());
         }
         ui->currentSongEditBox->setText(ui->playlistWidget->currentItem()->text());
+        ui->currentSongEditBox_2->setText(ui->playlistWidget->currentItem()->text());
         player_->play();
     }
 }
@@ -524,6 +530,7 @@ void MainWindow::backgroundColor(QString background, QString font) {
     ui->clearLocalButton->setStyleSheet(button);
     ui->clearPlaylistButton->setStyleSheet(button);
     ui->clearRemoteButton->setStyleSheet(button);
+    ui->removeButton->setStyleSheet(button);
     slider_->setStyleSheet(sliderMods);
     ui->horizontalSlider->setStyleSheet(sliderMods);
     MainWindow::setStyleSheet(maincolor);
@@ -542,6 +549,7 @@ void MainWindow::on_action_Modify_triggered(){
 void MainWindow::on_playlistWidget_itemDoubleClicked(QListWidgetItem* item)
 {
     ui->currentSongEditBox->setText(item->text());
+    ui->currentSongEditBox_2->setText(item->text());
     ui->playlistWidget->setCurrentItem(item);
     int selected = ui->playlistWidget->currentRow();
     if (selected == 0) {
@@ -595,9 +603,11 @@ void MainWindow::playlistIndexChanged(int index) {
     if(index == -1) {
         ui->playlistWidget->setCurrentRow(0);
         ui->currentSongEditBox->setText(ui->playlistWidget->currentItem()->text());
+        ui->currentSongEditBox_2->setText(ui->playlistWidget->currentItem()->text());
     } else {
         ui->playlistWidget->setCurrentRow(index);
         ui->currentSongEditBox->setText(ui->playlistWidget->currentItem()->text());
+        ui->currentSongEditBox_2->setText(ui->playlistWidget->currentItem()->text());
     }
 }
 
@@ -693,6 +703,7 @@ void MainWindow::on_clearPlaylistButton_clicked()
 {
     ui->playlistWidget->clear();
     playlist_->clear();
+    playlistData_.clear();
 }
 
 void MainWindow::on_clearLocalButton_clicked()
@@ -705,4 +716,40 @@ void MainWindow::on_clearLocalButton_clicked()
 void MainWindow::on_clearRemoteButton_clicked()
 {
     ui->remoteListWidget->clear();
+}
+
+
+void MainWindow::on_removeButton_clicked()
+{
+    int index = ui->playlistWidget->currentIndex().row();
+    qDebug("%d", index);
+    if(index <= 0) {
+        ui->playlistWidget->clear();
+         playlist_->clear();
+         playlistData_.clear();
+         ui->currentSongEditBox->setText(" ");
+         ui->currentSongEditBox_2->setText(" ");
+    } else {
+        playlist_->removeMedia(index);
+        playlistData_.removeAt(index);
+        ui->playlistWidget->takeItem(index);
+    }
+    if(index > 0) {
+        if(playlist_->currentIndex() == -1){
+            ui->playlistWidget->setCurrentRow(0);
+        } else {
+            ui->playlistWidget->setCurrentRow(playlist_->currentIndex());
+        }
+
+        ui->currentSongEditBox->setText(ui->playlistWidget->currentItem()->text());
+        ui->currentSongEditBox_2->setText(ui->playlistWidget->currentItem()->text());
+    }
+
+}
+
+void MainWindow::on_playlistWidget_currentRowChanged(int currentRow)
+{
+    if(currentRow >= 0) {
+        ui->currentSongEditBox_2->setText(ui->playlistWidget->currentItem()->text());
+    }
 }

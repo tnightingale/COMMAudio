@@ -66,14 +66,14 @@
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
-      <x>0</x>
+      <x>10</x>
       <y>0</y>
       <width>861</width>
       <height>451</height>
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -230,8 +230,8 @@
      <widget class="QPushButton" name="savePlaylistButton">
       <property name="geometry">
        <rect>
-        <x>430</x>
-        <y>30</y>
+        <x>290</x>
+        <y>20</y>
         <width>111</width>
         <height>28</height>
        </rect>
@@ -243,8 +243,8 @@
      <widget class="QPushButton" name="loadPlaylistButton">
       <property name="geometry">
        <rect>
-        <x>440</x>
-        <y>100</y>
+        <x>290</x>
+        <y>50</y>
         <width>111</width>
         <height>28</height>
        </rect>
@@ -264,6 +264,42 @@
       </property>
       <property name="text">
        <string>Clear</string>
+      </property>
+     </widget>
+     <widget class="QTextEdit" name="currentSongEditBox_2">
+      <property name="geometry">
+       <rect>
+        <x>430</x>
+        <y>280</y>
+        <width>361</width>
+        <height>31</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_6">
+      <property name="geometry">
+       <rect>
+        <x>330</x>
+        <y>290</y>
+        <width>81</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Remove Song</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="removeButton">
+      <property name="geometry">
+       <rect>
+        <x>430</x>
+        <y>320</y>
+        <width>93</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Remove</string>
       </property>
      </widget>
     </widget>
