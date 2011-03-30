@@ -83,11 +83,13 @@ private:
     JoinServer requestPlaylist_;
     Colors changeColor_;
     QTimeLine *timer_;
+    QMediaPlaylist* playlist_;
     bool muted_;
     QStringList songList_;
     QMap<QString,RemoteSong> remoteList_;
 
 private slots:
+    void playlistIndexChanged(int index);
     void seek(int seconds);
     void durationChanged(qint64 duration);
     void positionChanged(qint64 progress);

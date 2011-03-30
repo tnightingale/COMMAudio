@@ -29,6 +29,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->muteToolButton->setIcon(style()->standardIcon(QStyle::SP_MediaVolume));
 
     playerlink_ = player_->getPlayer();
+    playlist_ = player_->getPlaylist();
     connect(playerlink_, SIGNAL(durationChanged(qint64)), SLOT(durationChanged(qint64)));
     connect(playerlink_, SIGNAL(positionChanged(qint64)), SLOT(positionChanged(qint64)));
     slider_ = new QSlider(Qt::Horizontal, this);
@@ -36,6 +37,7 @@ MainWindow::MainWindow(QWidget *parent) :
     slider_->setGeometry(180,485,450,19);
     slider_->saveGeometry();
     connect(slider_, SIGNAL(sliderMoved(int)), this, SLOT(seek(int)));
+    connect(playlist_,SIGNAL(currentIndexChanged(int)), this, SLOT(playlistIndexChanged(int)));
 
     timer_ = new QTimeLine(50000);
     visualization(40);
@@ -552,4 +554,14 @@ void MainWindow::on_addMusicButton_clicked()
 void MainWindow::on_playbackBox_valueChanged(double playback)
 {
     playerlink_->setPlaybackRate(playback);
+}
+
+void MainWindow::playlistIndexChanged(int index) {
+    if(index == -1) {
+        ui->playlistWidget->setCurrentRow(0);
+        ui->currentSongEditBox->setText(ui->playlistWidget->currentItem()->text());
+    } else {
+        ui->playlistWidget->setCurrentRow(index);
+        ui->currentSongEditBox->setText(ui->playlistWidget->currentItem()->text());
+    }
 }

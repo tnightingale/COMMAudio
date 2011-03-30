@@ -33,6 +33,7 @@ public:
     void previousIndex(int desiredIndex);
     void nextIndex(int desiredIndex);
     void gotoIndex(int index);
+    QMediaPlaylist* getPlaylist();
     int getIndex();
 
 private:
