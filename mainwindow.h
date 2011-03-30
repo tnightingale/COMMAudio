@@ -71,6 +71,12 @@ public:
 
     void updateClientlist();
 
+    void loadlastPlaylist();
+
+    void savePlaylist();
+
+    void updatePlaylist();
+
 signals:
     void signalWMWSASyncTCPRx(int, int);
     void signalWMWSASyncUDPRx(int, int);
@@ -90,6 +96,7 @@ private:
     QMediaPlaylist* playlist_;
     bool muted_;
     QStringList songList_;
+    QStringList playlistData_;
     QMap<QString,RemoteSong> remoteList_;
 
 private slots:
@@ -116,6 +123,11 @@ private slots:
     void on_addMusicButton_clicked();
     void on_playbackBox_valueChanged(double );
     void on_action_Advanced_toggled(bool status);
+    void on_savePlaylistButton_clicked();
+    void on_loadPlaylistButton_clicked();
+    void on_clearPlaylistButton_clicked();
+    void on_clearLocalButton_clicked();
+    void on_clearRemoteButton_clicked();
 };
 
 #endif // MAINWINDOW_H
