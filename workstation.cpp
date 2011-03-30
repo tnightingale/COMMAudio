@@ -146,7 +146,7 @@ void Workstation::requestFile(QString ip, short port, QString songPath)
 
     // Create the control packet
 
-    byteArray.insert(0, port);
+
     byteArray.insert(0, FILE_TRANSFER);
 
     byteArray.append('\n');
