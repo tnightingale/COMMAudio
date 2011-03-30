@@ -74,7 +74,7 @@ void Workstation::sendFile(TCPSocket* socket)
     stream << fileStream;
 
     // Create the control packet
-    byteArray.insert(0, FILE_LIST);
+
     byteArray.append('\n');
 
     // Send our file to the other client
@@ -139,7 +139,10 @@ void Workstation::requestFile(QString ip, short port, QString songPath)
     stream << songPath;
 
     // Create the control packet
+
+    byteArray.insert(0, port);
     byteArray.insert(0, FILE_TRANSFER);
+
     byteArray.append('\n');
 
     // Send our own file list to the other client

@@ -289,7 +289,7 @@ void MainWindow::on_clientListWidget_itemDoubleClicked(QListWidgetItem* item)
 void MainWindow::on_remoteListWidget_itemDoubleClicked(QListWidgetItem* item)
 {
     RemoteSong songInfo = remoteList_.value(item->text());
-    emit requestFile(songInfo.getIp(), songInfo.getFilePath());
+    emit requestFile(songInfo.getIp(),songInfo.getPort(), songInfo.getFilePath());
 }
 
 /*
