@@ -387,7 +387,6 @@ void Workstation::receiveFileListController(TCPSocket *socket)
         stream << fileList.toSet();
 
         // Create the control packet
-        byteArray.insert(0, FILE_LIST);
         byteArray.append('\n');
 
         // Send our own file list to the other client
