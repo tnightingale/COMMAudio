@@ -52,7 +52,15 @@ Colors::Colors(QWidget *parent) :
     ui->backgroundWidget->addItem(new QListWidgetItem("MistyRose"));
     ui->backgroundWidget->addItem(new QListWidgetItem("Salmon"));
     ui->backgroundWidget->addItem(new QListWidgetItem("Blue"));
-
+    ui->backgroundWidget->addItem(new QListWidgetItem("DarkRed"));
+    ui->backgroundWidget->addItem(new QListWidgetItem("Indigo"));
+    ui->backgroundWidget->addItem(new QListWidgetItem("DarkSlateGray"));
+    ui->backgroundWidget->addItem(new QListWidgetItem("DimGray"));
+    ui->backgroundWidget->addItem(new QListWidgetItem("Gold"));
+    ui->backgroundWidget->addItem(new QListWidgetItem("Gray"));
+    ui->backgroundWidget->addItem(new QListWidgetItem("IndianRed"));
+    ui->backgroundWidget->addItem(new QListWidgetItem("LimeGreen"));
+    ui->backgroundWidget->addItem(new QListWidgetItem("Lime"));
 
     ui->textWidget->addItem(new QListWidgetItem("Aqua"));
     ui->textWidget->addItem(new QListWidgetItem("Red"));
@@ -93,34 +101,20 @@ Colors::Colors(QWidget *parent) :
     ui->textWidget->addItem(new QListWidgetItem("MistyRose"));
     ui->textWidget->addItem(new QListWidgetItem("Salmon"));
     ui->textWidget->addItem(new QListWidgetItem("Blue"));
-
+    ui->textWidget->addItem(new QListWidgetItem("DarkRed"));
+    ui->textWidget->addItem(new QListWidgetItem("Indigo"));
+    ui->textWidget->addItem(new QListWidgetItem("DarkSlateGray"));
+    ui->textWidget->addItem(new QListWidgetItem("DimGray"));
+    ui->textWidget->addItem(new QListWidgetItem("Gold"));
+    ui->textWidget->addItem(new QListWidgetItem("Gray"));
+    ui->textWidget->addItem(new QListWidgetItem("IndianRed"));
+    ui->textWidget->addItem(new QListWidgetItem("LimeGreen"));
+    ui->textWidget->addItem(new QListWidgetItem("Lime"));
 }
 
 Colors::~Colors()
 {
     delete ui;
-}
-
-void Colors::on_textWidget_itemDoubleClicked(QListWidgetItem* item)
-{
-    fontColor_ = item->text();
-
-    QString coloredFont = fontColor_;
-    coloredFont.append(";}");
-    coloredFont.prepend("QPushButton {background-color:" + backgroundColor_ + ";color:");
-    const QString color = coloredFont;
-    ui->testButton->setStyleSheet(color);
-
-}
-
-void Colors::on_backgroundWidget_itemDoubleClicked(QListWidgetItem* item)
-{
-    backgroundColor_ = item->text();
-    QString coloredFont = backgroundColor_;
-    coloredFont.append(";color:" + fontColor_ + ";}");
-    coloredFont.prepend("QPushButton {background-color:");
-    const QString color = coloredFont;
-    ui->testButton->setStyleSheet(color);
 }
 
 void Colors::on_defaultButton_clicked()
@@ -143,4 +137,24 @@ void Colors::on_tigerButton_clicked()
     ui->testButton->setStyleSheet("QPushButton {background-color: OrangeRed;color: Black;}");
     fontColor_ = "Black";
     backgroundColor_ = "OrangeRed";
+}
+
+void Colors::on_textWidget_currentItemChanged(QListWidgetItem* current, QListWidgetItem* previous)
+{
+    fontColor_ = current->text();
+    QString coloredFont = fontColor_;
+    coloredFont.append(";}");
+    coloredFont.prepend("QPushButton {background-color:" + backgroundColor_ + ";color:");
+    const QString color = coloredFont;
+    ui->testButton->setStyleSheet(color);
+}
+
+void Colors::on_backgroundWidget_currentItemChanged(QListWidgetItem* current, QListWidgetItem* previous)
+{
+    backgroundColor_ = current->text();
+    QString coloredFont = backgroundColor_;
+    coloredFont.append(";color:" + fontColor_ + ";}");
+    coloredFont.prepend("QPushButton {background-color:");
+    const QString color = coloredFont;
+    ui->testButton->setStyleSheet(color);
 }

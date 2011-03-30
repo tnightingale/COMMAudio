@@ -108,6 +108,7 @@ private slots:
     void on_horizontalSlider_valueChanged(int volume);
     void on_playlistWidget_itemDoubleClicked(QListWidgetItem* item);
     void on_addMusicButton_clicked();
+    void on_playbackBox_valueChanged(double );
 };
 
 #endif // MAINWINDOW_H

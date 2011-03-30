@@ -22,7 +22,6 @@ MainWindow::MainWindow(QWidget *parent) :
     slider->saveGeometry();
     slider->show();
 */
-
     ui->playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
     ui->stopButton->setIcon(style()->standardIcon(QStyle::SP_MediaStop));
     ui->nextButton->setIcon(style()->standardIcon(QStyle::SP_MediaSkipForward));
@@ -494,6 +493,7 @@ void MainWindow::backgroundColor(QString background, QString font) {
                             "QTabBar::tab:hover{background:" + fontColor + ";color:" + backColor + ";}";
     ui->tabWidget->setStyleSheet(tabColor);
     ui->volumeLcdNumber->setStyleSheet(color);
+    ui->playbackBox->setStyleSheet(color);
     ui->playButton->setStyleSheet(button);
     ui->stopButton->setStyleSheet(button);
     ui->previousButton->setStyleSheet(button);
@@ -545,4 +545,9 @@ void MainWindow::on_addMusicButton_clicked()
 
     }
     songList_ += songs;
+}
+
+void MainWindow::on_playbackBox_valueChanged(double playback)
+{
+    playerlink_->setPlaybackRate(playback);
 }

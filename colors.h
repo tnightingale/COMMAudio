@@ -19,13 +19,14 @@ public:
     QString getFont();
     QString getBackground();
 private slots:
-    void on_textWidget_itemDoubleClicked(QListWidgetItem* item);
-
-    void on_backgroundWidget_itemDoubleClicked(QListWidgetItem* item);
 
     void on_defaultButton_clicked();
 
     void on_tigerButton_clicked();
+
+    void on_textWidget_currentItemChanged(QListWidgetItem* current, QListWidgetItem* previous);
+
+    void on_backgroundWidget_currentItemChanged(QListWidgetItem* current, QListWidgetItem* previous);
 
 private:
     Ui::Colors *ui;
