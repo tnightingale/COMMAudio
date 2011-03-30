@@ -33,7 +33,7 @@ private:
     // create buffer, connect signals/slots
     void acceptVoiceChat();
 
-    bool processReceivingFile();
+    bool processReceivingFile(TCPSocket* socket, QByteArray* packet);
     bool processReceivingFileList(TCPSocket*, QByteArray*);
 
 

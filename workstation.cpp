@@ -274,15 +274,66 @@ void Workstation::receiveUDP()
 
 }
 
-void Workstation::receiveFileController(TCPSocket*)
+void Workstation::receiveFileController(TCPSocket* socket)
 {
+    qDebug("Workstation::requestFileListController(); Receiving other file list");
+    // Read the packet from the socket
+    QByteArray packet = socket->readAll();
 
+    // If processing is finished
+    if(processReceivingFile(&(*socket), &packet))
+    {
+        // Disconnect this slot from the received packet signal
+        disconnect(socket, SIGNAL(signalDataReceived(TCPSocket*)),
+                   this, SLOT(requestFileListController(TCPSocket*)));
+
+        // Close the socket
+        delete socket;
+    }
 }
 
-bool Workstation::processReceivingFile()
+bool Workstation::processReceivingFile(TCPSocket* socket, QByteArray* packet)
 {
     // Insert rest of received packet into the current transfers map
     //currentTransfers.insert(socket, packet.right(packet.length() - 1));
+
+
+    bool isFileListTransferComplete = false;
+    // Check to see if this is the last packet //need to figure out how to check this.
+    if (*packet[packet->length() - 1] == '\n')
+    {
+
+        FileData *fileData = currentTransfers.value(socket);
+        // Append any new data to any existing data
+        fileData->append(*packet);
+
+        // Write the all the data to the file
+        fileData->writeToFile();
+
+        // Get all the stored data from the current transfer
+        //QByteArray data = fileData->getData();
+
+        // Load the data into the stream
+        //QDataStream stream(&data, QIODevice::ReadOnly);
+
+
+        // Remove the file transfer
+        currentTransfers.remove(socket);
+
+        // Since processing of the transfer is complete, return true
+        isFileListTransferComplete = true;
+    }
+    else
+    {
+        // Append newly received data
+        FileData* fileData = currentTransfers.value(socket);
+        fileData->append(*packet);
+
+        // Since the transfer is not yet complete, return false
+        isFileListTransferComplete = false;
+    }
+    return isFileListTransferComplete;
+
 }
 
 /*
@@ -342,8 +393,8 @@ bool Workstation::processReceivingFileList(TCPSocket *socket, QByteArray *packet
     else
     {
         // Append newly received data
-        FileData fileData = currentTransfers.value(socket);
-        fileData.append(*packet);
+        FileData* fileData = currentTransfers.value(socket);
+        fileData->append(*packet);
 
         // Since the transfer is not yet complete, return false
         isFileListTransferComplete = false;
