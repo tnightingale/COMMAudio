@@ -71,6 +71,16 @@ public:
      */
     bool connectRemote(QString address, int port);
 
+    /**
+     * Returns the connected IP address of the socket.
+     *
+     * @author Luke Queenan
+     */
+    QString getIp()
+    {
+        return connectedIp;
+    }
+
 signals:
     /**
      *
@@ -100,6 +110,9 @@ public slots:
      */
     //void slotProcessWSAEvent(PMSG pMsg);
     void slotProcessWSAEvent(int, int);
+
+private:
+    QString connectedIp;
 };
 
 #endif // TCPSOCKET_H

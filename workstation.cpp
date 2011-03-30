@@ -162,10 +162,11 @@ void Workstation::requestFileList(QString ip, short port)
     // Send our own file list to the other client
     requestSocket->write(byteArray);
 
+
     qDebug("Workstation::requestFileList(); Sent file list");
 
     // Put the socket into the current transfers map
-    currentTransfers.value(requestSocket);
+    currentTransfers.insert(requestSocket, new FileData);
 
     // Connect the signal for receiving the other client's file list
     connect(requestSocket, SIGNAL(signalDataReceived(TCPSocket*)),
@@ -234,22 +235,18 @@ void Workstation::decodeControlMessage(TCPSocket *socket)
     disconnect(socket, SIGNAL(signalDataReceived(TCPSocket*)),
                this, SLOT(decodeControlMessage(TCPSocket*)));
 
-    // Read packet from the socket
-    QByteArray packet = socket->readAll();
-    qDebug() << "Workstation::decodeControlMessage(); DataRx: " << packet;
-
-    // Store then strip the first byte off the packet
-    char messageType = packet[0];
-    packet.remove(0, 1);
+    // Read and store the first byte for the control message
+    QByteArray messageType = socket->read(1);
 
     // Check for type of message
-    switch (messageType)
+    switch (messageType.at(0))
     {
     case FILE_LIST:
         // Connect the signal in case we receive more data
         connect(socket, SIGNAL(signalDataReceived(TCPSocket*)),
                 this, SLOT(receiveFileListController(TCPSocket*)));
         // Call function now to deal with rest of packet
+        currentTransfers.insert(socket, new FileData);
         receiveFileListController(&(*socket));
         break;
     case FILE_TRANSFER:
@@ -257,6 +254,7 @@ void Workstation::decodeControlMessage(TCPSocket *socket)
         connect(socket, SIGNAL(signalDataReceived(TCPSocket*)),
                 this, SLOT(receiveFileController(TCPSocket*)));
         // Call function now to deal with rest of packet
+        currentTransfers.insert(socket, new FileData);
         receiveFileController(&(*socket));
         break;
     case VOICE_CHAT:
@@ -310,56 +308,40 @@ bool Workstation::processReceivingFileList(TCPSocket *socket, QByteArray *packet
 {
     bool isFileListTransferComplete = false;
     // Check to see if this is the last packet
-    if (*packet[packet->length() - 1] == '\n')
+    if (packet->at(packet->length() - 1) == '\n')
     {
         // Get rid of the newline character
         packet->truncate(packet->length() - 1);
 
-        QDataStream *stream;
-        QStringList fileSet;
+        QStringList fileList;
 
-        // Check to see if we have already received data
-        if (currentTransfers.contains(socket))
-        {
-            // Get the existing QByteArray out and load it into the stream
-            stream = new QDataStream(currentTransfers.value(socket));
+        FileData *fileData = currentTransfers.value(socket);
+        // Append any new data to any existing data
+        fileData->append(*packet);
 
-            // Append the last packet to the stream
-            *stream << *packet;
-        }
-        else
-        {
-            // Load the packet into the stream
-            stream = new QDataStream(*packet);
-        }
+        // Get all the stored data from the current transfer
+        QByteArray data = fileData->getData();
+
+        // Load the data into the stream
+        QDataStream stream(&data, QIODevice::ReadOnly);
 
         // Stream the packet back into a QStringList
-        *stream >> fileSet;
+        stream >> fileList;
 
         // Send the file list to the main window for procesing
-        //mainWindowPointer_->appendToRemote(fileList, socket->getIp());
+        mainWindowPointer_->appendToRemote(fileList, socket->getIp());
+
+        // Remove the file transfer
+        currentTransfers.remove(socket);
 
         // Since processing of the transfer is complete, return true
         isFileListTransferComplete = true;
     }
     else
     {
-        QByteArray *buffer;
-        // Check to see if this is the first packet
-        if (currentTransfers.contains(socket))
-        {
-            // Since a buffer already exists, add to it
-            *buffer = currentTransfers.value(socket);
-            buffer->append(*packet);
-        }
-        else
-        {
-            // Assign the packet to the buffer
-            *buffer = *packet;
-        }
-
-        // Insert the buffer into the map
-        currentTransfers.insert(socket, *buffer);
+        // Append newly received data
+        FileData *fileData = currentTransfers.value(socket);
+        fileData->append(*packet);
 
         // Since the transfer is not yet complete, return false
         isFileListTransferComplete = false;
@@ -446,6 +428,6 @@ void Workstation::requestFileListController(TCPSocket *socket)
                    this, SLOT(requestFileListController(TCPSocket*)));
 
         // Close the socket
-        //socket->close();
+        delete socket;
     }
 }
