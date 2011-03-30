@@ -125,7 +125,7 @@ void Workstation::requestFile(QString ip, short port, QString songPath)
             requestSocket, SLOT(slotProcessWSAEvent(int,int)));
     // Connect to a remote host
     if (!requestSocket->connectRemote(ip, port)) {
-        qDebug("Workstation::requestFileList(); Failed to connect to remote.");
+        qDebug("Workstation::requestFile(); Failed to connect to remote.");
         return;
     }
 
@@ -149,7 +149,7 @@ void Workstation::requestFile(QString ip, short port, QString songPath)
     // Send our own file list to the other client
     requestSocket->write(byteArray);
 
-    qDebug("Workstation::requestFileList(); Sent file list");
+    qDebug("Workstation::requestFile(); Sent file");
 
     // Put the socket into the current transfers map
     currentTransfers.insert(requestSocket, new FileData(this, port));
@@ -222,7 +222,7 @@ void Workstation::requestFileList(QString ip, short port)
     qDebug("Workstation::requestFileList(); Sent file list");
 
     // Put the socket into the current transfers map
-    currentTransfers.insert(requestSocket, new FileData);
+    currentTransfers.insert(requestSocket, new FileData(this,port));
 
     // Connect the signal for receiving the other client's file list
     connect(requestSocket, SIGNAL(signalDataReceived(TCPSocket*)),
@@ -309,7 +309,7 @@ void Workstation::decodeControlMessage(TCPSocket *socket)
         //shouldnt this be sending a file back not receiving one?
         //should take rest of data -> songName
         //no need to listen for more data on this socket.
-        connect (socket, SIGNAL(signaldataReceived(TCPSocket*)),
+        connect (socket, SIGNAL(signalDataReceived(TCPSocket*)),
                  this, SLOT( decodeControlMessage(TCPSocket*)));
         currentTransfers.insert(socket, new FileData);
         sendFile(&(*socket));
@@ -338,7 +338,7 @@ void Workstation::receiveUDP()
 
 void Workstation::receiveFileController(TCPSocket* socket)
 {
-    qDebug("Workstation::requestFileListController(); Receiving other file list");
+    qDebug("Workstation::requestFileController(); Receiving other file");
     // Read the packet from the socket
     QByteArray packet = socket->readAll();
 
