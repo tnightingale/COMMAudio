@@ -9,12 +9,13 @@ MainWindow::MainWindow(QWidget *parent) :
     muted_(false)
 {
     ui->setupUi(this);
+    this->setFixedSize(861,598);
     ui->currentSongEditBox->setReadOnly(true);
 
+    this->statusBar()->setSizeGripEnabled(false);
     player_ = new AudioComponent(this);
     /*player->addSong("./test.raw");
-    player->play();*/
-
+    player->play();*/    
     /*
     Phonon::SeekSlider *slider = new Phonon::SeekSlider(this);
     slider->setMediaObject(player_->getPlaylist());
@@ -22,6 +23,14 @@ MainWindow::MainWindow(QWidget *parent) :
     slider->saveGeometry();
     slider->show();
 */
+
+    QFile file("mediaTracker.dat");
+     if(file.open(QIODevice::ReadOnly)) {
+         QDataStream in(&file);
+         in >> songList_;
+         file.close();
+         updateClientlist();
+    }
     ui->playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
     ui->stopButton->setIcon(style()->standardIcon(QStyle::SP_MediaStop));
     ui->nextButton->setIcon(style()->standardIcon(QStyle::SP_MediaSkipForward));
@@ -29,6 +38,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->muteToolButton->setIcon(style()->standardIcon(QStyle::SP_MediaVolume));
 
     playerlink_ = player_->getPlayer();
+    playlist_ = player_->getPlaylist();
     connect(playerlink_, SIGNAL(durationChanged(qint64)), SLOT(durationChanged(qint64)));
     connect(playerlink_, SIGNAL(positionChanged(qint64)), SLOT(positionChanged(qint64)));
     slider_ = new QSlider(Qt::Horizontal, this);
@@ -36,6 +46,7 @@ MainWindow::MainWindow(QWidget *parent) :
     slider_->setGeometry(180,485,450,19);
     slider_->saveGeometry();
     connect(slider_, SIGNAL(sliderMoved(int)), this, SLOT(seek(int)));
+    connect(playlist_,SIGNAL(currentIndexChanged(int)), this, SLOT(playlistIndexChanged(int)));
 
     timer_ = new QTimeLine(50000);
     visualization(40);
@@ -419,12 +430,11 @@ void MainWindow::on_nextButton_clicked()
         ui->currentSongEditBox->setText(ui->playlistWidget->currentItem()->text());
     } else {
         player_->next();
-        QString song = playerlink_->media().canonicalUrl().toString();
-        int n = song.lastIndexOf('/');
-        int s = song.size() - n - 1;
-        QString songTitle = song.right(s);
-        ui->currentSongEditBox->setText(songTitle);
-        ui->playlistWidget->setCurrentRow(ui->playlistWidget->currentRow() + 1);
+        if(playlist_->currentIndex() == 0) {
+            player_->next();
+        }
+        ui->playlistWidget->setCurrentRow(playlist_->currentIndex());
+        ui->currentSongEditBox->setText(ui->playlistWidget->currentItem()->text());
     }
 }
 
@@ -438,12 +448,12 @@ void MainWindow::on_previousButton_clicked()
         ui->currentSongEditBox->setText(ui->playlistWidget->currentItem()->text());
     } else {
         player_->previous();
-        QString song = playerlink_->media().canonicalUrl().toString();
-        int n = song.lastIndexOf('/');
-        int s = song.size() - n - 1;
-        QString songTitle = song.right(s);
-        ui->currentSongEditBox->setText(songTitle);
-        ui->playlistWidget->setCurrentRow(ui->playlistWidget->currentRow() - 1);
+        if(playlist_->currentIndex() == -1) {
+            ui->playlistWidget->setCurrentRow(0);
+        } else {
+            ui->playlistWidget->setCurrentRow(playlist_->currentIndex());
+        }
+        ui->currentSongEditBox->setText(ui->playlistWidget->currentItem()->text());
     }
 }
 
@@ -547,9 +557,63 @@ void MainWindow::on_addMusicButton_clicked()
 
     }
     songList_ += songs;
+    updateMusicContent(songList_);
+}
+
+void MainWindow::updateClientlist(){
+
+    QString fileName;
+    QString songTitle;
+
+    for (int i = 0; i < songList_.size();++i){
+        fileName = songList_.at(i);
+        int n = fileName.lastIndexOf('/');
+        int s = fileName.size() - n - 1;
+        songTitle = fileName.right(s);
+        ui->clientListWidget->addItem(new QListWidgetItem(songTitle));
+
+    }
 }
 
 void MainWindow::on_playbackBox_valueChanged(double playback)
 {
     playerlink_->setPlaybackRate(playback);
 }
+
+void MainWindow::playlistIndexChanged(int index) {
+    if(index == -1) {
+        ui->playlistWidget->setCurrentRow(0);
+        ui->currentSongEditBox->setText(ui->playlistWidget->currentItem()->text());
+    } else {
+        ui->playlistWidget->setCurrentRow(index);
+        ui->currentSongEditBox->setText(ui->playlistWidget->currentItem()->text());
+    }
+}
+
+void MainWindow::on_action_Advanced_toggled(bool status) {
+    if(status) {
+        slider_->show();
+        ui->playback_label->show();
+        ui->playbackBox->show();
+        ui->muteToolButton->show();
+        ui->horizontalSlider->show();
+        ui->volumeLcdNumber->show();
+        ui->talkButton->show();
+    } else {
+        slider_->hide();
+        ui->playback_label->hide();
+        ui->playbackBox->hide();
+        ui->muteToolButton->hide();
+        ui->horizontalSlider->hide();
+        ui->volumeLcdNumber->hide();
+        ui->talkButton->hide();
+    }
+}
+
+ void MainWindow::updateMusicContent(QStringList currentSongs){
+     QFile file("mediaTracker.dat");
+      file.open(QIODevice::WriteOnly);
+      QDataStream out(&file);
+      out << currentSongs.toSet();
+      file.close();
+ }

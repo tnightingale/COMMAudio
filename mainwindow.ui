@@ -325,7 +325,7 @@
      <double>1.000000000000000</double>
     </property>
    </widget>
-   <widget class="QLabel" name="label_6">
+   <widget class="QLabel" name="playback_label">
     <property name="geometry">
      <rect>
       <x>710</x>
@@ -364,8 +364,15 @@
     </property>
     <addaction name="action_Modify"/>
    </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <addaction name="action_Advanced"/>
+   </widget>
    <addaction name="menuConnections"/>
    <addaction name="menuColors"/>
+   <addaction name="menuView"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="action_Request_Playlist">
@@ -487,6 +494,17 @@
   <action name="action_Modify">
    <property name="text">
     <string>Appearance</string>
+   </property>
+  </action>
+  <action name="action_Advanced">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Advanced</string>
    </property>
   </action>
  </widget>

@@ -110,6 +110,10 @@ void AudioComponent::nextIndex(int desiredIndex) {
     }
 }
 
+QMediaPlaylist* AudioComponent::getPlaylist() {
+    return playlist_;
+}
+
 void AudioComponent::startMic(){
 
 

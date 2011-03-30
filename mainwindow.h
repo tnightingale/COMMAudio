@@ -67,6 +67,10 @@ public:
 
     void backgroundColor(QString background, QString font);
 
+    void updateMusicContent(QStringList currentSongs);
+
+    void updateClientlist();
+
 signals:
     void signalWMWSASyncTCPRx(int, int);
     void signalWMWSASyncUDPRx(int, int);
@@ -83,11 +87,13 @@ private:
     JoinServer requestPlaylist_;
     Colors changeColor_;
     QTimeLine *timer_;
+    QMediaPlaylist* playlist_;
     bool muted_;
     QStringList songList_;
     QMap<QString,RemoteSong> remoteList_;
 
 private slots:
+    void playlistIndexChanged(int index);
     void seek(int seconds);
     void durationChanged(qint64 duration);
     void positionChanged(qint64 progress);
@@ -109,6 +115,7 @@ private slots:
     void on_playlistWidget_itemDoubleClicked(QListWidgetItem* item);
     void on_addMusicButton_clicked();
     void on_playbackBox_valueChanged(double );
+    void on_action_Advanced_toggled(bool status);
 };
 
 #endif // MAINWINDOW_H
