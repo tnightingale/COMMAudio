@@ -10,7 +10,6 @@ FileData::FileData(QObject *parent, QString name, QByteArray data) : QObject(par
     data_ = data;
 }
 
-
 bool FileData::writeToFile() {
     QString path = "./" + name_;
     QFile file(path);
@@ -22,6 +21,7 @@ bool FileData::writeToFile() {
     file.close();
     return TRUE;
 }
+
 bool FileData::readFromFile() {
     QString path = "./" + name_;
     QFile file(path);

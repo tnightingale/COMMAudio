@@ -162,10 +162,11 @@ void Workstation::requestFileList(QString ip, short port)
     // Send our own file list to the other client
     requestSocket->write(byteArray);
 
+
     qDebug("Workstation::requestFileList(); Sent file list");
 
     // Put the socket into the current transfers map
-    currentTransfers.value(requestSocket);
+    currentTransfers.insert(requestSocket, new FileData);
 
     // Connect the signal for receiving the other client's file list
     connect(requestSocket, SIGNAL(signalDataReceived(TCPSocket*)),
@@ -234,22 +235,18 @@ void Workstation::decodeControlMessage(TCPSocket *socket)
     disconnect(socket, SIGNAL(signalDataReceived(TCPSocket*)),
                this, SLOT(decodeControlMessage(TCPSocket*)));
 
-    // Read packet from the socket
-    QByteArray packet = socket->readAll();
-    qDebug() << "Workstation::decodeControlMessage(); DataRx: " << packet;
-
-    // Store then strip the first byte off the packet
-    char messageType = packet[0];
-    packet.remove(0, 1);
+    // Read and store the first byte for the control message
+    QByteArray messageType = socket->read(1);
 
     // Check for type of message
-    switch (messageType)
+    switch (messageType.at(0))
     {
     case FILE_LIST:
         // Connect the signal in case we receive more data
         connect(socket, SIGNAL(signalDataReceived(TCPSocket*)),
                 this, SLOT(receiveFileListController(TCPSocket*)));
         // Call function now to deal with rest of packet
+        currentTransfers.insert(socket, new FileData);
         receiveFileListController(&(*socket));
         break;
     case FILE_TRANSFER:
@@ -257,6 +254,7 @@ void Workstation::decodeControlMessage(TCPSocket *socket)
         connect(socket, SIGNAL(signalDataReceived(TCPSocket*)),
                 this, SLOT(receiveFileController(TCPSocket*)));
         // Call function now to deal with rest of packet
+        currentTransfers.insert(socket, new FileData);
         receiveFileController(&(*socket));
         break;
     case VOICE_CHAT:
@@ -310,7 +308,7 @@ bool Workstation::processReceivingFileList(TCPSocket *socket, QByteArray *packet
 {
     bool isFileListTransferComplete = false;
     // Check to see if this is the last packet
-    if (*packet[packet->length() - 1] == '\n')
+    if (packet->at(packet->length() - 1) == '\n')
     {
         // Get rid of the newline character
         packet->truncate(packet->length() - 1);
