@@ -40,7 +40,7 @@ private:
 public slots:
     // Triggered by GUI buttons
     void connectToServer();
-    void requestFile();
+    void requestFile(QString ip, short port, QString songName);
     void requestFileList(QString, short);
     // Triggered by sockets
     void processConnection(TCPSocket*);

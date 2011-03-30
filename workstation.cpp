@@ -98,9 +98,47 @@ void Workstation::connectToServer()
 
 }
 
-void Workstation::requestFile()
+void Workstation::requestFile(QString ip, short port, QString songName)
 {
+    qDebug("Workstation::requestFileList(); Requesting file list.");
 
+    // Create the socket
+    TCPSocket *requestSocket = new TCPSocket(mainWindowPointer_->winId());
+    connect(mainWindowPointer_, SIGNAL(signalWMWSASyncTCPRx(int,int)),
+            requestSocket, SLOT(slotProcessWSAEvent(int,int)));
+    // Connect to a remote host
+    if (!requestSocket->connectRemote(ip, port)) {
+        qDebug("Workstation::requestFileList(); Failed to connect to remote.");
+        return;
+    }
+
+    qDebug("Workstation::requestFileList(); Assuming connection suceeded!.");
+
+    requestSocket->moveToThread(socketThread_);
+    requestSocket->open(QIODevice::ReadWrite);
+
+    // Get our local file list and convert it to a data stream
+    //QStringList fileList = mainWindowPointer_->getLocalFileList();
+    QByteArray byteArray;
+    QDataStream stream(&byteArray, QIODevice::WriteOnly);
+    //stream << fileList.toSet();
+    stream << songName;
+    // Create the control packet
+    byteArray.insert(0, FILE_TRANSFER);
+    byteArray.append('\n');
+
+    // Send our own file list to the other client
+    requestSocket->write(byteArray);
+
+
+    qDebug("Workstation::requestFileList(); Sent file list");
+
+    // Put the socket into the current transfers map
+    currentTransfers.insert(requestSocket, new FileData);
+
+    // Connect the signal for receiving the other client's file list
+    connect(requestSocket, SIGNAL(signalDataReceived(TCPSocket*)),
+            this, SLOT(requestFileListController(TCPSocket*)));
 }
 
 /*
@@ -301,19 +339,15 @@ bool Workstation::processReceivingFile(TCPSocket* socket, QByteArray* packet)
     if (*packet[packet->length() - 1] == '\n')
     {
 
+        // Get rid of the newline character
+        packet->truncate(packet->length() - 1);
+
         FileData *fileData = currentTransfers.value(socket);
         // Append any new data to any existing data
         fileData->append(*packet);
 
         // Write the all the data to the file
         fileData->writeToFile();
-
-        // Get all the stored data from the current transfer
-        //QByteArray data = fileData->getData();
-
-        // Load the data into the stream
-        //QDataStream stream(&data, QIODevice::ReadOnly);
-
 
         // Remove the file transfer
         currentTransfers.remove(socket);
