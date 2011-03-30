@@ -305,7 +305,8 @@ void Workstation::decodeControlMessage(TCPSocket *socket)
         //shouldnt this be sending a file back not receiving one?
         //should take rest of data -> songName
         //no need to listen for more data on this socket.
-        connect (socket,SIGNAL(signaldataReceived(TCPSocket*)),this,SLOT( decodeControlMessage(TCPSocket*)));
+        connect (socket, SIGNAL(signaldataReceived(TCPSocket*)),
+                 this, SLOT( decodeControlMessage(TCPSocket*)));
         currentTransfers.insert(socket, new FileData);
         sendFile(&(*socket));
 /*
@@ -435,7 +436,7 @@ bool Workstation::processReceivingFileList(TCPSocket *socket, QByteArray *packet
         stream >> fileList;
 
         // Send the file list to the main window for procesing
-        //mainWindowPointer_->appendToRemote(fileList, socket->getIp(), );
+        mainWindowPointer_->appendToRemote(fileList, socket->getIp(), fileData->getPort());
 
         // Remove the file transfer
         currentTransfers.remove(socket);
