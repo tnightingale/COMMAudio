@@ -75,7 +75,7 @@ void TCPSocket::accept(PMSG pMsg) {
     TCPSocket * clientSocket = new TCPSocket(newSocket, hWnd_);
     QObject::connect(clientSocket, SIGNAL(signalDataReceived(TCPSocket*)),
                      this, SIGNAL(signalDataReceived(TCPSocket*)));
-
+    connectedIp = QString(inet_ntoa(client.sin_addr));
     emit signalClientConnected(clientSocket);
 }
 
@@ -96,10 +96,10 @@ void TCPSocket::send(PMSG pMsg) {
     winsockBuff.buf = nextTxBuff_->data();
     winsockBuff.len = nextTxBuff_->size();
 
-    // TODO: I think i should actually be checking something here, like the 
+    // TODO: I think i should actually be checking something here, like the
     //       outputBuffer_ status or something.
     while (TRUE) {
-        result = WSASend(pMsg->wParam, &winsockBuff, 1, &numSent, 0, 
+        result = WSASend(pMsg->wParam, &winsockBuff, 1, &numSent, 0,
                          NULL, NULL);
         if ((err = WSAGetLastError()) > 0 && err != ERROR_IO_PENDING) {
             qDebug("TCPSocket::send(); Error: %d", err);
@@ -177,12 +177,12 @@ int TCPSocket::loadBuffer(size_t bytesToRead) {
         return 0;
     }
     nextTxBuff_ = new QByteArray(bytesToRead, '\0');
-    // TODO: I had problems with this, might need to call 
+    // TODO: I had problems with this, might need to call
     //       QByteArray::readRawData().
     outputBuffer_->open(QIODevice::ReadOnly);
     int bytesRead = outputBuffer_->read(nextTxBuff_->data(), bytesToRead);
     outputBuffer_->close();
-    
+
     // Removing stuff that was read from the buffer.
     QByteArray buffer = outputBuffer_->buffer();
     buffer.remove(0, bytesRead);
@@ -237,7 +237,7 @@ bool TCPSocket::connectRemote(QString address, int port) {
             return false;
         }
     }
-
+    connectedIp = address;
     return true;
 }
 
