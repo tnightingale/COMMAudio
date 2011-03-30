@@ -10,24 +10,6 @@
     <height>598</height>
    </rect>
   </property>
-  <property name="sizePolicy">
-   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-    <horstretch>0</horstretch>
-    <verstretch>0</verstretch>
-   </sizepolicy>
-  </property>
-  <property name="minimumSize">
-   <size>
-    <width>861</width>
-    <height>598</height>
-   </size>
-  </property>
-  <property name="maximumSize">
-   <size>
-    <width>861</width>
-    <height>598</height>
-   </size>
-  </property>
   <property name="windowTitle">
    <string>Need a fancy program name and icon</string>
   </property>
@@ -512,50 +494,6 @@
   <action name="action_Modify">
    <property name="text">
     <string>Appearance</string>
-   </property>
-  </action>
-  <action name="action_Slider">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Slider</string>
-   </property>
-  </action>
-  <action name="action_Playback_Rate">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Playback Rate</string>
-   </property>
-  </action>
-  <action name="action_Volume">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Volume</string>
-   </property>
-  </action>
-  <action name="action_Push_To_Talk">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Push To Talk</string>
    </property>
   </action>
   <action name="action_Advanced">

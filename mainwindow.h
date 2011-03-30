@@ -67,6 +67,10 @@ public:
 
     void backgroundColor(QString background, QString font);
 
+    void updateMusicContent(QStringList currentSongs);
+
+    void updateClientlist();
+
 signals:
     void signalWMWSASyncTCPRx(int, int);
     void signalWMWSASyncUDPRx(int, int);
