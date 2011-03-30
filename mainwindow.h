@@ -10,6 +10,8 @@
 #include "tcpsocket.h"
 #include "audiocomponent.h"
 #include "joinserver.h"
+#include "colors.h"
+#include "ui_colors.h"
 #include "ui_joinserver.h"
 #include "remoteSong.h"
 #include <QGraphicsView>
@@ -63,6 +65,8 @@ public:
 
     QStringList getLocalFileList();
 
+    void backgroundColor(QString background, QString font);
+
 signals:
     void signalWMWSASyncTCPRx(int, int);
     void signalWMWSASyncUDPRx(int, int);
@@ -70,16 +74,25 @@ signals:
     void requestFile(QString, QString);
 
 private:
+    QSlider *slider_;
     Ui::MainWindow *ui;
     TCPSocket *controlSocket_;
     AudioComponent* player_;
+    QMediaPlayer* playerlink_;
     JoinServer joinServer_;
     JoinServer requestPlaylist_;
+    Colors changeColor_;
     QTimeLine *timer_;
+    bool muted_;
+    QStringList songList_;
     QMap<QString,RemoteSong> remoteList_;
 
 private slots:
+    void seek(int seconds);
+    void durationChanged(qint64 duration);
+    void positionChanged(qint64 progress);
     void on_action_Join_Multicast_triggered();
+    void on_action_Modify_triggered();
     void on_action_Request_Playlist_triggered();
     void on_action_Visible_toggled(bool status);
     void on_clientListWidget_itemDoubleClicked(QListWidgetItem* item);
@@ -88,6 +101,14 @@ private slots:
     void on_remoteListWidget_itemDoubleClicked(QListWidgetItem* item);
     void on_talkButton_pressed();
     void on_talkButton_released();
+    void on_tabWidget_currentChanged(int index);
+    void on_nextButton_clicked();
+    void on_previousButton_clicked();
+    void on_muteToolButton_clicked();
+    void on_horizontalSlider_valueChanged(int volume);
+    void on_playlistWidget_itemDoubleClicked(QListWidgetItem* item);
+    void on_addMusicButton_clicked();
+    void on_playbackBox_valueChanged(double );
 };
 
 #endif // MAINWINDOW_H
