@@ -59,8 +59,9 @@ void next();
 void previous();
 
 void startMic();
+void startMic(QIODevice* stream);
 void stopMic();
-
+void playStream(QIODevice* stream);
 };
 
 #endif // AUDIOCOMPONENT_H
