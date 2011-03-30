@@ -250,6 +250,10 @@ void MainWindow::on_clientListWidget_itemDoubleClicked(QListWidgetItem* item)
     QString fullPath = findFullPath(dataClicked);
     if(player_->addSong(fullPath)) {
         ui->playlistWidget->addItem(new QListWidgetItem(dataClicked));
+        ui->songAddedEditBox->setText(dataClicked);
+        if(ui->playlistWidget->count() == 1) {
+            ui->currentSongEditBox->setText(dataClicked);
+        }
     }
     timer_->setPaused(true);
 }
