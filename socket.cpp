@@ -24,7 +24,6 @@ Socket::Socket(SOCKET socket, HWND hWnd)
 }
 
 qint64 Socket::readData(char * data, qint64 maxSize) {
-    //qDebug("Socket::readData(); Reading %d bytes", maxSize);
     qint64 bytesRead = 0;
 
     // Mutex lock here.
