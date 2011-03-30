@@ -9,12 +9,13 @@ MainWindow::MainWindow(QWidget *parent) :
     muted_(false)
 {
     ui->setupUi(this);
+    this->setFixedSize(861,598);
     ui->currentSongEditBox->setReadOnly(true);
 
+    this->statusBar()->setSizeGripEnabled(false);
     player_ = new AudioComponent(this);
     /*player->addSong("./test.raw");
-    player->play();*/
-
+    player->play();*/    
     /*
     Phonon::SeekSlider *slider = new Phonon::SeekSlider(this);
     slider->setMediaObject(player_->getPlaylist());
@@ -563,5 +564,25 @@ void MainWindow::playlistIndexChanged(int index) {
     } else {
         ui->playlistWidget->setCurrentRow(index);
         ui->currentSongEditBox->setText(ui->playlistWidget->currentItem()->text());
+    }
+}
+
+void MainWindow::on_action_Advanced_toggled(bool status) {
+    if(status) {
+        slider_->show();
+        ui->playback_label->show();
+        ui->playbackBox->show();
+        ui->muteToolButton->show();
+        ui->horizontalSlider->show();
+        ui->volumeLcdNumber->show();
+        ui->talkButton->show();
+    } else {
+        slider_->hide();
+        ui->playback_label->hide();
+        ui->playbackBox->hide();
+        ui->muteToolButton->hide();
+        ui->horizontalSlider->hide();
+        ui->volumeLcdNumber->hide();
+        ui->talkButton->hide();
     }
 }

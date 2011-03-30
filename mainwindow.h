@@ -111,6 +111,7 @@ private slots:
     void on_playlistWidget_itemDoubleClicked(QListWidgetItem* item);
     void on_addMusicButton_clicked();
     void on_playbackBox_valueChanged(double );
+    void on_action_Advanced_toggled(bool status);
 };
 
 #endif // MAINWINDOW_H
