@@ -25,8 +25,17 @@ AudioComponent::AudioComponent(QObject *parent) :
 void AudioComponent::setSourceFolder(){
     QString Folder = QFileDialog::getExistingDirectory(0,"Source Directory",".",QFileDialog::ShowDirsOnly);
     sourceFolder_ = QDir(Folder);
-
+    playlist_->currentIndex();
 }
+
+void AudioComponent::gotoIndex(int index) {
+    playlist_->setCurrentIndex(index);
+}
+
+int AudioComponent::getIndex(){
+    return playlist_->currentIndex();
+}
+
 QStringList AudioComponent::getFileList(){
     QStringList stuff;
     QStringList filters;
@@ -54,8 +63,8 @@ QList<QMediaContent> AudioComponent::getQueue() {
 // return playlist_->queue();
 }
 
-void AudioComponent::addSongToBegining(QString filename) {
-    addSong(filename);
+bool AudioComponent::addSongToBegining(QString filename) {
+    return addSong(filename);
     //QList<Phonon::MediaSource> queue = playlist_->queue();
 }
 
@@ -65,9 +74,9 @@ void AudioComponent::setCurrentSong(QString fileName){
     //playlist_->setCurrentSource(fileName);
 }
 
-void AudioComponent::addSong(QString filename) {
+bool AudioComponent::addSong(QString filename) {
 
-    playlist_->addMedia(QUrl::fromLocalFile(filename));
+   return playlist_->addMedia(QUrl::fromLocalFile(filename));
 }
 void AudioComponent::play() {
     player_->play();
@@ -87,6 +96,18 @@ void AudioComponent::previous(){
 
 QMediaPlayer* AudioComponent::getPlayer() {
     return player_;
+}
+
+void AudioComponent::previousIndex(int desiredIndex) {
+    while(playlist_->previousIndex(1)!= desiredIndex){
+        playlist_->previous();
+    }
+}
+
+void AudioComponent::nextIndex(int desiredIndex) {
+    while(playlist_->nextIndex(1)!= desiredIndex){
+        playlist_->next();
+    }
 }
 
 void AudioComponent::startMic(){

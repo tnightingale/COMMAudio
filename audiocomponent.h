@@ -18,7 +18,7 @@ public:
     explicit AudioComponent(QObject *parent = 0);
 
 
-    void addSong(QString filename);
+    bool addSong(QString filename);
     void setSourceFolder();
     QDir getSourceFolder(){
         return sourceFolder_;
@@ -26,10 +26,14 @@ public:
     QStringList getFileList();
 
     QList<QMediaContent> getQueue();
-    void addSongToBegining(QString filename);
+    bool addSongToBegining(QString filename);
     void setCurrentSong(QString fileName);
     QMediaPlayer::State getState();
     QMediaPlayer* getPlayer();
+    void previousIndex(int desiredIndex);
+    void nextIndex(int desiredIndex);
+    void gotoIndex(int index);
+    int getIndex();
 
 private:
     QMediaPlayer* player_;

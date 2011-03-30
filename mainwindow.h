@@ -84,6 +84,7 @@ private:
     Colors changeColor_;
     QTimeLine *timer_;
     bool muted_;
+    QStringList songList_;
     QMap<QString,RemoteSong> remoteList_;
 
 private slots:
@@ -105,6 +106,8 @@ private slots:
     void on_previousButton_clicked();
     void on_muteToolButton_clicked();
     void on_horizontalSlider_valueChanged(int volume);
+    void on_playlistWidget_itemDoubleClicked(QListWidgetItem* item);
+    void on_addMusicButton_clicked();
 };
 
 #endif // MAINWINDOW_H

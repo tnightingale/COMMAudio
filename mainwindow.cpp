@@ -8,16 +8,13 @@ MainWindow::MainWindow(QWidget *parent) :
     slider_(0),
     muted_(false)
 {
-    QString fileName;
-    QString songTitle;
-
     ui->setupUi(this);
     ui->currentSongEditBox->setReadOnly(true);
 
     player_ = new AudioComponent(this);
     /*player->addSong("./test.raw");
     player->play();*/
-    player_->setSourceFolder();
+
     /*
     Phonon::SeekSlider *slider = new Phonon::SeekSlider(this);
     slider->setMediaObject(player_->getPlaylist());
@@ -49,25 +46,7 @@ MainWindow::MainWindow(QWidget *parent) :
    // player->startMic();
 
     ui->remoteListWidget->setSortingEnabled(true);
-    //ui->clientListWidget->setSortingEnabled(true);
-    QStringList songList = player_->getFileList();
-    for (int i = 0; i < songList.size();++i){
-        fileName = songList.at(i);
-        player_->addSong(fileName);
-        int n = fileName.lastIndexOf('/');
-        int s = fileName.size() - n - 1;
-        songTitle = fileName.right(s);
-        ui->clientListWidget->addItem(new QListWidgetItem(songTitle));
-
-    }
-
-    if(songList.size() > 0) {
-        fileName = songList.at(0);
-        int n = fileName.lastIndexOf('/');
-        int s = fileName.size() - n - 1;
-        songTitle = fileName.right(s);
-        ui->currentSongEditBox->setText(songTitle);
-    }
+   // ui->clientListWidget->setSortingEnabled(true);
     //working player code for wav files. will play following 3 files from internet in succession
 
 
@@ -75,7 +54,6 @@ MainWindow::MainWindow(QWidget *parent) :
     player->addSong("http://www.dailywav.com/0311/spiteMe.wav");
     player->addSong("http://www.dailywav.com/0311/convictionsBourbon.wav");*/
     //player->play();
-
 }
 
 MainWindow::~MainWindow()
@@ -85,8 +63,8 @@ MainWindow::~MainWindow()
 
 QString MainWindow::findFullPath(QString filename) {
     QString fullPath;
-    for (int i = 0; i < player_->getFileList().size();++i){
-        fullPath = player_->getFileList().at(i);
+    for (int i = 0; i < songList_.size();++i){
+        fullPath = songList_.at(i);
         if(fullPath.contains(filename)) {
             return fullPath;
         }
@@ -235,11 +213,11 @@ void MainWindow::visualization(int n) {
     timer_->start();
 }
 
-void MainWindow::appendToRemote(QStringList songList, QString ipAddress)
+void MainWindow::appendToRemote(QStringList songList_, QString ipAddress)
 {
     QString fileName, songTitle;
-    for (int i = 0; i < songList.size();++i){
-        fileName = songList.at(i);
+    for (int i = 0; i < songList_.size();++i){
+        fileName = songList_.at(i);
         int n = fileName.lastIndexOf('/');
         int s = fileName.size() - n - 1;
         songTitle = fileName.right(s);
@@ -268,14 +246,11 @@ void MainWindow::appendToRemote(QStringList songList, QString ipAddress)
 */
 void MainWindow::on_clientListWidget_itemDoubleClicked(QListWidgetItem* item)
 {
-    player_->stop();
     QString dataClicked = item->text();
     QString fullPath = findFullPath(dataClicked);
-    player_->setCurrentSong(fullPath);
-    ui->currentSongEditBox->setText(dataClicked);
-    qDebug(qPrintable(item->text()));
-    player_->play();
-    ui->playButton->setText("Pause");
+    if(player_->addSong(fullPath)) {
+        ui->playlistWidget->addItem(new QListWidgetItem(dataClicked));
+    }
     timer_->setPaused(true);
 }
 
@@ -333,6 +308,7 @@ void MainWindow::on_playButton_clicked()
        ui->playButton->setText("Pause");
        ui->playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPause));
        player_->play();
+
        if(ui->tabWidget->currentIndex() == 1) {
             timer_->setPaused(false);
        } else {
@@ -403,7 +379,7 @@ bool MainWindow::winEvent(PMSG msg, long * result) {
 */
 QStringList MainWindow::getLocalFileList()
 {
-    return player_->getFileList();
+    return songList_;
 }
 
 
@@ -432,22 +408,40 @@ void MainWindow::on_tabWidget_currentChanged(int index)
 
 void MainWindow::on_nextButton_clicked()
 {
-    player_->next();
-    QString song = playerlink_->media().canonicalUrl().toString();
-    int n = song.lastIndexOf('/');
-    int s = song.size() - n - 1;
-    QString songTitle = song.right(s);
-    ui->currentSongEditBox->setText(songTitle);
+    int max = (ui->playlistWidget->count() - 1);
+    int current = ui->playlistWidget->currentIndex().row();
+    if(current == max) {
+        player_->gotoIndex(-1);
+        ui->playlistWidget->setCurrentRow(0);
+        ui->currentSongEditBox->setText(ui->playlistWidget->currentItem()->text());
+    } else {
+        player_->next();
+        QString song = playerlink_->media().canonicalUrl().toString();
+        int n = song.lastIndexOf('/');
+        int s = song.size() - n - 1;
+        QString songTitle = song.right(s);
+        ui->currentSongEditBox->setText(songTitle);
+        ui->playlistWidget->setCurrentRow(ui->playlistWidget->currentRow() + 1);
+    }
 }
 
 void MainWindow::on_previousButton_clicked()
 {
-    player_->previous();
-    QString song = playerlink_->media().canonicalUrl().toString();
-    int n = song.lastIndexOf('/');
-    int s = song.size() - n - 1;
-    QString songTitle = song.right(s);
-    ui->currentSongEditBox->setText(songTitle);
+    int max = (ui->playlistWidget->count() - 1);
+    int current = ui->playlistWidget->currentIndex().row();
+    if(current == 0) {
+        player_->gotoIndex(max);
+        ui->playlistWidget->setCurrentRow(max);
+        ui->currentSongEditBox->setText(ui->playlistWidget->currentItem()->text());
+    } else {
+        player_->previous();
+        QString song = playerlink_->media().canonicalUrl().toString();
+        int n = song.lastIndexOf('/');
+        int s = song.size() - n - 1;
+        QString songTitle = song.right(s);
+        ui->currentSongEditBox->setText(songTitle);
+        ui->playlistWidget->setCurrentRow(ui->playlistWidget->currentRow() - 1);
+    }
 }
 
 void MainWindow::on_muteToolButton_clicked()
@@ -502,6 +496,7 @@ void MainWindow::backgroundColor(QString background, QString font) {
     ui->talkButton->setStyleSheet(button);
     ui->muteToolButton->setStyleSheet(button);
     ui->nextButton->setStyleSheet(button);
+    ui->addMusicButton->setStyleSheet(button);
     slider_->setStyleSheet(sliderMods);
     ui->horizontalSlider->setStyleSheet(sliderMods);
     MainWindow::setStyleSheet(maincolor);
@@ -515,4 +510,35 @@ void MainWindow::on_action_Modify_triggered(){
     {
         backgroundColor(changeColor_.getBackground(), changeColor_.getFont());
     }
+}
+
+void MainWindow::on_playlistWidget_itemDoubleClicked(QListWidgetItem* item)
+{
+    ui->currentSongEditBox->setText(item->text());
+    ui->playlistWidget->setCurrentItem(item);
+    int selected = ui->playlistWidget->currentRow();
+    if (selected == 0) {
+        player_->gotoIndex(-1);
+    } else {
+        player_->gotoIndex(selected);
+    }
+}
+
+void MainWindow::on_addMusicButton_clicked()
+{
+
+    QString fileName;
+    QString songTitle;
+
+    player_->setSourceFolder();
+    QStringList songs = player_->getFileList();
+    for (int i = 0; i < songs.size();++i){
+        fileName = songs.at(i);
+        int n = fileName.lastIndexOf('/');
+        int s = fileName.size() - n - 1;
+        songTitle = fileName.right(s);
+        ui->clientListWidget->addItem(new QListWidgetItem(songTitle));
+
+    }
+    songList_ += songs;
 }
