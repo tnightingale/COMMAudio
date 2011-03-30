@@ -305,16 +305,16 @@ void Workstation::decodeControlMessage(TCPSocket *socket)
         //shouldnt this be sending a file back not receiving one?
         //should take rest of data -> songName
         //no need to listen for more data on this socket.
-        //connect (socket,SIGNAL(signaldataReceived(TCPSocket*)),this,SLOT( decodeControlMessage(TCPSocket*)));
-        //currentTransfers.insert(socket, new FileData);
-        //sendFile(&(*socket));
-
+        connect (socket,SIGNAL(signaldataReceived(TCPSocket*)),this,SLOT( decodeControlMessage(TCPSocket*)));
+        currentTransfers.insert(socket, new FileData);
+        sendFile(&(*socket));
+/*
         // Connect the signal for the type of transfer
         connect(socket, SIGNAL(signalDataReceived(TCPSocket*)),
                 this, SLOT(receiveFileController(TCPSocket*)));
         // Call function now to deal with rest of packet
         currentTransfers.insert(socket, new FileData);
-        receiveFileController(&(*socket));
+        receiveFileController(&(*socket));*/
         break;
     case VOICE_CHAT:
         // Connect to voice chat here
