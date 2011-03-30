@@ -361,12 +361,9 @@ void Workstation::receiveFileController(TCPSocket* socket)
 
 bool Workstation::processReceivingFile(TCPSocket* socket, QByteArray* packet)
 {
-    // Insert rest of received packet into the current transfers map
-    //currentTransfers.insert(socket, packet.right(packet.length() - 1));
-
-
     bool isFileListTransferComplete = false;
-    // Check to see if this is the last packet //need to figure out how to check this.
+
+    // Check to see if this is the last packet
     if (*packet[packet->length() - 1] == '\n')
     {
 
