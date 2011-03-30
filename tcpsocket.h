@@ -78,7 +78,17 @@ public:
      */
     QString getIp()
     {
-        return connectedIp;
+        return connectedIp_;
+    }
+
+    /**
+     * Returns the connected port of the socket.
+     *
+     * @author Luke Queenan
+     */
+    short getPort()
+    {
+        return connectedPort_;
     }
 
 signals:
@@ -112,7 +122,8 @@ public slots:
     void slotProcessWSAEvent(int, int);
 
 private:
-    QString connectedIp;
+    QString connectedIp_;
+    short connectedPort_;
 };
 
 #endif // TCPSOCKET_H

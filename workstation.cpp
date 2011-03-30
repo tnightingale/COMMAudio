@@ -116,8 +116,7 @@ void Workstation::connectToServer()
 
 void Workstation::requestFile(QString ip, short port, QString songPath)
 {
-    qDebug("Workstation::requestFileList(); Requesting File: %s", songPath);
-
+    qDebug("Workstation::requestFileList(); Requesting File");
 
     // Create the socket
     TCPSocket *requestSocket = new TCPSocket(mainWindowPointer_->winId());
@@ -149,7 +148,7 @@ void Workstation::requestFile(QString ip, short port, QString songPath)
     qDebug("Workstation::requestFileList(); Sent file list");
 
     // Put the socket into the current transfers map
-    currentTransfers.insert(requestSocket, new FileData);
+    currentTransfers.insert(requestSocket, new FileData(this, port));
 
     // Connect the signal for receiving the other client's file list
     connect(requestSocket, SIGNAL(signalDataReceived(TCPSocket*)),
@@ -526,7 +525,6 @@ void Workstation::requestFileListController(TCPSocket *socket)
 {
     qDebug("Workstation::requestFileListController(); Receiving other file list");
     // Read the packet from the socket
-    socket->read(1);
     QByteArray packet = socket->readAll();
 
     // If processing is finished

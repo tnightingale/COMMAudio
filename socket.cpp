@@ -64,7 +64,7 @@ bool Socket::listen(PSOCKADDR_IN pSockAddr) {
                WSAGetLastError());
         return false;
     }
-    
+
     qDebug("Socket::listen(); listening to port %d", ntohs(pSockAddr->sin_port));
 
     return true;
