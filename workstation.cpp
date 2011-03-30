@@ -525,6 +525,7 @@ void Workstation::requestFileListController(TCPSocket *socket)
 {
     qDebug("Workstation::requestFileListController(); Receiving other file list");
     // Read the packet from the socket
+
     QByteArray packet = socket->readAll();
 
     // If processing is finished

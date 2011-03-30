@@ -4,10 +4,13 @@ FileData::FileData(QObject *parent) :
     QObject(parent)
 {
 }
-
-FileData::FileData(QObject *parent, QString name, QByteArray data) : QObject(parent){
+FileData::FileData(QObject *parent, short port) : QObject(parent){
+    port_ = port;
+}
+FileData::FileData(QObject *parent, QString name, QByteArray data, short port) : QObject(parent){
     name_ = name;
     data_ = data;
+    port_ = port;
 }
 
 bool FileData::writeToFile() {
