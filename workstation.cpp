@@ -41,6 +41,8 @@ Workstation::Workstation(MainWindow* mainWindow)
     // Connect the GUI button signals to the functions in here
     connect(mainWindow, SIGNAL(requestPlaylist(QString, short)),
             this, SLOT(requestFileList(QString, short)));
+    connect(mainWindow, SIGNAL(requestFile(QString, short, QString)),
+            this, SLOT(requestFile(QString, short ,QString)));
 
     // Listen on the TCP socket for other client connections
     if(!tcpSocket_->listen(7000))
@@ -74,7 +76,6 @@ void Workstation::sendFile(TCPSocket* socket)
     stream << fileStream;
 
     // Create the control packet
-    byteArray.insert(0, FILE_LIST);
     byteArray.append('\n');
 
     // Send our file to the other client
