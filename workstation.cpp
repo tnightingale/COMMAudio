@@ -358,7 +358,7 @@ bool Workstation::processReceivingFile(TCPSocket* socket, QByteArray* packet)
     bool isFileListTransferComplete = false;
 
     // Check to see if this is the last packet
-    if (*packet[packet->length() - 1] == '\n')
+    if (packet->at(packet->length() - 1) == '\n')
     {
         // Get rid of the newline character
         packet->truncate(packet->length() - 1);
