@@ -11,6 +11,8 @@ Socket::Socket(HWND hWnd, int addressFamily, int connectionType, int protocol)
         throw "Socket::Socket(); Can't create socket.";
     }
 
+    lock_ = new QMutex();
+
     connect(this, SIGNAL(signalSocketClosed()),
             this, SLOT(deleteLater()));
 }
@@ -27,6 +29,7 @@ qint64 Socket::readData(char * data, qint64 maxSize) {
     qint64 bytesRead = 0;
 
     // Mutex lock here.
+    QMutexLocker locker(lock_);
     inputBuffer_->open(QBuffer::ReadOnly);
     bytesRead = inputBuffer_->read(data, maxSize);
     inputBuffer_->close();
@@ -44,6 +47,7 @@ qint64 Socket::writeData(const char * data, qint64 maxSize) {
     qint64 bytesWritten = 0;
 
     // Mutex lock here.
+    QMutexLocker locker(lock_);
     outputBuffer_->open(QBuffer::Append);
     bytesWritten = outputBuffer_->write(data, maxSize);
     outputBuffer_->close();

@@ -224,7 +224,7 @@ void MainWindow::appendToRemote(QStringList songList_, QString ipAddress, short 
         int n = fileName.lastIndexOf('/');
         int s = fileName.size() - n - 1;
         songTitle = fileName.right(s);
-        remoteList_.insert(songTitle,*new RemoteSong(songTitle, ipAddress, port));
+        remoteList_.insert(songTitle,*new RemoteSong(fileName, ipAddress, port));
         ui->remoteListWidget->addItem(new QListWidgetItem(songTitle));
     }
 }
@@ -284,7 +284,7 @@ void MainWindow::on_clientListWidget_itemDoubleClicked(QListWidgetItem* item)
 void MainWindow::on_remoteListWidget_itemDoubleClicked(QListWidgetItem* item)
 {
     RemoteSong songInfo = remoteList_.value(item->text());
-    emit requestFile(songInfo.getIp(), songInfo.getFilePath());
+    emit requestFile(songInfo.getIp(),songInfo.getPort(), songInfo.getFilePath());
 }
 
 /*

@@ -28,7 +28,6 @@ private:
 
     // Functions
     void sendFile(TCPSocket* socket);
-    void sendFileList();
     // Create, send back socket information,
     // create buffer, connect signals/slots
     void acceptVoiceChat();

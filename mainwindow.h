@@ -79,7 +79,7 @@ signals:
     void signalWMWSASyncTCPRx(int, int);
     void signalWMWSASyncUDPRx(int, int);
     void requestPlaylist(QString, short);
-    void requestFile(QString, QString);
+    void requestFile(QString,short, QString);
 
 private:
     QSlider *slider_;
