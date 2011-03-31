@@ -58,7 +58,8 @@ protected:
     /** These are probably going to be passed on to the writeThread. */
     size_t packetSize_;
 
-    QMutex *lock_;
+    QMutex sendLock_;
+    QMutex receiveLock_;
 
     virtual qint64 readData(char * data, qint64 maxSize);
     virtual qint64 writeData(const char * data, qint64 maxSize);
@@ -95,6 +96,8 @@ public:
      * @author Tom Nightingale.
      */
     void close(PMSG pMsg);
+
+    bool isSequential();
 
 signals:
     void signalSocketClosed();

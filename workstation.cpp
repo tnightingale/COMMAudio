@@ -16,7 +16,7 @@ Workstation::Workstation(MainWindow* mainWindow)
     WORD wVersionRequested = MAKEWORD(2,2);
 
     if ((err = WSAStartup(wVersionRequested, &wsaData)) < 0) {
-        qDebug("Workstation::Workstation(): Missing WINSOCK2 DLL.");
+        ////qdebug("Workstation::Workstation(): Missing WINSOCK2 DLL.");
         throw "Workstation::Workstation(): Missing WINSOCK2 DLL.";
     }
 
@@ -79,17 +79,14 @@ void Workstation::sendFile(TCPSocket* socket)
         return;
     }
 
-    // Stream in the file and stream it out into a byte array
-    QDataStream in(&file);
-    QByteArray byteArray;
-    QDataStream out(&byteArray, QIODevice::WriteOnly);
-    out << in;
+    // Read file into a byte array for sending
+    packet = file.readAll();
 
     // Create the control packet
-    byteArray.append('\n');
+    packet.append('\n');
 
     // Send our file to the other client
-    socket->write(byteArray);
+    socket->write(packet);
 }
 
 void Workstation::acceptVoiceChat()
@@ -122,7 +119,7 @@ void Workstation::connectToServer()
 
 void Workstation::requestFile(QString ip, short port, QString songPath)
 {
-    qDebug("Workstation::requestFileList(); Requesting File");
+    //qdebug("Workstation::requestFileList(); Requesting File");
 
     // Create the socket
     TCPSocket *requestSocket = new TCPSocket(mainWindowPointer_->winId());
@@ -130,11 +127,11 @@ void Workstation::requestFile(QString ip, short port, QString songPath)
             requestSocket, SLOT(slotProcessWSAEvent(int,int)));
     // Connect to a remote host
     if (!requestSocket->connectRemote(ip, port)) {
-        qDebug("Workstation::requestFile(); Failed to connect to remote.");
+        //qdebug("Workstation::requestFile(); Failed to connect to remote.");
         return;
     }
 
-    qDebug("Workstation::requestFileList(); Assuming connection suceeded!.");
+    //qdebug("Workstation::requestFileList(); Assuming connection suceeded!.");
 
     requestSocket->moveToThread(socketThread_);
     requestSocket->open(QIODevice::ReadWrite);
@@ -145,19 +142,16 @@ void Workstation::requestFile(QString ip, short port, QString songPath)
     stream << songPath;
 
     // Create the control packet
-
-
     byteArray.insert(0, FILE_TRANSFER);
-
     byteArray.append('\n');
 
     // Send our own file list to the other client
     requestSocket->write(byteArray);
 
-    qDebug("Workstation::requestFile(); Sent file");
+    //qdebug("Workstation::requestFile(); Sent file");
 
     // Put the socket into the current transfers map
-    currentTransfers.insert(requestSocket, new FileData(this, port));
+    currentTransfers.insert(requestSocket, new FileData(this, songPath, port));
 
     // Connect the signal for receiving the other client's file list
     connect(requestSocket, SIGNAL(signalDataReceived(TCPSocket*)),
@@ -187,7 +181,7 @@ void Workstation::requestFile(QString ip, short port, QString songPath)
 */
 void Workstation::requestFileList(QString ip, short port)
 {
-    qDebug("Workstation::requestFileList(); Requesting file list.");
+    //qdebug("Workstation::requestFileList(); Requesting file list.");
 
     // Create the socket
     TCPSocket *requestSocket = new TCPSocket(mainWindowPointer_->winId());
@@ -195,11 +189,11 @@ void Workstation::requestFileList(QString ip, short port)
             requestSocket, SLOT(slotProcessWSAEvent(int,int)));
     // Connect to a remote host
     if (!requestSocket->connectRemote(ip, port)) {
-        qDebug("Workstation::requestFileList(); Failed to connect to remote.");
+        //qdebug("Workstation::requestFileList(); Failed to connect to remote.");
         return;
     }
 
-    qDebug("Workstation::requestFileList(); Assuming connection suceeded!.");
+    //qdebug("Workstation::requestFileList(); Assuming connection suceeded!.");
 
     requestSocket->moveToThread(socketThread_);
     requestSocket->open(QIODevice::ReadWrite);
@@ -224,7 +218,7 @@ void Workstation::requestFileList(QString ip, short port)
     requestSocket->write(byteArray);
 
 
-    qDebug("Workstation::requestFileList(); Sent file list");
+    //qdebug("Workstation::requestFileList(); Sent file list");
 
     // Put the socket into the current transfers map
     currentTransfers.insert(requestSocket, new FileData(this,port));
@@ -255,15 +249,15 @@ void Workstation::requestFileList(QString ip, short port)
 */
 void Workstation::processConnection(TCPSocket* socket)
 {
-    qDebug("Workstation::processConnection(); processing connection.");
+    //qdebug("Workstation::processConnection(); processing connection.");
 
     // Connect the socket to the window's message loop.
     if (!connect(mainWindowPointer_, SIGNAL(signalWMWSASyncTCPRx(int, int)),
                  socket, SLOT(slotProcessWSAEvent(int, int)))) {
-        qDebug("Workstation::processConnection(); connect(signalWMWSASyncTCPRx()) failed.");
+        //qdebug("Workstation::processConnection(); connect(signalWMWSASyncTCPRx()) failed.");
     }
     if (!socket->open(QIODevice::ReadWrite)) {
-        qDebug("Workstation::processConnection(); could not open client socket.");
+        //qdebug("Workstation::processConnection(); could not open client socket.");
     }
 }
 
@@ -290,7 +284,7 @@ void Workstation::processConnection(TCPSocket* socket)
 */
 void Workstation::decodeControlMessage(TCPSocket *socket)
 {
-    qDebug("Workstation::decodeControlMessage(); Decoding...");
+    //qdebug("Workstation::decodeControlMessage(); Decoding...");
 
     // Disconnect from decode control message
     disconnect(socket, SIGNAL(signalDataReceived(TCPSocket*)),
@@ -343,7 +337,7 @@ void Workstation::receiveUDP()
 
 void Workstation::receiveFileController(TCPSocket* socket)
 {
-    qDebug("Workstation::requestFileController(); Receiving other file");
+    //qdebug("Workstation::requestFileController(); Receiving other file");
     // Read the packet from the socket
     QByteArray packet = socket->readAll();
 
@@ -364,13 +358,13 @@ bool Workstation::processReceivingFile(TCPSocket* socket, QByteArray* packet)
     bool isFileListTransferComplete = false;
 
     // Check to see if this is the last packet
-    if (*packet[packet->length() - 1] == '\n')
+    if (packet->at(packet->length() - 1) == '\n')
     {
-
         // Get rid of the newline character
         packet->truncate(packet->length() - 1);
 
         FileData *fileData = currentTransfers.value(socket);
+
         // Append any new data to any existing data
         fileData->append(*packet);
 
@@ -393,7 +387,6 @@ bool Workstation::processReceivingFile(TCPSocket* socket, QByteArray* packet)
         isFileListTransferComplete = false;
     }
     return isFileListTransferComplete;
-
 }
 
 /*
@@ -530,7 +523,7 @@ void Workstation::receiveFileListController(TCPSocket *socket)
 */
 void Workstation::requestFileListController(TCPSocket *socket)
 {
-    qDebug("Workstation::requestFileListController(); Receiving other file list");
+    //qdebug("Workstation::requestFileListController(); Receiving other file list");
     // Read the packet from the socket
 
     QByteArray packet = socket->readAll();
