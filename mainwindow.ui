@@ -73,7 +73,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -388,19 +388,6 @@
      <enum>Qt::Horizontal</enum>
     </property>
    </widget>
-   <widget class="QPushButton" name="addMusicButton">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>70</y>
-      <width>111</width>
-      <height>28</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Add Music Folder</string>
-    </property>
-   </widget>
    <widget class="QDoubleSpinBox" name="playbackBox">
     <property name="geometry">
      <rect>
@@ -471,9 +458,17 @@
     </property>
     <addaction name="action_Advanced"/>
    </widget>
+   <widget class="QMenu" name="menuAdd_Music">
+    <property name="title">
+     <string>Add Music</string>
+    </property>
+    <addaction name="action_Folder"/>
+    <addaction name="action_Song"/>
+   </widget>
    <addaction name="menuConnections"/>
    <addaction name="menuColors"/>
    <addaction name="menuView"/>
+   <addaction name="menuAdd_Music"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="action_Request_Playlist">
@@ -606,6 +601,16 @@
    </property>
    <property name="text">
     <string>Advanced</string>
+   </property>
+  </action>
+  <action name="action_Folder">
+   <property name="text">
+    <string>Folder</string>
+   </property>
+  </action>
+  <action name="action_Song">
+   <property name="text">
+    <string>Song</string>
    </property>
   </action>
  </widget>
