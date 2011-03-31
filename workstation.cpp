@@ -79,17 +79,14 @@ void Workstation::sendFile(TCPSocket* socket)
         return;
     }
 
-    // Stream in the file and stream it out into a byte array
-    QDataStream in(&file);
-    QByteArray byteArray;
-    QDataStream out(&byteArray, QIODevice::WriteOnly);
-    out << in;
+    // Read file into a byte array for sending
+    QByteArray packet = file.readAll();
 
     // Create the control packet
-    byteArray.append('\n');
+    packet.append('\n');
 
     // Send our file to the other client
-    socket->write(byteArray);
+    socket->write(packet);
 }
 
 void Workstation::acceptVoiceChat()
