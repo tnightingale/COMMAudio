@@ -104,3 +104,8 @@ void Socket::slotProcessWSAEvent(PMSG pMsg) {
 
     return;
 }
+
+bool Socket::isSequential()
+{
+    return true;
+}

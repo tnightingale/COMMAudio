@@ -97,6 +97,8 @@ public:
      */
     void close(PMSG pMsg);
 
+    bool isSequential();
+
 signals:
     void signalSocketClosed();
     void readyWrite(qint64);

@@ -154,7 +154,7 @@ void TCPSocket::receive(PMSG pMsg) {
         numReceived -= bytesWritten;
         inputBuffer_->close();
         // Unlock mutex.
-        receiveLock_.lock();
+        receiveLock_.unlock();
         if (numReceived == 0) {
             break;
         }
