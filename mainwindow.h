@@ -5,8 +5,6 @@
 #include <QListWidgetItem>
 #include <QMap>
 #include <QDebug>
-#include <Phonon/MediaSource>
-#include <Phonon/SeekSlider>
 #include "tcpsocket.h"
 #include "audiocomponent.h"
 #include "joinserver.h"

@@ -16,15 +16,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     this->statusBar()->setSizeGripEnabled(false);
     player_ = new AudioComponent(this);
-    /*player->addSong("./test.raw");
-    player->play();*/    
-    /*
-    Phonon::SeekSlider *slider = new Phonon::SeekSlider(this);
-    slider->setMediaObject(player_->getPlaylist());
-    slider->setGeometry(180,490,450,19);
-    slider->saveGeometry();
-    slider->show();
-*/
 
     QFile file("mediaTracker.dat");
     if(file.open(QIODevice::ReadOnly)) {
@@ -787,4 +778,5 @@ void MainWindow::on_action_Song_triggered() {
         ui->clientListWidget->addItem(new QListWidgetItem(songTitle));
     }
     songList_.append(filename);
+    updateMusicContent(songList_);
 }
