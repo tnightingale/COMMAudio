@@ -9,6 +9,8 @@
 #include <QDataStream>
 #include <QFile>
 #include <QDebug>
+#include <QMutex>
+#include <QMutexLocker>
 
 #define MSGSIZE 1024
 #define WM_WSAASYNC_TCP (WM_USER + 1)
@@ -38,7 +40,7 @@ protected:
     /** The socket descriptor for which this object is encapsulating. */
     SOCKET socket_;
 
-    /** Window handle, due to windows idiosyncracies, all sockets are tied to 
+    /** Window handle, due to windows idiosyncracies, all sockets are tied to
      *  a window. */
     HWND hWnd_;
 
@@ -55,6 +57,8 @@ protected:
 
     /** These are probably going to be passed on to the writeThread. */
     size_t packetSize_;
+
+    QMutex *lock_;
 
     virtual qint64 readData(char * data, qint64 maxSize);
     virtual qint64 writeData(const char * data, qint64 maxSize);
