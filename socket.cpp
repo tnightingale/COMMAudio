@@ -11,7 +11,7 @@ Socket::Socket(HWND hWnd, int addressFamily, int connectionType, int protocol)
         throw "Socket::Socket(); Can't create socket.";
     }
 
-    lock_ = new QMutex();
+    //lock_ = new QMutex();
 
     connect(this, SIGNAL(signalSocketClosed()),
             this, SLOT(deleteLater()));
