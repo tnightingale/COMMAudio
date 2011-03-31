@@ -17,6 +17,7 @@ private:
 
 public:
     explicit FileData(QObject *parent = 0);
+    explicit FileData(QObject *parent, QString name, short port);
     explicit FileData(QObject *parent, short port);
     explicit FileData(QObject *parent, QString name, QByteArray data, short port);
     void setName(QString name) {

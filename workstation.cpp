@@ -80,7 +80,7 @@ void Workstation::sendFile(TCPSocket* socket)
     }
 
     // Read file into a byte array for sending
-    QByteArray packet = file.readAll();
+    packet = file.readAll();
 
     // Create the control packet
     packet.append('\n');
@@ -142,10 +142,7 @@ void Workstation::requestFile(QString ip, short port, QString songPath)
     stream << songPath;
 
     // Create the control packet
-
-
     byteArray.insert(0, FILE_TRANSFER);
-
     byteArray.append('\n');
 
     // Send our own file list to the other client
@@ -154,7 +151,7 @@ void Workstation::requestFile(QString ip, short port, QString songPath)
     qDebug("Workstation::requestFile(); Sent file");
 
     // Put the socket into the current transfers map
-    currentTransfers.insert(requestSocket, new FileData(this, port));
+    currentTransfers.insert(requestSocket, new FileData(this, songPath, port));
 
     // Connect the signal for receiving the other client's file list
     connect(requestSocket, SIGNAL(signalDataReceived(TCPSocket*)),
@@ -363,11 +360,11 @@ bool Workstation::processReceivingFile(TCPSocket* socket, QByteArray* packet)
     // Check to see if this is the last packet
     if (*packet[packet->length() - 1] == '\n')
     {
-
         // Get rid of the newline character
         packet->truncate(packet->length() - 1);
 
         FileData *fileData = currentTransfers.value(socket);
+
         // Append any new data to any existing data
         fileData->append(*packet);
 
@@ -390,7 +387,6 @@ bool Workstation::processReceivingFile(TCPSocket* socket, QByteArray* packet)
         isFileListTransferComplete = false;
     }
     return isFileListTransferComplete;
-
 }
 
 /*
