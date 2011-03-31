@@ -683,6 +683,7 @@ void MainWindow::loadlastPlaylist() {
         playlist_->clear();
         playlist_->load(&buffer, "m3u");
         updatePlaylist();
+        player_->play();
     }
 }
 
