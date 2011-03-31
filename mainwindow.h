@@ -120,7 +120,6 @@ private slots:
     void on_muteToolButton_clicked();
     void on_horizontalSlider_valueChanged(int volume);
     void on_playlistWidget_itemDoubleClicked(QListWidgetItem* item);
-    void on_addMusicButton_clicked();
     void on_playbackBox_valueChanged(double );
     void on_action_Advanced_toggled(bool status);
     void on_savePlaylistButton_clicked();
@@ -130,6 +129,8 @@ private slots:
     void on_clearRemoteButton_clicked();
     void on_removeButton_clicked();
     void on_playlistWidget_currentRowChanged(int currentRow);
+    void on_action_Folder_triggered();
+    void on_action_Song_triggered();
 };
 
 #endif // MAINWINDOW_H

@@ -525,7 +525,6 @@ void MainWindow::backgroundColor(QString background, QString font) {
     ui->talkButton->setStyleSheet(button);
     ui->muteToolButton->setStyleSheet(button);
     ui->nextButton->setStyleSheet(button);
-    ui->addMusicButton->setStyleSheet(button);
     ui->savePlaylistButton->setStyleSheet(button);
     ui->loadPlaylistButton->setStyleSheet(button);
     ui->clearLocalButton->setStyleSheet(button);
@@ -563,26 +562,6 @@ void MainWindow::on_playlistWidget_itemDoubleClicked(QListWidgetItem* item)
     } else {
         player_->gotoIndex(selected);
     }
-}
-
-void MainWindow::on_addMusicButton_clicked()
-{
-
-    QString fileName;
-    QString songTitle;
-
-    player_->setSourceFolder();
-    QStringList songs = player_->getFileList();
-    for (int i = 0; i < songs.size();++i){
-        fileName = songs.at(i);
-        int n = fileName.lastIndexOf('/');
-        int s = fileName.size() - n - 1;
-        songTitle = fileName.right(s);
-        ui->clientListWidget->addItem(new QListWidgetItem(songTitle));
-
-    }
-    songList_ += songs;
-    updateMusicContent(songList_);
 }
 
 void MainWindow::updateClientlist(){
@@ -629,8 +608,6 @@ void MainWindow::on_action_Advanced_toggled(bool status) {
         ui->stopButton->setGeometry(270,70,93,28);
         ui->previousButton->setGeometry(170,70,93,28);
         ui->nextButton->setGeometry(470,70,93,28);
-        ui->addMusicButton->setGeometry(0,70,111,28);
-
         ui->volumeLcdNumber->setGeometry(770,70,64,28);
         ui->muteToolButton->setGeometry(650,70,93,28);
         ui->horizontalSlider->setGeometry(670,40,160,19);
@@ -646,8 +623,6 @@ void MainWindow::on_action_Advanced_toggled(bool status) {
         ui->stopButton->setGeometry(270,40,93,28);
         ui->previousButton->setGeometry(170,40,93,28);
         ui->nextButton->setGeometry(470,40,93,28);
-        ui->addMusicButton->setGeometry(0,40,111,28);
-
         ui->volumeLcdNumber->setGeometry(770,40,64,28);
         ui->muteToolButton->setGeometry(650,40,93,28);
         ui->horizontalSlider->setGeometry(670,10,160,19);
@@ -777,4 +752,39 @@ void MainWindow::on_playlistWidget_currentRowChanged(int currentRow)
     if(currentRow >= 0) {
         ui->currentSongEditBox_2->setText(ui->playlistWidget->currentItem()->text());
     }
+}
+
+void MainWindow::on_action_Folder_triggered() {
+    QString fileName;
+    QString songTitle;
+
+    player_->setSourceFolder();
+    QStringList songs = player_->getFileList();
+    for (int i = 0; i < songs.size();++i){
+        fileName = songs.at(i);
+        int n = fileName.lastIndexOf('/');
+        int s = fileName.size() - n - 1;
+        songTitle = fileName.right(s);
+        ui->clientListWidget->addItem(new QListWidgetItem(songTitle));
+
+    }
+    songList_ += songs;
+    updateMusicContent(songList_);
+}
+
+void MainWindow::on_action_Song_triggered() {
+    QString songTitle;
+    QString filename = QFileDialog::getOpenFileName(
+            this,
+            tr("Load Song"),
+            QDir::currentPath(),
+            tr("Documents (*.wav *.mp3)") );
+    QFile file(filename);
+    if(file.open(QIODevice::ReadOnly)) {
+        int n = filename.lastIndexOf('/');
+        int s = filename.size() - n - 1;
+        songTitle = filename.right(s);
+        ui->clientListWidget->addItem(new QListWidgetItem(songTitle));
+    }
+    songList_.append(filename);
 }
