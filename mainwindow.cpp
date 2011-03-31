@@ -751,16 +751,17 @@ void MainWindow::on_action_Folder_triggered() {
     QString songTitle;
 
     player_->setSourceFolder();
-    QStringList songs = player_->getFileList();
-    for (int i = 0; i < songs.size();++i){
-        fileName = songs.at(i);
+    songList_ += player_->getFileList();
+    songList_.removeDuplicates();
+    ui->clientListWidget->clear();
+    for (int i = 0; i < songList_.size();++i){
+        fileName = songList_.at(i);
         int n = fileName.lastIndexOf('/');
         int s = fileName.size() - n - 1;
         songTitle = fileName.right(s);
         ui->clientListWidget->addItem(new QListWidgetItem(songTitle));
 
     }
-    songList_ += songs;
     updateMusicContent(songList_);
 }
 
@@ -773,12 +774,14 @@ void MainWindow::on_action_Song_triggered() {
             tr("Documents (*.wav *.mp3)") );
     QFile file(filename);
     if(file.open(QIODevice::ReadOnly)) {
-        int n = filename.lastIndexOf('/');
-        int s = filename.size() - n - 1;
-        songTitle = filename.right(s);
-        ui->clientListWidget->addItem(new QListWidgetItem(songTitle));
+        songList_.append(filename);
+        if(songList_.removeDuplicates() == 0) {
+            int n = filename.lastIndexOf('/');
+            int s = filename.size() - n - 1;
+            songTitle = filename.right(s);
+            ui->clientListWidget->addItem(new QListWidgetItem(songTitle));
+        }
     }
-    songList_.append(filename);
     updateMusicContent(songList_);
 }
 
