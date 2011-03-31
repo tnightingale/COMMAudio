@@ -117,13 +117,6 @@ Colors::~Colors()
     delete ui;
 }
 
-void Colors::on_defaultButton_clicked()
-{
-    ui->testButton->setStyleSheet("QPushButton {background-color: Black;color: white;}");
-    fontColor_ = "White";
-    backgroundColor_ = "Black";
-}
-
 QString Colors::getFont() {
     return fontColor_;
 }
@@ -132,12 +125,6 @@ QString Colors::getBackground(){
     return backgroundColor_;
 }
 
-void Colors::on_tigerButton_clicked()
-{
-    ui->testButton->setStyleSheet("QPushButton {background-color: OrangeRed;color: Black;}");
-    fontColor_ = "Black";
-    backgroundColor_ = "OrangeRed";
-}
 
 void Colors::on_textWidget_currentItemChanged(QListWidgetItem* current, QListWidgetItem* previous)
 {

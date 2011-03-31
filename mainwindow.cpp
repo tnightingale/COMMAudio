@@ -350,6 +350,7 @@ void MainWindow::on_stopButton_clicked()
 {
     player_->stop();
     ui->playButton->setText("Play");
+    ui->playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
     timer_->setPaused(true);
 }
 
@@ -779,4 +780,12 @@ void MainWindow::on_action_Song_triggered() {
     }
     songList_.append(filename);
     updateMusicContent(songList_);
+}
+
+void MainWindow::on_action_Tiger_triggered() {
+   backgroundColor("OrangeRed", "Black");
+}
+
+void MainWindow::on_action_Default_triggered() {
+    backgroundColor("Black", "White");
 }

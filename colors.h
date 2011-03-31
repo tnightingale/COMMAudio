@@ -20,10 +20,6 @@ public:
     QString getBackground();
 private slots:
 
-    void on_defaultButton_clicked();
-
-    void on_tigerButton_clicked();
-
     void on_textWidget_currentItemChanged(QListWidgetItem* current, QListWidgetItem* previous);
 
     void on_backgroundWidget_currentItemChanged(QListWidgetItem* current, QListWidgetItem* previous);

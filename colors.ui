@@ -88,32 +88,6 @@
     <string>Text Color</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="defaultButton">
-   <property name="geometry">
-    <rect>
-     <x>450</x>
-     <y>180</y>
-     <width>93</width>
-     <height>28</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Default</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="tigerButton">
-   <property name="geometry">
-    <rect>
-     <x>450</x>
-     <y>130</y>
-     <width>93</width>
-     <height>28</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Tiger Theme</string>
-   </property>
-  </widget>
  </widget>
  <resources/>
  <connections>

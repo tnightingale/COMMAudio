@@ -129,6 +129,8 @@ private slots:
     void on_playlistWidget_currentRowChanged(int currentRow);
     void on_action_Folder_triggered();
     void on_action_Song_triggered();
+    void on_action_Tiger_triggered();
+    void on_action_Default_triggered();
 };
 
 #endif // MAINWINDOW_H
