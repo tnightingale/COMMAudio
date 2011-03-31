@@ -148,12 +148,13 @@ void TCPSocket::receive(PMSG pMsg) {
 
     while (numReceived > 0) {
         // Lock mutex here.
+        receiveLock_.lock();
         inputBuffer_->open(QBuffer::WriteOnly);
         bytesWritten = inputBuffer_->write(winsockBuff.buf, numReceived);
         numReceived -= bytesWritten;
         inputBuffer_->close();
         // Unlock mutex.
-
+        receiveLock_.lock();
         if (numReceived == 0) {
             break;
         }
@@ -174,6 +175,7 @@ void TCPSocket::connect(PMSG) {
 
 int TCPSocket::loadBuffer(size_t bytesToRead) {
     // Lock mutex here
+    sendLock_.lock();
     if (outputBuffer_->bytesAvailable() == 0) {
         return 0;
     }
@@ -189,6 +191,7 @@ int TCPSocket::loadBuffer(size_t bytesToRead) {
     buffer.remove(0, bytesRead);
     outputBuffer_->setData(buffer);
     // Unlock mutex.
+    sendLock_.unlock();
 
     nextTxBuff_->resize(bytesRead);
     return bytesRead;

@@ -29,7 +29,7 @@ qint64 Socket::readData(char * data, qint64 maxSize) {
     qint64 bytesRead = 0;
 
     // Mutex lock here.
-    lock_.lock();
+    receiveLock_.lock();
     inputBuffer_->open(QBuffer::ReadOnly);
     bytesRead = inputBuffer_->read(data, maxSize);
     inputBuffer_->close();
@@ -39,7 +39,7 @@ qint64 Socket::readData(char * data, qint64 maxSize) {
     buffer.remove(0, bytesRead);
     inputBuffer_->setData(buffer);
     // Mutex unlock.
-    lock_.unlock();
+    receiveLock_.unlock();
 
     return bytesRead;
 }
@@ -48,12 +48,12 @@ qint64 Socket::writeData(const char * data, qint64 maxSize) {
     qint64 bytesWritten = 0;
 
     // Mutex lock here.
-    lock_.lock();
+    sendLock_.lock();
     outputBuffer_->open(QBuffer::Append);
     bytesWritten = outputBuffer_->write(data, maxSize);
     outputBuffer_->close();
     // Mutex unlock.
-    lock_.unlock();
+    sendLock_.unlock();
     emit readyWrite(bytesWritten);
 
     return bytesWritten;
