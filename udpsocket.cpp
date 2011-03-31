@@ -1,13 +1,13 @@
 #include "udpsocket.h"
 
-UDPSocket::UDPSocket(HWND hWnd) 
+UDPSocket::UDPSocket(HWND hWnd)
 : Socket(hWnd, AF_INET, SOCK_DGRAM, IPPROTO_UDP) {
     int err = 0;
     int flags = FD_READ | FD_CLOSE;
 
     if ((err = WSAAsyncSelect(socket_, hWnd, WM_WSAASYNC_TCP, flags))
                               == SOCKET_ERROR) {
-        qDebug("UDPSocket::UDPSocket(): Error setting up async select.");
+        //qdebug("UDPSocket::UDPSocket(): Error setting up async select.");
         throw "UDPSocket::UDPSocket(): Error setting up async select.";
     }
 }
@@ -34,7 +34,7 @@ void UDPSocket::send(PMSG pMsg) {
         ol->hEvent = (HANDLE) winsockBuff.buf;
 
         if ((num = data_->readRawData(winsockBuff.buf, bytesToRead)) <= 0) {
-            qDebug("UDPSocket()::send(); Finishing...");
+            //qdebug("UDPSocket()::send(); Finishing...");
             break;
         }
         winsockBuff.len = num;
@@ -45,7 +45,7 @@ void UDPSocket::send(PMSG pMsg) {
                            UDPSocket::sendWorkerRoutine);
 
         if ((err = WSAGetLastError()) > 0 && err != ERROR_IO_PENDING) {
-            qDebug("UDPSocket::send(); Error: %d", err);
+            //qdebug("UDPSocket::send(); Error: %d", err);
             return;
         }
 
@@ -74,8 +74,8 @@ void UDPSocket::receive(PMSG pMsg) {
     if (WSARecvFrom(pMsg->wParam, &(data->winsockBuff), 1, NULL, &flags,
                 NULL, NULL, ol, UDPSocket::recvWorkerRoutine) == SOCKET_ERROR) {
         if ((err = WSAGetLastError()) != WSA_IO_PENDING) {
-            qDebug("UDPSocket::receive(): WSARecv() failed with error %d",
-                   err);
+            //qdebug("UDPSocket::receive(): WSARecv() failed with error %d",
+                   //err);
             return;
         }
     }
@@ -88,8 +88,8 @@ void UDPSocket::slotProcessWSAEvent(int socket, int lParam) {
     PMSG pMsg = &msg;
 
     if (WSAGETSELECTERROR(pMsg->lParam)) {
-        qDebug("UDPSocket::slotProcessWSAEvent(): %d: Socket failed. Error: %d",
-              (int) pMsg->wParam, WSAGETSELECTERROR(pMsg->lParam));
+        //qdebug("UDPSocket::slotProcessWSAEvent(): %d: Socket failed. Error: %d",
+              //(int) pMsg->wParam, WSAGETSELECTERROR(pMsg->lParam));
         return;
     }
 
@@ -100,14 +100,14 @@ void UDPSocket::slotProcessWSAEvent(int socket, int lParam) {
 
     switch (WSAGETSELECTEVENT(pMsg->lParam)) {
         case FD_READ:
-            qDebug("UDPSocket::slotProcessWSAEvent: %d: FD_READ.",
-                   (int) pMsg->wParam);
+            //qdebug("UDPSocket::slotProcessWSAEvent: %d: FD_READ.",
+                   //(int) pMsg->wParam);
             receive(pMsg);
             break;
 
         case FD_WRITE:
-            qDebug("UDPSocket::slotProcessWSAEvent: %d: FD_WRITE.",
-                   (int) pMsg->wParam);
+            //qdebug("UDPSocket::slotProcessWSAEvent: %d: FD_WRITE.",
+                   //(int) pMsg->wParam);
             send(pMsg);
             break;
 

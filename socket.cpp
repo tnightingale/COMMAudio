@@ -7,7 +7,7 @@ Socket::Socket(HWND hWnd, int addressFamily, int connectionType, int protocol)
     if ((socket_ = WSASocket(addressFamily, connectionType, protocol, NULL, 0,
                              WSA_FLAG_OVERLAPPED)) == INVALID_SOCKET) {
         int err = WSAGetLastError();
-        qDebug("Socket::Socket(): Can't create socket. (%d)", err);
+        //qdebug("Socket::Socket(): Can't create socket. (%d)", err);
         throw "Socket::Socket(); Can't create socket.";
     }
 
@@ -59,12 +59,12 @@ bool Socket::listen(PSOCKADDR_IN pSockAddr) {
 
     if ((err = bind(socket_, (PSOCKADDR) pSockAddr, sizeof(SOCKADDR))
         == SOCKET_ERROR)) {
-        qDebug("Socket::listen(): Can't bind to socket. Error: %d",
-               WSAGetLastError());
+        //qdebug("Socket::listen(): Can't bind to socket. Error: %d",
+               //WSAGetLastError());
         return false;
     }
 
-    qDebug("Socket::listen(); listening to port %d", ntohs(pSockAddr->sin_port));
+    //qdebug("Socket::listen(); listening to port %d", ntohs(pSockAddr->sin_port));
 
     return true;
 }
@@ -79,8 +79,8 @@ void Socket::close(PMSG pMsg) {
 
 void Socket::slotProcessWSAEvent(PMSG pMsg) {
     if (WSAGETSELECTERROR(pMsg->lParam)) {
-        qDebug("Socket::slotProcessWSAEvent(): %d: Socket failed with error %d",
-              (int) pMsg->wParam, WSAGETSELECTERROR(pMsg->lParam));
+        //qdebug("Socket::slotProcessWSAEvent(): %d: Socket failed with error %d",
+              //(int) pMsg->wParam, WSAGETSELECTERROR(pMsg->lParam));
         return;
     }
 
@@ -91,8 +91,8 @@ void Socket::slotProcessWSAEvent(PMSG pMsg) {
     switch (WSAGETSELECTEVENT(pMsg->lParam)) {
 
         case FD_CLOSE:
-            qDebug("Socket::slotProcessWSAEvent(); %d: FD_CLOSE.",
-                   (int) pMsg->wParam);
+            //qdebug("Socket::slotProcessWSAEvent(); %d: FD_CLOSE.",
+                   //(int) pMsg->wParam);
             close(pMsg);
             break;
     }
