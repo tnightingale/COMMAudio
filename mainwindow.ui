@@ -17,8 +17,8 @@
    <widget class="QPushButton" name="playButton">
     <property name="geometry">
      <rect>
-      <x>410</x>
-      <y>510</y>
+      <x>370</x>
+      <y>70</y>
       <width>93</width>
       <height>28</height>
      </rect>
@@ -30,8 +30,8 @@
    <widget class="QPushButton" name="stopButton">
     <property name="geometry">
      <rect>
-      <x>300</x>
-      <y>510</y>
+      <x>270</x>
+      <y>70</y>
       <width>93</width>
       <height>28</height>
      </rect>
@@ -43,8 +43,8 @@
    <widget class="QTextEdit" name="currentSongEditBox">
     <property name="geometry">
      <rect>
-      <x>180</x>
-      <y>480</y>
+      <x>170</x>
+      <y>30</y>
       <width>461</width>
       <height>31</height>
      </rect>
@@ -53,8 +53,8 @@
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
-      <x>80</x>
-      <y>490</y>
+      <x>70</x>
+      <y>40</y>
       <width>81</width>
       <height>20</height>
      </rect>
@@ -66,14 +66,14 @@
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>0</y>
+      <x>0</x>
+      <y>100</y>
       <width>861</width>
       <height>451</height>
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -308,7 +308,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>510</y>
+      <y>0</y>
       <width>93</width>
       <height>28</height>
      </rect>
@@ -320,8 +320,8 @@
    <widget class="QPushButton" name="previousButton">
     <property name="geometry">
      <rect>
-      <x>180</x>
-      <y>510</y>
+      <x>170</x>
+      <y>70</y>
       <width>93</width>
       <height>28</height>
      </rect>
@@ -333,8 +333,8 @@
    <widget class="QPushButton" name="nextButton">
     <property name="geometry">
      <rect>
-      <x>550</x>
-      <y>510</y>
+      <x>470</x>
+      <y>70</y>
       <width>93</width>
       <height>28</height>
      </rect>
@@ -346,8 +346,8 @@
    <widget class="QLCDNumber" name="volumeLcdNumber">
     <property name="geometry">
      <rect>
-      <x>790</x>
-      <y>510</y>
+      <x>770</x>
+      <y>70</y>
       <width>64</width>
       <height>23</height>
      </rect>
@@ -359,8 +359,8 @@
    <widget class="QPushButton" name="muteToolButton">
     <property name="geometry">
      <rect>
-      <x>690</x>
-      <y>510</y>
+      <x>650</x>
+      <y>70</y>
       <width>93</width>
       <height>28</height>
      </rect>
@@ -372,8 +372,8 @@
    <widget class="QSlider" name="horizontalSlider">
     <property name="geometry">
      <rect>
-      <x>690</x>
-      <y>490</y>
+      <x>670</x>
+      <y>40</y>
       <width>160</width>
       <height>19</height>
      </rect>
@@ -392,7 +392,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>450</y>
+      <y>70</y>
       <width>111</width>
       <height>28</height>
      </rect>
@@ -404,8 +404,8 @@
    <widget class="QDoubleSpinBox" name="playbackBox">
     <property name="geometry">
      <rect>
-      <x>800</x>
-      <y>460</y>
+      <x>780</x>
+      <y>10</y>
       <width>41</width>
       <height>22</height>
      </rect>
@@ -429,8 +429,8 @@
    <widget class="QLabel" name="playback_label">
     <property name="geometry">
      <rect>
-      <x>710</x>
-      <y>460</y>
+      <x>660</x>
+      <y>10</y>
       <width>81</width>
       <height>20</height>
      </rect>

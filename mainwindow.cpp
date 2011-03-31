@@ -45,7 +45,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(playerlink_, SIGNAL(positionChanged(qint64)), SLOT(positionChanged(qint64)));
     slider_ = new QSlider(Qt::Horizontal, this);
     slider_->setRange(0, playerlink_->duration() / 1000);
-    slider_->setGeometry(180,485,450,19);
+    slider_->setGeometry(180,29,450,19);
     slider_->saveGeometry();
     connect(slider_, SIGNAL(sliderMoved(int)), this, SLOT(seek(int)));
     connect(playlist_,SIGNAL(currentIndexChanged(int)), this, SLOT(playlistIndexChanged(int)));
@@ -512,6 +512,7 @@ void MainWindow::backgroundColor(QString background, QString font) {
     background = background.append(font);
     const QString color = background;
     const QString button = hover;
+    const QString border = "* {border-style:groove;border-width:1px;border-color:" + fontColor + ";}";
     const QString tabColor = "QTabWidget::tab-bar {background: Red;} QTabBar::tab"
             "{background:" + backColor + ";color:" + fontColor + ";}" + color +
             "QTabBar::tab:hover{background:" + fontColor + ";color:" + backColor + ";}";
@@ -533,6 +534,11 @@ void MainWindow::backgroundColor(QString background, QString font) {
     ui->removeButton->setStyleSheet(button);
     slider_->setStyleSheet(sliderMods);
     ui->horizontalSlider->setStyleSheet(sliderMods);
+    ui->playlistWidget->setStyleSheet(border);
+    ui->clientListWidget->setStyleSheet(border);
+    ui->remoteListWidget->setStyleSheet(border);
+    ui->currentSongEditBox_2->setStyleSheet(border);
+
     MainWindow::setStyleSheet(maincolor);
     ui->menuBar->setStyleSheet(color + "QMenuBar::item {background:" + backColor + ";color:" + fontColor + ";}"
                                "QMenuBar::item:selected {background:" + fontColor + ";color:" + backColor + ";}"
@@ -616,18 +622,36 @@ void MainWindow::on_action_Advanced_toggled(bool status) {
         slider_->show();
         ui->playback_label->show();
         ui->playbackBox->show();
-        ui->muteToolButton->show();
-        ui->horizontalSlider->show();
-        ui->volumeLcdNumber->show();
         ui->talkButton->show();
+        this->setFixedSize(861,598);
+        ui->tabWidget->setGeometry(0,100,861,451);
+        ui->playButton->setGeometry(370,70,93,28);
+        ui->stopButton->setGeometry(270,70,93,28);
+        ui->previousButton->setGeometry(170,70,93,28);
+        ui->nextButton->setGeometry(470,70,93,28);
+        ui->addMusicButton->setGeometry(0,70,111,28);
+
+        ui->volumeLcdNumber->setGeometry(770,70,64,28);
+        ui->muteToolButton->setGeometry(650,70,93,28);
+        ui->horizontalSlider->setGeometry(670,40,160,19);
+        ui->currentSongEditBox->setGeometry(170,30,461,31);
     } else {
         slider_->hide();
         ui->playback_label->hide();
         ui->playbackBox->hide();
-        ui->muteToolButton->hide();
-        ui->horizontalSlider->hide();
-        ui->volumeLcdNumber->hide();
         ui->talkButton->hide();
+        this->setFixedSize(861,568);
+        ui->tabWidget->setGeometry(0,70,861,451);
+        ui->playButton->setGeometry(370,40,93,28);
+        ui->stopButton->setGeometry(270,40,93,28);
+        ui->previousButton->setGeometry(170,40,93,28);
+        ui->nextButton->setGeometry(470,40,93,28);
+        ui->addMusicButton->setGeometry(0,40,111,28);
+
+        ui->volumeLcdNumber->setGeometry(770,40,64,28);
+        ui->muteToolButton->setGeometry(650,40,93,28);
+        ui->horizontalSlider->setGeometry(670,10,160,19);
+        ui->currentSongEditBox->setGeometry(170,0,461,31);
     }
 }
 
