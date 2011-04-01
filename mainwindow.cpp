@@ -798,14 +798,11 @@ void MainWindow::addSongToLocal(QString filename){
     int n = filename.lastIndexOf('/');
     int s = filename.size() - n - 1;
     songTitle = filename.right(s);
-    QFile file(songTitle);
-    file.open(QIODevice::WriteOnly);
-    QDataStream out(&file);
-    out << filename;
-    file.close();
-    songList_.append(file.fileName());
+    QFile* file = new QFile(songTitle);
+    QFileInfo info(file->fileName());
+    songList_.append(info.absoluteFilePath());
     updateMusicContent(songList_);
-    ui->clientListWidget->addItem(new QListWidgetItem(songTitle));
+    ui->clientListWidget->addItem(new QListWidgetItem(info.filePath()));
 }
 
 void MainWindow::on_action_Tiger_triggered() {
