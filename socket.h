@@ -97,7 +97,7 @@ public:
      */
     void close(PMSG pMsg);
 
-    bool isSequential();
+    bool isSequential() const;
 
 signals:
     void signalSocketClosed();
