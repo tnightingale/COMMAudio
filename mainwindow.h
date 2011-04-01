@@ -75,6 +75,8 @@ public:
 
     void updatePlaylist();
 
+    void addSongToLocal(QString song);
+
 signals:
     void signalWMWSASyncTCPRx(int, int);
     void signalWMWSASyncUDPRx(int, int);

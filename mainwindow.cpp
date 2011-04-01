@@ -225,7 +225,14 @@ void MainWindow::appendToRemote(QStringList songList_, QString ipAddress, short 
         int s = fileName.size() - n - 1;
         songTitle = fileName.right(s);
         remoteList_.insert(songTitle,*new RemoteSong(fileName, ipAddress, port));
-        ui->remoteListWidget->addItem(new QListWidgetItem(songTitle));
+    }
+
+    ui->remoteListWidget->clear();
+    QList<QString> list = remoteList_.keys();
+    QList<QString>::iterator it;
+    for(it = list.begin(); it!= list.end(); ++it)
+    {
+       ui->remoteListWidget->addItem(new QListWidgetItem((*it)));
     }
 }
 
@@ -285,6 +292,7 @@ void MainWindow::on_remoteListWidget_itemDoubleClicked(QListWidgetItem* item)
 {
     RemoteSong songInfo = remoteList_.value(item->text());
     emit requestFile(songInfo.getIp(),songInfo.getPort(), songInfo.getFilePath());
+    addSongToLocal(songInfo.getFilePath());
 }
 
 /*
@@ -783,6 +791,21 @@ void MainWindow::on_action_Song_triggered() {
         }
     }
     updateMusicContent(songList_);
+}
+
+void MainWindow::addSongToLocal(QString filename){
+    QString songTitle;
+    int n = filename.lastIndexOf('/');
+    int s = filename.size() - n - 1;
+    songTitle = filename.right(s);
+    QFile file(songTitle);
+    file.open(QIODevice::WriteOnly);
+    QDataStream out(&file);
+    out << filename;
+    file.close();
+    songList_.append(file.fileName());
+    updateMusicContent(songList_);
+    ui->clientListWidget->addItem(new QListWidgetItem(songTitle));
 }
 
 void MainWindow::on_action_Tiger_triggered() {
