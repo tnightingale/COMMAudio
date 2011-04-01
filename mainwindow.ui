@@ -451,6 +451,8 @@
      <string>Theme</string>
     </property>
     <addaction name="action_Modify"/>
+    <addaction name="action_Default"/>
+    <addaction name="action_Tiger"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -589,7 +591,7 @@
   </action>
   <action name="action_Modify">
    <property name="text">
-    <string>Appearance</string>
+    <string>Custom</string>
    </property>
   </action>
   <action name="action_Advanced">
@@ -611,6 +613,16 @@
   <action name="action_Song">
    <property name="text">
     <string>Song</string>
+   </property>
+  </action>
+  <action name="action_Default">
+   <property name="text">
+    <string>Default</string>
+   </property>
+  </action>
+  <action name="action_Tiger">
+   <property name="text">
+    <string>Tiger</string>
    </property>
   </action>
  </widget>

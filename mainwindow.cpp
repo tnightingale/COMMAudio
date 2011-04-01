@@ -16,15 +16,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     this->statusBar()->setSizeGripEnabled(false);
     player_ = new AudioComponent(this);
-    /*player->addSong("./test.raw");
-    player->play();*/    
-    /*
-    Phonon::SeekSlider *slider = new Phonon::SeekSlider(this);
-    slider->setMediaObject(player_->getPlaylist());
-    slider->setGeometry(180,490,450,19);
-    slider->saveGeometry();
-    slider->show();
-*/
 
     QFile file("mediaTracker.dat");
     if(file.open(QIODevice::ReadOnly)) {
@@ -234,7 +225,14 @@ void MainWindow::appendToRemote(QStringList songList_, QString ipAddress, short 
         int s = fileName.size() - n - 1;
         songTitle = fileName.right(s);
         remoteList_.insert(songTitle,*new RemoteSong(fileName, ipAddress, port));
-        ui->remoteListWidget->addItem(new QListWidgetItem(songTitle));
+    }
+
+    ui->remoteListWidget->clear();
+    QList<QString> list = remoteList_.keys();
+    QList<QString>::iterator it;
+    for(it = list.begin(); it!= list.end(); ++it)
+    {
+       ui->remoteListWidget->addItem(new QListWidgetItem((*it)));
     }
 }
 
@@ -294,6 +292,7 @@ void MainWindow::on_remoteListWidget_itemDoubleClicked(QListWidgetItem* item)
 {
     RemoteSong songInfo = remoteList_.value(item->text());
     emit requestFile(songInfo.getIp(),songInfo.getPort(), songInfo.getFilePath());
+    addSongToLocal(songInfo.getFilePath());
 }
 
 /*
@@ -359,6 +358,7 @@ void MainWindow::on_stopButton_clicked()
 {
     player_->stop();
     ui->playButton->setText("Play");
+    ui->playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
     timer_->setPaused(true);
 }
 
@@ -759,16 +759,17 @@ void MainWindow::on_action_Folder_triggered() {
     QString songTitle;
 
     player_->setSourceFolder();
-    QStringList songs = player_->getFileList();
-    for (int i = 0; i < songs.size();++i){
-        fileName = songs.at(i);
+    songList_ += player_->getFileList();
+    songList_.removeDuplicates();
+    ui->clientListWidget->clear();
+    for (int i = 0; i < songList_.size();++i){
+        fileName = songList_.at(i);
         int n = fileName.lastIndexOf('/');
         int s = fileName.size() - n - 1;
         songTitle = fileName.right(s);
         ui->clientListWidget->addItem(new QListWidgetItem(songTitle));
 
     }
-    songList_ += songs;
     updateMusicContent(songList_);
 }
 
@@ -781,10 +782,33 @@ void MainWindow::on_action_Song_triggered() {
             tr("Documents (*.wav *.mp3)") );
     QFile file(filename);
     if(file.open(QIODevice::ReadOnly)) {
-        int n = filename.lastIndexOf('/');
-        int s = filename.size() - n - 1;
-        songTitle = filename.right(s);
-        ui->clientListWidget->addItem(new QListWidgetItem(songTitle));
+        songList_.append(filename);
+        if(songList_.removeDuplicates() == 0) {
+            int n = filename.lastIndexOf('/');
+            int s = filename.size() - n - 1;
+            songTitle = filename.right(s);
+            ui->clientListWidget->addItem(new QListWidgetItem(songTitle));
+        }
     }
-    songList_.append(filename);
+    updateMusicContent(songList_);
+}
+
+void MainWindow::addSongToLocal(QString filename){
+    QString songTitle;
+    int n = filename.lastIndexOf('/');
+    int s = filename.size() - n - 1;
+    songTitle = filename.right(s);
+    QFile* file = new QFile(songTitle);
+    QFileInfo info(file->fileName());
+    songList_.append(info.absoluteFilePath());
+    updateMusicContent(songList_);
+    ui->clientListWidget->addItem(new QListWidgetItem(info.filePath()));
+}
+
+void MainWindow::on_action_Tiger_triggered() {
+   backgroundColor("OrangeRed", "Black");
+}
+
+void MainWindow::on_action_Default_triggered() {
+    backgroundColor("Black", "White");
 }
