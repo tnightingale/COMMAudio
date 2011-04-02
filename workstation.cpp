@@ -62,10 +62,10 @@ Workstation::~Workstation() {
     // Should delete the current transfers map here too?
 }
 
-void Workstation::sendFile(QByteArray *packet)
+void Workstation::sendFile(TCPSocket *socket, QByteArray *data)
 {
     // Create file name
-    QDataStream fileNameStream(&(*packet), QIODevice::ReadOnly);
+    QDataStream fileNameStream(&(*data), QIODevice::ReadOnly);
     QString fileName;
     fileNameStream >> fileName;
 
@@ -77,7 +77,7 @@ void Workstation::sendFile(QByteArray *packet)
     }
 
     // Read file into a byte array for sending
-    packet = file.readAll();
+    QByteArray packet = file.readAll();
 
     // Create the control packet
     packet.append('\n');
@@ -352,13 +352,13 @@ bool Workstation::processReceivingFileRequest(TCPSocket *socket, QByteArray *pac
         fileData->append(*packet);
 
         // Send the file
-
+        sendFile(socket, packet);
 
         // Remove the file transfer
-        currentTransfers.remove(socket);
+        //currentTransfers.remove(socket);
 
         // Since processing of the transfer is complete, return true
-        isFileListTransferComplete = true;
+        isReceivingFileRequestFinished = true;
     }
     else
     {
@@ -367,8 +367,7 @@ bool Workstation::processReceivingFileRequest(TCPSocket *socket, QByteArray *pac
         fileData->append(*packet);
 
         // Since the transfer is not yet complete, return false
-        isFileListTransferComplete = false;
-    }
+        isReceivingFileRequestFinished = false;
     }
 
     return isReceivingFileRequestFinished;

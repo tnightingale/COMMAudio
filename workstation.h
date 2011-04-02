@@ -27,7 +27,7 @@ private:
     QMap <TCPSocket*, FileData*> currentTransfers;
 
     // Functions
-    void sendFile(QByteArray*);
+    void sendFile(TCPSocket*, QByteArray*);
     void acceptVoiceChat();
 
     bool processReceivingFile(TCPSocket*, QByteArray*);
