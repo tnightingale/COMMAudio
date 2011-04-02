@@ -294,9 +294,11 @@ void Workstation::decodeControlMessage(TCPSocket *socket)
         receiveFileListController(&(*socket));
         break;
     case FILE_TRANSFER:
-        //currentTransfers.insert(socket, new FileData);
-        // Send the file
-        sendFile(&(*socket));
+        // Connect the signal in case we receive more data
+        connect(socket, SIGNAL(signalDataReceived(TCPSocket*)),
+                this, SLOT(sendFileController(TCPSocket*)));
+        currentTransfers.insert(socket, new FileData);
+        sendFileController(&(*socket));
         break;
     case VOICE_CHAT:
         // Connect to voice chat here
@@ -315,7 +317,22 @@ void Workstation::receiveUDP()
 
 void Workstation::sendFileController(TCPSocket *socket)
 {
+    // Read the packet from the socket
+    QByteArray packet = socket->readAll();
 
+    // If processing is finished
+    if (processReceivingFileRequest(&(*socket), &packet))
+    {
+
+    }
+}
+
+bool Workstation::processReceivingFileRequest(TCPSocket *socket, QByteArray *packet)
+{
+    bool isReceivingFileRequestFinished = false;
+
+
+    return isReceivingFileRequestFinished;
 }
 
 void Workstation::receiveFileController(TCPSocket *socket)

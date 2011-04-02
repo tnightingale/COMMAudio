@@ -28,12 +28,11 @@ private:
 
     // Functions
     void sendFile(TCPSocket* socket);
-    // Create, send back socket information,
-    // create buffer, connect signals/slots
     void acceptVoiceChat();
 
-    bool processReceivingFile(TCPSocket* socket, QByteArray* packet);
+    bool processReceivingFile(TCPSocket*, QByteArray*);
     bool processReceivingFileList(TCPSocket*, QByteArray*);
+    bool processReceivingFileRequest(TCPSocket*, QByteArray*);
 
 
 public slots:
