@@ -11,20 +11,20 @@ class FileData : public QObject
 
 
 private:
-    QString name_;
+    QString path_;
     QByteArray data_;
     short port_;
 
 public:
     explicit FileData(QObject *parent = 0);
-    explicit FileData(QObject *parent, QString name, short port);
+    explicit FileData(QObject *parent, QString path, short port);
     explicit FileData(QObject *parent, short port);
-    explicit FileData(QObject *parent, QString name, QByteArray data, short port);
-    void setName(QString name) {
-        name_ = name;
+    explicit FileData(QObject *parent, QString path, QByteArray data, short port);
+    void setpath(QString path) {
+        path_ = path;
     }
-    QString getName() {
-        return name_;
+    QString getname() {
+        return path_;
     }
     void setData(QByteArray data) {
         data_ = data;

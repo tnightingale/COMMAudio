@@ -5,25 +5,25 @@ FileData::FileData(QObject *parent) :
 {
 }
 
-FileData::FileData(QObject *parent, QString name, short port) : QObject(parent){
+FileData::FileData(QObject *parent, QString path, short port) : QObject(parent){
     port_ = port;
-    name_ = name;
+    path_ = path;
 }
 
 FileData::FileData(QObject *parent, short port) : QObject(parent){
     port_ = port;
 }
 
-FileData::FileData(QObject *parent, QString name, QByteArray data, short port) : QObject(parent){
-    name_ = name;
+FileData::FileData(QObject *parent, QString path, QByteArray data, short port) : QObject(parent){
+    path_ = path;
     data_ = data;
     port_ = port;
 }
 
 bool FileData::writeToFile() {
-    int n = name_.lastIndexOf('/');
-    int s = name_.size() - n - 1;
-    QString songTitle = name_.right(s);
+    int n = path_.lastIndexOf('/');
+    int s = path_.size() - n - 1;
+    QString songTitle = path_.right(s);
     QFile file(songTitle);
     if(!file.open(QIODevice::WriteOnly)){
         return false;
@@ -34,7 +34,7 @@ bool FileData::writeToFile() {
 }
 
 bool FileData::readFromFile() {
-    QFile file(name_);
+    QFile file(path_);
     if(!file.open(QIODevice::ReadOnly)){
         return false;
     }
