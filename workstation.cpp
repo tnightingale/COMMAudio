@@ -64,7 +64,7 @@ Workstation::~Workstation() {
 
 void Workstation::sendFile(TCPSocket* socket)
 {
-    // Get file name from packet
+    // Get data from packet
     QByteArray packet = socket->readAll();
 
     // Create file name
@@ -125,6 +125,7 @@ void Workstation::requestFile(QString ip, short port, QString songPath)
     TCPSocket *requestSocket = new TCPSocket(mainWindowPointer_->winId());
     connect(mainWindowPointer_, SIGNAL(signalWMWSASyncTCPRx(int,int)),
             requestSocket, SLOT(slotProcessWSAEvent(int,int)));
+
     // Connect to a remote host
     if (!requestSocket->connectRemote(ip, port)) {
         //qdebug("Workstation::requestFile(); Failed to connect to remote.");
@@ -187,6 +188,7 @@ void Workstation::requestFileList(QString ip, short port)
     TCPSocket *requestSocket = new TCPSocket(mainWindowPointer_->winId());
     connect(mainWindowPointer_, SIGNAL(signalWMWSASyncTCPRx(int,int)),
             requestSocket, SLOT(slotProcessWSAEvent(int,int)));
+
     // Connect to a remote host
     if (!requestSocket->connectRemote(ip, port)) {
         //qdebug("Workstation::requestFileList(); Failed to connect to remote.");
@@ -204,19 +206,12 @@ void Workstation::requestFileList(QString ip, short port)
     QDataStream stream(&byteArray, QIODevice::WriteOnly);
     stream << fileList.toSet();
 
-    /* Stream out test
-    QDataStream s(&byteArray, QIODevice::ReadOnly);
-    QSet<QString> test;
-    QStringList temp;
-    s >> temp;
-//*/
     // Create the control packet
     byteArray.insert(0, FILE_LIST);
     byteArray.append('\n');
 
     // Send our own file list to the other client
     requestSocket->write(byteArray);
-
 
     //qdebug("Workstation::requestFileList(); Sent file list");
 
@@ -305,20 +300,10 @@ void Workstation::decodeControlMessage(TCPSocket *socket)
         receiveFileListController(&(*socket));
         break;
     case FILE_TRANSFER:
-        //shouldnt this be sending a file back not receiving one?
-        //should take rest of data -> songName
-        //no need to listen for more data on this socket.
-        connect (socket, SIGNAL(signalDataReceived(TCPSocket*)),
-                 this, SLOT( decodeControlMessage(TCPSocket*)));
+        // Do we need to create a current transfer?
         currentTransfers.insert(socket, new FileData);
+        // Send the file
         sendFile(&(*socket));
-        /*
-        // Connect the signal for the type of transfer
-        connect(socket, SIGNAL(signalDataReceived(TCPSocket*)),
-                this, SLOT(receiveFileController(TCPSocket*)));
-        // Call function now to deal with rest of packet
-        currentTransfers.insert(socket, new FileData);
-        receiveFileController(&(*socket));*/
         break;
     case VOICE_CHAT:
         // Connect to voice chat here
