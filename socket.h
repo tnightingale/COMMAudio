@@ -2,7 +2,6 @@
 #define SOCKET_H
 
 #include <QObject>
-#include <QBuffer>
 #include <windowsx.h>
 #include <winsock2.h>
 #include <QTextStream>
@@ -19,20 +18,7 @@
 #define MAXUDPDGRAMSIZE 65507
 #define PACKETSIZE 4096
 
-class Socket;
-
-typedef struct _DATA_ {
-    WSABUF winsockBuff;
-    Socket* socket;
-    SOCKET clientSD;
-} DATA, *PDATA;
-
-typedef struct _STATS_ {
-    int totalBytes;
-    int totalPackets;
-    DWORD startTime;
-    DWORD finishTime;
-} STATS, *PSTATS;
+class Buffer;
 
 class Socket : public QIODevice {
   Q_OBJECT
@@ -45,10 +31,10 @@ protected:
     HWND hWnd_;
 
     /** The internal output buffer for writing data. */
-    QBuffer* outputBuffer_;
+    Buffer* outputBuffer_;
 
     /** The internal input buffer for reading data. */
-    QBuffer* inputBuffer_;
+    Buffer* inputBuffer_;
 
     /** This tracks the next block of data to transmit. Needs to be persistent
      *  incase WSASend() returns with WSAEWOULDBLOCK and block needs to be
@@ -58,8 +44,8 @@ protected:
     /** These are probably going to be passed on to the writeThread. */
     size_t packetSize_;
 
-    QMutex sendLock_;
-    QMutex receiveLock_;
+    QMutex* sendLock_;
+    QMutex* receiveLock_;
 
     virtual qint64 readData(char * data, qint64 maxSize);
     virtual qint64 writeData(const char * data, qint64 maxSize);
@@ -98,6 +84,8 @@ public:
     void close(PMSG pMsg);
 
     bool isSequential() const;
+    qint64 size() const;
+    qint64 bytesAvailable() const;
 
 signals:
     void signalSocketClosed();

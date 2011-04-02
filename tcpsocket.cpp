@@ -1,4 +1,5 @@
 #include "tcpsocket.h"
+#include "buffer.h"
 
 TCPSocket::TCPSocket(HWND hWnd)
 : Socket(hWnd, AF_INET, SOCK_STREAM, IPPROTO_TCP) {}
@@ -38,7 +39,7 @@ bool TCPSocket::open(OpenMode mode) {
 
     if ((err = WSAAsyncSelect(socket_, hWnd_, WM_WSAASYNC_TCP, flags))
                               == SOCKET_ERROR) {
-        //qdebug("TCPSocket::open(): Error setting up async select.");
+        //qDebug("TCPSocket::open(): Error setting up async select.");
         return false;
     }
 
@@ -67,7 +68,7 @@ void TCPSocket::accept(PMSG pMsg) {
     if ((newSocket = ::accept(pMsg->wParam, (PSOCKADDR) &client,
                                  &client_length)) == INVALID_SOCKET) {
         if (WSAGetLastError() != WSAEWOULDBLOCK) {
-            //qdebug("TCPSocket:accept(); Error: %d", WSAGetLastError());
+            qDebug("TCPSocket:accept(); Error: %d", WSAGetLastError());
             return;
         }
     }
@@ -90,7 +91,7 @@ void TCPSocket::send(PMSG pMsg) {
     WSABUF winsockBuff;
 
     if (nextTxBuff_ == NULL && loadBuffer(bytesToRead) == 0) {
-        //qdebug("TCPSocket::send(); Nothing to send.");
+        qDebug("TCPSocket::send(); Nothing to send.");
         return;
     }
 
@@ -103,18 +104,18 @@ void TCPSocket::send(PMSG pMsg) {
         result = WSASend(pMsg->wParam, &winsockBuff, 1, &numSent, 0,
                          NULL, NULL);
         if ((err = WSAGetLastError()) > 0 && err != ERROR_IO_PENDING) {
-            //qdebug("TCPSocket::send(); Error: %d", err);
+            qDebug("TCPSocket::send(); Error: %d", err);
             return;
         }
         if (result == WSAEWOULDBLOCK) {
-            //qdebug("TCPSocket::send(); Socket buffer full: WSAEWOULDBLOCK");
+            qDebug("TCPSocket::send(); Socket buffer full: WSAEWOULDBLOCK");
             return;
         }
 
         delete nextTxBuff_;
         nextTxBuff_ = NULL;
         if ((num = loadBuffer(bytesToRead)) <= 0) {
-            //qdebug("TCPSocket::send(); Finishing...");
+            qDebug("TCPSocket::send(); Finishing...");
             break;
         }
         winsockBuff.len = num;
@@ -138,23 +139,24 @@ void TCPSocket::receive(PMSG pMsg) {
     if (WSARecv(pMsg->wParam, &(winsockBuff), 1, &numReceived, &flags,
                 NULL, NULL) == SOCKET_ERROR) {
         if ((err = WSAGetLastError()) != WSA_IO_PENDING) {
-            //qdebug("TCPSocket::receive(): WSARecv() failed with error %d",
-                   //err);
+            qDebug("TCPSocket::receive(): WSARecv() failed with error %d",
+                   err);
             return;
         }
     }
 
-    ////qdebug() << "TCPSocket::receive(); DataRx: " << winsockBuff.buf;
+    qDebug() << "TCPSocket::receive(); DataRx: " << winsockBuff.buf;
 
     while (numReceived > 0) {
         // Lock mutex here.
-        receiveLock_.lock();
-        inputBuffer_->open(QBuffer::WriteOnly);
-        bytesWritten = inputBuffer_->write(winsockBuff.buf, numReceived);
+        QMutexLocker locker(receiveLock_);
+        QByteArray writeData(winsockBuff.buf, numReceived);
+        inputBuffer_->write(writeData);
+        bytesWritten = writeData.size();
         numReceived -= bytesWritten;
-        inputBuffer_->close();
+        locker.unlock();
         // Unlock mutex.
-        receiveLock_.unlock();
+
         if (numReceived == 0) {
             break;
         }
@@ -168,32 +170,23 @@ void TCPSocket::receive(PMSG pMsg) {
 
 void TCPSocket::connect(PMSG) {
     if (loadBuffer(PACKETSIZE) < 0) {
-        //qdebug("TCPSocket::connect(); Cannot read from data source!");
+        qDebug("TCPSocket::connect(); Cannot read from data source!");
         throw "TCPSocket::connect(); Cannot read from data source!";
     }
 }
 
 int TCPSocket::loadBuffer(size_t bytesToRead) {
     // Lock mutex here
-    sendLock_.lock();
-    if (outputBuffer_->bytesAvailable() == 0) {
+    QMutexLocker locker(sendLock_);
+    if (outputBuffer_->size() == 0) {
         return 0;
     }
-    nextTxBuff_ = new QByteArray(bytesToRead, '\0');
-    // TODO: I had problems with this, might need to call
-    //       QByteArray::readRawData().
-    outputBuffer_->open(QIODevice::ReadOnly);
-    int bytesRead = outputBuffer_->read(nextTxBuff_->data(), bytesToRead);
-    outputBuffer_->close();
 
-    // Removing stuff that was read from the buffer.
-    QByteArray buffer = outputBuffer_->buffer();
-    buffer.remove(0, bytesRead);
-    outputBuffer_->setData(buffer);
+    nextTxBuff_ = new QByteArray(outputBuffer_->read(bytesToRead));
+    int bytesRead = nextTxBuff_->size();
+    locker.unlock();
     // Unlock mutex.
-    sendLock_.unlock();
 
-    nextTxBuff_->resize(bytesRead);
     return bytesRead;
 }
 
@@ -211,7 +204,7 @@ bool TCPSocket::listen(int port) {
 
     if ((::listen(socket_, 5)) == SOCKET_ERROR) {
         err = WSAGetLastError();
-        //qdebug("TCPSocket::listen(); Error: %d.", err);
+        qDebug("TCPSocket::listen(); Error: %d.", err);
         return false;
     }
 
@@ -225,7 +218,7 @@ bool TCPSocket::connectRemote(QString address, int port) {
 
     if ((host = gethostbyname(address.toAscii().data())) == NULL) {
         err = GetLastError();
-        //qdebug("Client::writeTCP(): Unknown server address. Error: %d.", err);
+        //qDebug("Client::writeTCP(): Unknown server address. Error: %d.", err);
         return false;
     }
 
@@ -236,7 +229,7 @@ bool TCPSocket::connectRemote(QString address, int port) {
     if ((err = ::connect(socket_, (PSOCKADDR) &serverSockAddrIn,
                    sizeof(SOCKADDR_IN))) == SOCKET_ERROR) {
         if ((err = WSAGetLastError()) != WSAEWOULDBLOCK) {
-            //qdebug("TCPSocket::connectRemote(): Connect failed. Error: %d",
+            //qDebug("TCPSocket::connectRemote(): Connect failed. Error: %d",
                    //WSAGetLastError());
             return false;
         }
@@ -258,33 +251,33 @@ void TCPSocket::slotProcessWSAEvent(int wParam, int lParam) {
     }
 
     if (WSAGETSELECTERROR(pMsg->lParam)) {
-        //qdebug("TCPSocket::slotProcessWSAEvent(): %d: Socket failed. Error: %d",
-              //(int) pMsg->wParam, WSAGETSELECTERROR(pMsg->lParam));
+        qDebug("TCPSocket::slotProcessWSAEvent(): %d: Socket failed. Error: %d",
+              (int) pMsg->wParam, WSAGETSELECTERROR(pMsg->lParam));
         return;
     }
 
     switch (WSAGETSELECTEVENT(pMsg->lParam)) {
         case FD_ACCEPT:
-            //qdebug("TCPSocket::slotProcessWSAEvent: %d: FD_ACCEPT.",
-                   //(int) pMsg->wParam);
+            qDebug("TCPSocket::slotProcessWSAEvent: %d: FD_ACCEPT.",
+                   (int) pMsg->wParam);
             accept(pMsg);
             break;
 
         case FD_READ:
-            //qdebug("TCPSocket::slotProcessWSAEvent: %d: FD_READ.",
-                   //(int) pMsg->wParam);
+            qDebug("TCPSocket::slotProcessWSAEvent: %d: FD_READ.",
+                   (int) pMsg->wParam);
             receive(pMsg);
             break;
 
         case FD_CONNECT:
-            //qdebug("TCPSocket::slotProcessWSAEvent: %d: FD_CONNECT.",
-                   //(int) pMsg->wParam);
+            qDebug("TCPSocket::slotProcessWSAEvent: %d: FD_CONNECT.",
+                   (int) pMsg->wParam);
             connect(pMsg);
             break;
 
         case FD_WRITE:
-            //qdebug("TCPSocket::slotProcessWSAEvent: %d: FD_WRITE.",
-                   //(int) pMsg->wParam);
+            qDebug("TCPSocket::slotProcessWSAEvent: %d: FD_WRITE.",
+                   (int) pMsg->wParam);
             send(pMsg);
             break;
 

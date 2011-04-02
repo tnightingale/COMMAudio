@@ -1,25 +1,25 @@
 #include "socket.h"
+#include "buffer.h"
 
 Socket::Socket(HWND hWnd, int addressFamily, int connectionType, int protocol)
-: hWnd_(hWnd), outputBuffer_(new QBuffer()), inputBuffer_(new QBuffer()),
-  nextTxBuff_(NULL) {
+: hWnd_(hWnd), outputBuffer_(new Buffer()), inputBuffer_(new Buffer()),
+  nextTxBuff_(NULL), sendLock_(new QMutex()), receiveLock_(new QMutex()) {
 
     if ((socket_ = WSASocket(addressFamily, connectionType, protocol, NULL, 0,
                              WSA_FLAG_OVERLAPPED)) == INVALID_SOCKET) {
         int err = WSAGetLastError();
-        //qdebug("Socket::Socket(): Can't create socket. (%d)", err);
+        qDebug("Socket::Socket(): Can't create socket. (%d)", err);
         throw "Socket::Socket(); Can't create socket.";
     }
-
-    //lock_ = new QMutex();
 
     connect(this, SIGNAL(signalSocketClosed()),
             this, SLOT(deleteLater()));
 }
 
 Socket::Socket(SOCKET socket, HWND hWnd)
-: socket_(socket), hWnd_(hWnd), outputBuffer_(new QBuffer()),
-  inputBuffer_(new QBuffer()), nextTxBuff_(NULL) {
+: socket_(socket), hWnd_(hWnd), outputBuffer_(new Buffer()),
+  inputBuffer_(new Buffer()), nextTxBuff_(NULL),
+  sendLock_(new QMutex()), receiveLock_(new QMutex()) {
 
     connect(this, SIGNAL(signalSocketClosed()),
             this, SLOT(deleteLater()));
@@ -29,17 +29,11 @@ qint64 Socket::readData(char * data, qint64 maxSize) {
     qint64 bytesRead = 0;
 
     // Mutex lock here.
-    receiveLock_.lock();
-    inputBuffer_->open(QBuffer::ReadOnly);
-    bytesRead = inputBuffer_->read(data, maxSize);
-    inputBuffer_->close();
-
-    // Removing stuff that was read from the buffer.
-    QByteArray buffer = inputBuffer_->buffer();
-    buffer.remove(0, bytesRead);
-    inputBuffer_->setData(buffer);
+    QMutexLocker locker(receiveLock_);
+    QByteArray readData = inputBuffer_->read(maxSize);
+    bytesRead = readData.size();
+    memcpy(data, readData.data(), bytesRead);
     // Mutex unlock.
-    receiveLock_.unlock();
 
     return bytesRead;
 }
@@ -48,15 +42,24 @@ qint64 Socket::writeData(const char * data, qint64 maxSize) {
     qint64 bytesWritten = 0;
 
     // Mutex lock here.
-    sendLock_.lock();
-    outputBuffer_->open(QBuffer::Append);
-    bytesWritten = outputBuffer_->write(data, maxSize);
-    outputBuffer_->close();
+    QMutexLocker locker(sendLock_);
+    QByteArray writeData(data, maxSize);
+    outputBuffer_->write(writeData);
+    bytesWritten = maxSize;
+    locker.unlock();
     // Mutex unlock.
-    sendLock_.unlock();
-    emit readyWrite(bytesWritten);
 
+    emit readyWrite(bytesWritten);
     return bytesWritten;
+}
+
+qint64 Socket::size() const {
+    return bytesAvailable();
+}
+
+qint64 Socket::bytesAvailable() const {
+    qDebug("Socket::bytesAvailable(); Bytes: %d", inputBuffer_->size() + QIODevice::bytesAvailable());
+    return inputBuffer_->size() + QIODevice::bytesAvailable();
 }
 
 bool Socket::listen(PSOCKADDR_IN pSockAddr) {
@@ -64,12 +67,12 @@ bool Socket::listen(PSOCKADDR_IN pSockAddr) {
 
     if ((err = bind(socket_, (PSOCKADDR) pSockAddr, sizeof(SOCKADDR))
         == SOCKET_ERROR)) {
-        //qdebug("Socket::listen(): Can't bind to socket. Error: %d",
-               //WSAGetLastError());
+        qDebug("Socket::listen(): Can't bind to socket. Error: %d",
+               WSAGetLastError());
         return false;
     }
 
-    //qdebug("Socket::listen(); listening to port %d", ntohs(pSockAddr->sin_port));
+    qDebug("Socket::listen(); listening to port %d", ntohs(pSockAddr->sin_port));
 
     return true;
 }
@@ -84,7 +87,7 @@ void Socket::close(PMSG pMsg) {
 
 void Socket::slotProcessWSAEvent(PMSG pMsg) {
     if (WSAGETSELECTERROR(pMsg->lParam)) {
-        //qdebug("Socket::slotProcessWSAEvent(): %d: Socket failed with error %d",
+        //qDebug("Socket::slotProcessWSAEvent(): %d: Socket failed with error %d",
               //(int) pMsg->wParam, WSAGETSELECTERROR(pMsg->lParam));
         return;
     }
@@ -96,7 +99,7 @@ void Socket::slotProcessWSAEvent(PMSG pMsg) {
     switch (WSAGETSELECTEVENT(pMsg->lParam)) {
 
         case FD_CLOSE:
-            //qdebug("Socket::slotProcessWSAEvent(); %d: FD_CLOSE.",
+            //qDebug("Socket::slotProcessWSAEvent(); %d: FD_CLOSE.",
                    //(int) pMsg->wParam);
             close(pMsg);
             break;
