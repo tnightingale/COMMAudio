@@ -62,6 +62,7 @@ void UDPSocket::receive(PMSG pMsg) {
     DWORD flags = 0;
     WSAOVERLAPPED* ol;
 
+/*
     PDATA data = (PDATA) calloc(1, sizeof(DATA));
     data->socket = this;
     data->winsockBuff.len = MAXUDPDGRAMSIZE;
@@ -79,6 +80,7 @@ void UDPSocket::receive(PMSG pMsg) {
             return;
         }
     }
+*/
 }
 
 void UDPSocket::slotProcessWSAEvent(int socket, int lParam) {
