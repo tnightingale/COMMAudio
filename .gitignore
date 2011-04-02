@@ -25,3 +25,4 @@ qrc_*
 /debug
 object_script*
 *.orig
+*.dat

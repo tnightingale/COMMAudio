@@ -145,22 +145,18 @@ void TCPSocket::receive(PMSG pMsg) {
         }
     }
 
-    qDebug() << "TCPSocket::receive(); DataRx: " << winsockBuff.buf;
-
-    while (numReceived > 0) {
-        // Lock mutex here.
-        QMutexLocker locker(receiveLock_);
-        QByteArray writeData(winsockBuff.buf, numReceived);
-        inputBuffer_->write(writeData);
-        bytesWritten = writeData.size();
-        numReceived -= bytesWritten;
-        locker.unlock();
-        // Unlock mutex.
-
-        if (numReceived == 0) {
-            break;
-        }
+    qDebug() << "TCPSocket::receive(); DataRx: " << winsockBuff.buf << ", Num: " << numReceived;
+    if (numReceived == 0) {
+        return;
     }
+
+    QByteArray writeData(winsockBuff.buf, numReceived);
+
+    // CRITICAL SECTION: Lock mutex here.
+    QMutexLocker locker(receiveLock_);
+    inputBuffer_->write(writeData);
+    locker.unlock();
+    // END CRITICAL SECTION: Unlock mutex.
 
     delete[] winsockBuff.buf;
 

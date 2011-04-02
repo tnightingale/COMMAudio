@@ -278,6 +278,14 @@ void Workstation::decodeControlMessage(TCPSocket *socket)
 
     // Read and store the first byte for the control message
     QByteArray messageType = socket->read(1);
+    // TODO: For some reason we seem to receive a bunch of '\0' chars before the
+    //       SIGNAL(signalDataReceived()) is disconnected. The sanity check
+    //       and return; below shouldn't be necessary. It is just a bandaid fix
+    //       and doesn't actually solve the problem. However, at the end of the
+    //       day, sending extra NULL data is the least of our concerns.
+    if (messageType.size() == 0) {
+        return;
+    }
 
     // Check for type of message
     switch (messageType.at(0))
@@ -302,7 +310,7 @@ void Workstation::decodeControlMessage(TCPSocket *socket)
         break;
     default:
         // Since the message is not recognized, close the connection
-        //socket->deleteLater();
+        socket->deleteLater();
         break;
     }
 }
