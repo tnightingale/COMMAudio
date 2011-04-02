@@ -313,7 +313,12 @@ void Workstation::receiveUDP()
 
 }
 
-void Workstation::receiveFileController(TCPSocket* socket)
+void Workstation::sendFileController(TCPSocket *socket)
+{
+
+}
+
+void Workstation::receiveFileController(TCPSocket *socket)
 {
     // Read the packet from the socket
     QByteArray packet = socket->readAll();

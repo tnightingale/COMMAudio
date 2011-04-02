@@ -48,6 +48,7 @@ public slots:
     void receiveFileController(TCPSocket*);
     void receiveFileListController(TCPSocket*);
     void requestFileListController(TCPSocket*);
+    void sendFileController(TCPSocket*);
 
 signals:
     void signalFileListUpdate(QStringList*);
