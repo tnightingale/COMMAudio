@@ -323,7 +323,12 @@ void Workstation::sendFileController(TCPSocket *socket)
     // If processing is finished
     if (processReceivingFileRequest(&(*socket), &packet))
     {
+        // Disconnect this slot from the received packet signal
+        disconnect(socket, SIGNAL(signalDataReceived(TCPSocket*)),
+                   this, SLOT(sendFileController(TCPSocket*)));
 
+        // Close the socket
+        delete socket;
     }
 }
 
