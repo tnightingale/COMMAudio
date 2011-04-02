@@ -288,7 +288,7 @@ void Workstation::decodeControlMessage(TCPSocket *socket)
 
     // Disconnect from decode control message
     disconnect(socket, SIGNAL(signalDataReceived(TCPSocket*)),
-               this, SLOT(decodeControlMessage(TCPSocket*)));
+               tcpSocket_, SIGNAL(signalDataReceived(TCPSocket*)));
 
     // Read and store the first byte for the control message
     QByteArray messageType = socket->read(1);
@@ -325,7 +325,7 @@ void Workstation::decodeControlMessage(TCPSocket *socket)
         break;
     default:
         // Since the message is not recognized, close the connection
-        delete socket;
+        //socket->deleteLater();
         break;
     }
 }
