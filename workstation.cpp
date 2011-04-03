@@ -52,7 +52,6 @@ Workstation::Workstation(MainWindow* mainWindow)
 
     tcpSocket_->moveToThread(socketThread_);
     socketThread_->start();
-
 }
 
 Workstation::~Workstation() {
@@ -83,14 +82,8 @@ void Workstation::sendFile(TCPSocket *socket, QByteArray *data)
     QByteArray len((const char *)&length, sizeof(int));
     packet.insert(0, len);
 
-    /* Test for retrieving length
-    int test;
-    memcpy(&test, len, sizeof(int));
-    */
-
     // Send our file to the other client
-    int test = socket->write(packet);
-    return;
+    socket->write(packet);
 }
 
 void Workstation::acceptVoiceChat()
