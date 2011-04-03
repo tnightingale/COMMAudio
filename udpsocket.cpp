@@ -1,4 +1,5 @@
 #include "udpsocket.h"
+#include "buffer.h"
 
 UDPSocket::UDPSocket(HWND hWnd)
 : Socket(hWnd, AF_INET, SOCK_DGRAM, IPPROTO_UDP) { }
@@ -48,72 +49,79 @@ bool UDPSocket::open(OpenMode mode) {
 void UDPSocket::send(PMSG pMsg) {
     int err = 0;
     int result = 0;
+    DWORD numSent = 0;
     int num = 0;
-    size_t bytesRead = 0;
     size_t bytesToRead = PACKETSIZE;
-    size_t totalSent = 0;
 
-    DWORD numBytesSent = 0;
-    WSAOVERLAPPED* ol;
     WSABUF winsockBuff;
 
-    winsockBuff.len = PACKETSIZE;
-    bytesRead = winsockBuff.len;
+    if (nextTxBuff_ == NULL && loadBuffer(bytesToRead) == 0) {
+        qDebug("UDPSocket::send(); Nothing to send.");
+        return;
+    }
 
-/*
-    while (data_->status() == QDataStream::Ok) {
-        ol = (WSAOVERLAPPED*) calloc(1, sizeof(WSAOVERLAPPED));
-        winsockBuff.buf = (char *) malloc(bytesToRead * sizeof(char));
-        ol->hEvent = (HANDLE) winsockBuff.buf;
+    winsockBuff.buf = nextTxBuff_->data();
+    winsockBuff.len = nextTxBuff_->size();
 
-        if ((num = data_->readRawData(winsockBuff.buf, bytesToRead)) <= 0) {
-            //qdebug("UDPSocket()::send(); Finishing...");
+    while (TRUE) {
+        result = WSASendTo(pMsg->wParam, &winsockBuff, 1, &numSent, 0,
+                           (PSOCKADDR) &serverSockAddrIn_, sizeof(serverSockAddrIn_), 
+                           NULL, NULL);
+
+        if ((err = WSAGetLastError()) > 0 && err != ERROR_IO_PENDING) {
+            qDebug("UDPSocket::send(); Error: %d", err);
+            return;
+        }
+        if (result == WSAEWOULDBLOCK) {
+            qDebug("UDPSocket::send(); Socket buffer full: WSAEWOULDBLOCK");
+            return;
+        }
+
+        delete nextTxBuff_;
+        nextTxBuff_ = NULL;
+        if ((num = loadBuffer(bytesToRead)) <= 0) {
+            qDebug("TCPSocket::send(); Finishing...");
             break;
         }
         winsockBuff.len = num;
-        totalSent += num;
-
-        result = WSASendTo(pMsg->wParam, &winsockBuff, 1, &numBytesSent, 0,
-                           (PSOCKADDR) &serverSockAddrIn_, sizeof(serverSockAddrIn_), ol,
-                           UDPSocket::sendWorkerRoutine);
-
-        if ((err = WSAGetLastError()) > 0 && err != ERROR_IO_PENDING) {
-            //qdebug("UDPSocket::send(); Error: %d", err);
-            return;
-        }
-
-        if (result == WSAEWOULDBLOCK) {
-            return;
-        }
-
     }
-*/
 }
 
 void UDPSocket::receive(PMSG pMsg) {
     int err = 0;
     DWORD flags = 0;
-    WSAOVERLAPPED* ol;
+    DWORD numReceived = 0;
+    int bytesWritten = 0;
+    WSABUF winsockBuff;
 
-/*
-    PDATA data = (PDATA) calloc(1, sizeof(DATA));
-    data->socket = this;
-    data->winsockBuff.len = MAXUDPDGRAMSIZE;
-    data->winsockBuff.buf = (char*) calloc(data->winsockBuff.len, sizeof(char));
-    data->clientSD = pMsg->wParam;
+    winsockBuff.len = MAXUDPDGRAMSIZE;
+    winsockBuff.buf = (char*) calloc(winsockBuff.len, sizeof(char));
 
-    ol = (WSAOVERLAPPED*) calloc(1, sizeof(WSAOVERLAPPED));
-    ol->hEvent = (HANDLE) data;
-
-    if (WSARecvFrom(pMsg->wParam, &(data->winsockBuff), 1, NULL, &flags,
-                NULL, NULL, ol, UDPSocket::recvWorkerRoutine) == SOCKET_ERROR) {
+    if (WSARecvFrom(pMsg->wParam, &(winsockBuff), 1, &numReceived, &flags,
+                NULL, NULL, NULL, NULL) == SOCKET_ERROR) {
         if ((err = WSAGetLastError()) != WSA_IO_PENDING) {
-            //qdebug("UDPSocket::receive(): WSARecv() failed with error %d",
-                   //err);
+            qDebug("UDPSocket::receive(): WSARecv() failed with error %d",
+                   err);
             return;
         }
     }
-*/
+    
+    if (numReceived == 0) {
+        return;
+    }
+
+    QByteArray writeData(winsockBuff.buf, numReceived);
+
+    // CRITICAL SECTION: Lock mutex here.
+    QMutexLocker locker(receiveLock_);
+    inputBuffer_->write(writeData);
+    locker.unlock();
+    // END CRITICAL SECTION: Unlock mutex.
+
+    delete[] winsockBuff.buf;
+
+    emit readyRead();
+    emit signalDataReceived(this);
 }
 
 void UDPSocket::slotProcessWSAEvent(int socket, int lParam) {
@@ -122,27 +130,27 @@ void UDPSocket::slotProcessWSAEvent(int socket, int lParam) {
     msg.lParam = lParam;
     PMSG pMsg = &msg;
 
-    if (WSAGETSELECTERROR(pMsg->lParam)) {
-        //qdebug("UDPSocket::slotProcessWSAEvent(): %d: Socket failed. Error: %d",
-              //(int) pMsg->wParam, WSAGETSELECTERROR(pMsg->lParam));
+    // Filtering out messages for other sockets.
+    if (pMsg->wParam != socket_) {
         return;
     }
 
-    // Filtering out messages for other sockets / protocols.
-    if (pMsg->wParam != socket_) {
+    if (WSAGETSELECTERROR(pMsg->lParam)) {
+        qDebug("UDPSocket::slotProcessWSAEvent(): %d: Socket failed. Error: %d",
+              (int) pMsg->wParam, WSAGETSELECTERROR(pMsg->lParam));
         return;
     }
 
     switch (WSAGETSELECTEVENT(pMsg->lParam)) {
         case FD_READ:
-            //qdebug("UDPSocket::slotProcessWSAEvent: %d: FD_READ.",
-                   //(int) pMsg->wParam);
+            qDebug("UDPSocket::slotProcessWSAEvent: %d: FD_READ.",
+                   (int) pMsg->wParam);
             receive(pMsg);
             break;
 
         case FD_WRITE:
-            //qdebug("UDPSocket::slotProcessWSAEvent: %d: FD_WRITE.",
-                   //(int) pMsg->wParam);
+            qDebug("UDPSocket::slotProcessWSAEvent: %d: FD_WRITE.",
+                   (int) pMsg->wParam);
             send(pMsg);
             break;
 

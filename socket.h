@@ -44,6 +44,9 @@ protected:
     /** These are probably going to be passed on to the writeThread. */
     size_t packetSize_;
 
+    QString connectedIp_;
+    short connectedPort_;
+
     QMutex* sendLock_;
     QMutex* receiveLock_;
 
@@ -106,6 +109,27 @@ public:
      * @author Tom Nightingale.
      */
     void close(PMSG pMsg);
+
+    /**
+     * Returns the connected IP address of the socket.
+     *
+     * @author Luke Queenan
+     */
+    QString getIp()
+    {
+        return connectedIp_;
+    }
+
+    /**
+     * Returns the connected port of the socket.
+     *
+     * @author Luke Queenan
+     */
+    short getPort()
+    {
+        return connectedPort_;
+    }
+
 
     bool isSequential() const;
     qint64 size() const;

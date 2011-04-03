@@ -11,26 +11,27 @@ class UDPSocket : public Socket
 private:
     SOCKADDR_IN serverSockAddrIn_;
 
+protected:
+    /**
+     *
+     * @param pMsg
+     *
+     * @author Tom Nightingale
+     */
+    virtual void receive(PMSG pMsg);
+
+    /**
+     *
+     * @param pMsg
+     *
+     * @author Tom Nightingale
+     */
+    virtual void send(PMSG pMsg);
+
 public:
     UDPSocket(HWND hWnd);
 
     bool open(OpenMode mode);
-
-    /**
-     *
-     * @param pMsg
-     *
-     * @author Tom Nightingale
-     */
-    void receive(PMSG pMsg);
-
-    /**
-     *
-     * @param pMsg
-     *
-     * @author Tom Nightingale
-     */
-    void send(PMSG pMsg);
 
     /**
      *

@@ -3,6 +3,7 @@
 #include <QMap>
 
 class MainWindow;
+class Socket;
 class TCPSocket;
 class UDPSocket;
 class FileData;
