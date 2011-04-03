@@ -58,6 +58,10 @@ public:
         data_.append(data);
     }
 
+    bool transferComplete() {
+        return (data_.size() == totalSize_);
+    }
+
     bool writeToFile();
     bool readFromFile();
 

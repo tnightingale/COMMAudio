@@ -79,13 +79,13 @@ void Workstation::sendFile(TCPSocket *socket, QByteArray *data)
     QByteArray packet = file.readAll();
 
     // Create the control packet
-    long long length = packet.size();
-    QByteArray len((const char *)&length, sizeof(long long));
+    int length = packet.size();
+    QByteArray len((const char *)&length, sizeof(int));
     packet.insert(0, len);
 
     /* Test for retrieving length
-    long long test;
-    memcpy(&test, len, sizeof(long long));
+    int test;
+    memcpy(&test, len, sizeof(int));
     */
 
     // Send our file to the other client
@@ -414,34 +414,37 @@ bool Workstation::processReceivingFile(TCPSocket* socket, QByteArray* packet)
     // Check to see if this is the last packet
     // TODO: DANGER!!! WE CANNOT ASSUME THAT AN AUDIO FILE WILL *NOT* CONTAIN
     //       '\n's!!!!! NEED TO COME UP WITH AN ALTERNATIVE APPROACH.
-    if (packet->endsWith('\n'))
+
+    // Get the file data object for this transfer
+    FileData *fileData = currentTransfers.value(socket);
+
+    // Check to see if we have the size of the packet yet (first packet)
+    if (fileData->getTotalSize() == 0)
     {
-        // Get rid of the newline character
-        packet->truncate(packet->length() - 1);
+        // Get the first eight bytes, convert them to a long long, remove them
+        // from the packet and set the length in the file data
+        QByteArray length = packet->left(8);
+        int packetLength;
+        memcpy(&packetLength, length, sizeof(int));
+        *packet = packet->right(packet->size() - 8);
+        fileData->setTotalSize(packetLength);
+    }
 
-        FileData *fileData = currentTransfers.value(socket);
+    // Append any new data to any existing data
+    fileData->append(*packet);
 
-        // Append any new data to any existing data
-        fileData->append(*packet);
-
-        // Write the all the data to the file
+    // Check to see if we have received all the data
+    if (fileData->transferComplete())
+    {
+        // Write all the data to disk
         fileData->writeToFile();
 
         // Remove the file transfer
         currentTransfers.remove(socket);
 
-        // Since processing of the transfer is complete, return true
         isFileListTransferComplete = true;
     }
-    else
-    {
-        // Append newly received data
-        FileData* fileData = currentTransfers.value(socket);
-        fileData->append(*packet);
 
-        // Since the transfer is not yet complete, return false
-        isFileListTransferComplete = false;
-    }
     return isFileListTransferComplete;
 }
 
