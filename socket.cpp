@@ -58,8 +58,11 @@ qint64 Socket::size() const {
 }
 
 qint64 Socket::bytesAvailable() const {
+    QMutexLocker locker(receiveLock_);
     qDebug("Socket::bytesAvailable(); Bytes: %d", inputBuffer_->size() + QIODevice::bytesAvailable());
-    return inputBuffer_->size() + QIODevice::bytesAvailable();
+    qint64 size = inputBuffer_->size() + QIODevice::bytesAvailable();
+
+    return size;
 }
 
 bool Socket::listen(PSOCKADDR_IN pSockAddr) {

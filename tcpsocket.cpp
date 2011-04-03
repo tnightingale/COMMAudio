@@ -145,7 +145,7 @@ void TCPSocket::receive(PMSG pMsg) {
         }
     }
 
-    qDebug() << "TCPSocket::receive(); DataRx: " << winsockBuff.buf << ", Num: " << numReceived;
+    //qDebug() << "TCPSocket::receive(); DataRx: " << winsockBuff.buf << ", Num: " << numReceived;
     if (numReceived == 0) {
         return;
     }
