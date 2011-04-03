@@ -79,6 +79,8 @@ public:
 
     void addSongToLocal(QString song);
 
+    bool requestVoiceChat(QString);
+
 signals:
     void signalWMWSASyncTCPRx(int, int);
     void signalWMWSASyncUDPRx(int, int);

@@ -30,7 +30,7 @@ private:
 
     // Functions
     void sendFile(Socket*, QByteArray*);
-    void acceptVoiceChat();
+    void acceptVoiceChat(Socket*);
 
     bool processReceivingFile(Socket*, QByteArray*);
     bool processReceivingFileList(Socket*, QByteArray*);

@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "audiocomponent.h"
 #include <QFileDialog>
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -819,4 +820,21 @@ void MainWindow::on_action_Tiger_triggered() {
 
 void MainWindow::on_action_Default_triggered() {
     backgroundColor("Black", "White");
+}
+
+bool MainWindow::requestVoiceChat(QString fromIp)
+{
+    QMessageBox prompt;
+    prompt.setText("IP " + fromIp + " would like to voice chat.");
+    prompt.setInformativeText("Do you accept this challenge?");
+    prompt.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    prompt.setDefaultButton((QMessageBox::No));
+
+    int result = prompt.exec();
+
+    if (result == QMessageBox::Yes)
+    {
+        return true;
+    }
+    return false;
 }
