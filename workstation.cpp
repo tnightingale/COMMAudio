@@ -601,7 +601,7 @@ void Workstation::requestFileListController(Socket *socket)
     {
         // Disconnect this slot from the received packet signal
         disconnect(socket, SIGNAL(signalDataReceived(Socket*)),
-                   this, SLOT(requestFileListController(TCPSocket*)));
+                   this, SLOT(requestFileListController(Socket*)));
 
         // Close the socket
         delete socket;
