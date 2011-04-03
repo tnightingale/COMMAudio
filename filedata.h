@@ -8,8 +8,6 @@ class FileData : public QObject
 {
     Q_OBJECT
 
-
-
 private:
     QString path_;
     QByteArray data_;

@@ -4,6 +4,7 @@ FileData::FileData(QObject *parent) :
     QObject(parent)
 {
     totalSize_ = 0;
+    port_ = 0;
 }
 
 FileData::FileData(QObject *parent, QString path, short port) : QObject(parent){

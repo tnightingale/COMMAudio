@@ -195,6 +195,8 @@ void Workstation::requestFileList(QString ip, short port)
 
     // Create the control packet
     byteArray.insert(0, FILE_LIST);
+    QByteArray portArray((const char *)&port, sizeof(port));
+    byteArray.insert(1, portArray);
     byteArray.append('\n');
 
     // Send our own file list to the other client
@@ -284,8 +286,9 @@ void Workstation::decodeControlMessage(TCPSocket *socket)
         // Connect the signal in case we receive more data
         connect(socket, SIGNAL(signalDataReceived(TCPSocket*)),
                 this, SLOT(receiveFileListController(TCPSocket*)));
+        // Create transfer object
+        currentTransfers.insert(socket, new FileData());
         // Call function now to deal with rest of packet
-        currentTransfers.insert(socket, new FileData);
         receiveFileListController(&(*socket));
         break;
     case FILE_TRANSFER:
@@ -462,6 +465,20 @@ bool Workstation::processReceivingFile(TCPSocket* socket, QByteArray* packet)
 bool Workstation::processReceivingFileList(TCPSocket *socket, QByteArray *packet)
 {
     bool isFileListTransferComplete = false;
+
+    // Get the file transfer object
+    FileData *fileData = currentTransfers.value(socket);
+
+    // Check to see if this is the first packet
+    if (fileData->getPort() == 0)
+    {
+        QByteArray portArray = packet->left(2);
+        short port;
+        memcpy(&port, portArray, sizeof(short));
+        *packet = packet->right(packet->size() - 4);
+        fileData->setPort(port);
+    }
+
     // Check to see if this is the last packet
     if (packet->at(packet->length() - 1) == '\n')
     {
@@ -470,7 +487,6 @@ bool Workstation::processReceivingFileList(TCPSocket *socket, QByteArray *packet
 
         QStringList fileList;
 
-        FileData *fileData = currentTransfers.value(socket);
         // Append any new data to any existing data
         fileData->append(*packet);
 
@@ -495,7 +511,6 @@ bool Workstation::processReceivingFileList(TCPSocket *socket, QByteArray *packet
     else
     {
         // Append newly received data
-        FileData *fileData = currentTransfers.value(socket);
         fileData->append(*packet);
 
         // Since the transfer is not yet complete, return false
