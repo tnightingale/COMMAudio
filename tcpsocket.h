@@ -72,16 +72,7 @@ signals:
      *
      * @author Tom Nightingale
      */
-    void signalClientConnected(TCPSocket * clientSocket);
-
-    /**
-     *
-     * @param socket
-     * @param buffer
-     *
-     * @author Tom Nightingale
-     */
-    void signalDataReceived(TCPSocket *tcpSocket);
+    void signalClientConnected(Socket * clientSocket);
 
 public slots:
     /**

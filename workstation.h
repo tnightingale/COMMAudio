@@ -25,15 +25,15 @@ private:
     MainWindow *mainWindowPointer_;
 
     // Collection for file transfers
-    QMap <TCPSocket*, FileData*> currentTransfers;
+    QMap <Socket*, FileData*> currentTransfers;
 
     // Functions
-    void sendFile(TCPSocket*, QByteArray*);
+    void sendFile(Socket*, QByteArray*);
     void acceptVoiceChat();
 
-    bool processReceivingFile(TCPSocket*, QByteArray*);
-    bool processReceivingFileList(TCPSocket*, QByteArray*);
-    bool processReceivingFileRequest(TCPSocket*, QByteArray*);
+    bool processReceivingFile(Socket*, QByteArray*);
+    bool processReceivingFileList(Socket*, QByteArray*);
+    bool processReceivingFileRequest(Socket*, QByteArray*);
 
 
 public slots:
@@ -42,13 +42,13 @@ public slots:
     void requestFile(QString, short, QString);
     void requestFileList(QString, short);
     // Triggered by sockets
-    void processConnection(TCPSocket*);
-    void decodeControlMessage(TCPSocket*);
+    void processConnection(Socket*);
+    void decodeControlMessage(Socket*);
     void receiveUDP();
-    void receiveFileController(TCPSocket*);
-    void receiveFileListController(TCPSocket*);
-    void requestFileListController(TCPSocket*);
-    void sendFileController(TCPSocket*);
+    void receiveFileController(Socket*);
+    void receiveFileListController(Socket*);
+    void requestFileListController(Socket*);
+    void sendFileController(Socket*);
 
 signals:
     void signalFileListUpdate(QStringList*);

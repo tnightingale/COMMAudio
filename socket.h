@@ -140,6 +140,15 @@ signals:
     void readyWrite(qint64);
     void status(QString);
 
+    /**
+     *
+     * @param socket
+     * @param buffer
+     *
+     * @author Tom Nightingale
+     */
+    void signalDataReceived(Socket* socket);
+
 public slots:
     /**
      *
