@@ -9,6 +9,24 @@
 class TCPSocket : public Socket
 {
     Q_OBJECT
+
+protected:
+    /**
+     *
+     * @param pMsg
+     *
+     * @author Tom Nightingale
+     */
+    virtual void receive(PMSG pMsg);
+
+    /**
+     *
+     * @param pMsg
+     *
+     * @author Tom Nightingale
+     */
+    virtual void send(PMSG pMsg);
+
 public:
     TCPSocket(HWND hWnd);
     TCPSocket(SOCKET socket, HWND hWnd);
@@ -29,31 +47,7 @@ public:
      *
      * @author Tom Nightingale
      */
-    void receive(PMSG pMsg);
-
-    /**
-     *
-     * @param pMsg
-     *
-     * @author Tom Nightingale
-     */
-    void send(PMSG pMsg);
-
-    /**
-     *
-     * @param pMsg
-     *
-     * @author Tom Nightingale
-     */
     void connect(PMSG pMsg);
-
-    /**
-     *
-     * @param bytesToRead
-     *
-     * @author Tom Nightingale
-     */
-    int loadBuffer(size_t bytesToRead);
 
     /**
      *
@@ -110,8 +104,6 @@ signals:
     void signalDataReceived(TCPSocket *tcpSocket);
 
 public slots:
-    void slotWriteData(qint64);
-
     /**
      *
      * @param pMsg

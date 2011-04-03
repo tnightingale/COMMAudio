@@ -1,15 +1,48 @@
 #include "udpsocket.h"
 
 UDPSocket::UDPSocket(HWND hWnd)
-: Socket(hWnd, AF_INET, SOCK_DGRAM, IPPROTO_UDP) {
-    int err = 0;
-    int flags = FD_READ | FD_CLOSE;
+: Socket(hWnd, AF_INET, SOCK_DGRAM, IPPROTO_UDP) { }
 
-    if ((err = WSAAsyncSelect(socket_, hWnd, WM_WSAASYNC_TCP, flags))
-                              == SOCKET_ERROR) {
-        //qdebug("UDPSocket::UDPSocket(): Error setting up async select.");
-        throw "UDPSocket::UDPSocket(): Error setting up async select.";
+bool UDPSocket::open(OpenMode mode) {
+    int err = 0;
+    int flags = FD_CLOSE;
+
+    switch (mode) {
+        case QIODevice::ReadOnly:
+            flags |= FD_READ;
+            break;
+
+        case QIODevice::WriteOnly:
+            flags |= FD_WRITE;
+            break;
+
+        case QIODevice::ReadWrite:
+            flags |= FD_READ | FD_WRITE;
+            break;
+
+        case QIODevice::NotOpen:
+            flags = 0;
+            break;
+
+        case QIODevice::Append:
+        case QIODevice::Truncate:
+        case QIODevice::Text:
+        case QIODevice::Unbuffered:
+        default:
+            return false;
+            break;
     }
+
+    if ((err = WSAAsyncSelect(socket_, hWnd_, WM_WSAASYNC_UDP, flags))
+                              == SOCKET_ERROR) {
+        qDebug("UDPSocket::open(): Error setting up async select.");
+        return false;
+    }
+
+    QIODevice::connect(this, SIGNAL(readyWrite(qint64)),
+                       this, SLOT(slotWriteData(qint64)));
+
+    return QIODevice::open(mode);
 }
 
 void UDPSocket::send(PMSG pMsg) {

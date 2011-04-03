@@ -50,6 +50,30 @@ protected:
     virtual qint64 readData(char * data, qint64 maxSize);
     virtual qint64 writeData(const char * data, qint64 maxSize);
 
+    /**
+     *
+     * @param bytesToRead
+     *
+     * @author Tom Nightingale
+     */
+    int loadBuffer(size_t bytesToRead);
+
+    /**
+     *
+     * @param pMsg
+     *
+     * @author Tom Nightingale
+     */
+    virtual void receive(PMSG pMsg) {}
+
+    /**
+     *
+     * @param pMsg
+     *
+     * @author Tom Nightingale
+     */
+    virtual void send(PMSG pMsg) {}
+
 public:
     Socket(HWND hWnd, int addressFamily, int connectionType, int protocol);
     Socket(SOCKET socket, HWND hWnd);
@@ -100,6 +124,11 @@ public slots:
      * @author Tom Nightingale.
      */
     virtual void slotProcessWSAEvent(PMSG pMsg);
+
+    /**
+     *
+     */
+    void slotWriteData(qint64 bytesToWrite);
 
 };
 

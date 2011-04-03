@@ -21,11 +21,11 @@ bool TCPSocket::open(OpenMode mode) {
             break;
 
         case QIODevice::ReadWrite:
-             flags |= FD_CONNECT | FD_READ | FD_WRITE | FD_ACCEPT;
+            flags |= FD_CONNECT | FD_READ | FD_WRITE | FD_ACCEPT;
             break;
 
         case QIODevice::NotOpen:
-             flags = 0;
+            flags = 0;
             break;
 
         case QIODevice::Append:
@@ -39,7 +39,7 @@ bool TCPSocket::open(OpenMode mode) {
 
     if ((err = WSAAsyncSelect(socket_, hWnd_, WM_WSAASYNC_TCP, flags))
                               == SOCKET_ERROR) {
-        //qDebug("TCPSocket::open(): Error setting up async select.");
+        qDebug("TCPSocket::open(): Error setting up async select.");
         return false;
     }
 
@@ -47,17 +47,6 @@ bool TCPSocket::open(OpenMode mode) {
                        this, SLOT(slotWriteData(qint64)));
 
     return QIODevice::open(mode);
-}
-
-void TCPSocket::slotWriteData(qint64 bytesToWrite) {
-    if (loadBuffer(bytesToWrite) < 0) {
-        return;
-    }
-    MSG msg;
-    msg.wParam = socket_;
-    msg.lParam = 0;
-    PMSG pMsg = &msg;
-    send(pMsg);
 }
 
 void TCPSocket::accept(PMSG pMsg) {
@@ -169,21 +158,6 @@ void TCPSocket::connect(PMSG) {
         qDebug("TCPSocket::connect(); Cannot read from data source!");
         throw "TCPSocket::connect(); Cannot read from data source!";
     }
-}
-
-int TCPSocket::loadBuffer(size_t bytesToRead) {
-    // Lock mutex here
-    QMutexLocker locker(sendLock_);
-    if (outputBuffer_->size() == 0) {
-        return 0;
-    }
-
-    nextTxBuff_ = new QByteArray(outputBuffer_->read(bytesToRead));
-    int bytesRead = nextTxBuff_->size();
-    locker.unlock();
-    // Unlock mutex.
-
-    return bytesRead;
 }
 
 bool TCPSocket::listen(int port) {

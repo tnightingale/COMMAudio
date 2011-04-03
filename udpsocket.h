@@ -14,6 +14,8 @@ private:
 public:
     UDPSocket(HWND hWnd);
 
+    bool open(OpenMode mode);
+
     /**
      *
      * @param pMsg

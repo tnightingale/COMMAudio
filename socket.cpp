@@ -53,6 +53,34 @@ qint64 Socket::writeData(const char * data, qint64 maxSize) {
     return bytesWritten;
 }
 
+void Socket::slotWriteData(qint64 bytesToWrite) {
+    if (loadBuffer(bytesToWrite) < 0) {
+        return;
+    }
+
+    MSG msg;
+    msg.wParam = socket_;
+    msg.lParam = 0;
+    PMSG pMsg = &msg;
+    send(pMsg);
+}
+
+int Socket::loadBuffer(size_t bytesToRead) {
+    // Lock mutex here
+    QMutexLocker locker(sendLock_);
+    if (outputBuffer_->size() == 0) {
+        return 0;
+    }
+
+    nextTxBuff_ = new QByteArray(outputBuffer_->read(bytesToRead));
+    int bytesRead = nextTxBuff_->size();
+    locker.unlock();
+    // Unlock mutex.
+
+    return bytesRead;
+}
+
+
 qint64 Socket::size() const {
     return bytesAvailable();
 }
