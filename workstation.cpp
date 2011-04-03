@@ -88,13 +88,14 @@ void Workstation::sendFile(Socket *socket, QByteArray *data)
 
 void Workstation::acceptVoiceChat(Socket *socket)
 {
+    TCPSocket *mySocket = (TCPSocket*)socket;
     QString ip;
     QByteArray data;
     QByteArray packet;
     short port = 0;
 
     // Read the packet
-    packet = socket->readAll();
+    packet = mySocket->readAll();
 
     // Get the port
     data = packet.left(2);
@@ -102,14 +103,18 @@ void Workstation::acceptVoiceChat(Socket *socket)
     packet = packet.right((packet.size() - 2));
 
     // Get the ip
-    memcpy(&ip, data, sizeof(data));
+    ip = mySocket->getIp();
 
     // Get the user's response
     if (mainWindowPointer_->requestVoiceChat(ip))
     {
-        // Create the connection here
+        // Create the voice connection here
     }
-    // Respond with something? Or just disconnect?
+    else
+    {
+        // User does not want to voice chat
+        delete socket;
+    }
 }
 
 /*
