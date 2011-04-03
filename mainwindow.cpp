@@ -16,6 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     this->statusBar()->setSizeGripEnabled(false);
     player_ = new AudioComponent(this);
+
     /*player->addSong("./test.raw");
     player->play();*/    
     /*
@@ -316,7 +317,7 @@ void MainWindow::on_remoteListWidget_itemDoubleClicked(QListWidgetItem* item)
 */
 void MainWindow::on_playButton_clicked()
 {
-
+player_->testwav("./applause.wav");
     if(ui->playButton->text() == "Pause") {
         ui->playButton->setText("Play");
         ui->playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));

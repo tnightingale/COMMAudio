@@ -136,10 +136,13 @@ void AudioComponent::startMic(){
     }
 
     input_ = new QAudioInput(format,NULL);
-    QIODevice* micData = input_->start();
     QAudioOutput* qoutput_;
     qoutput_ = new QAudioOutput(format,NULL);
-    qoutput_->start(micData);
+
+    input_->start(qoutput_->start());
+
+
+
     //return micData;
 }
 void AudioComponent::startMic(QIODevice* stream) {
@@ -190,3 +193,80 @@ void AudioComponent::playStream(QIODevice* stream){
     qoutput_->start(stream);
 
 }
+
+void AudioComponent::testwav(QString fileName){
+
+    QFile file(fileName);
+    file.open(QIODevice::ReadOnly);
+    data = file.readAll();
+    QByteArray tempdata = data; //used to view data....
+    file.close();
+    int position = 0;
+
+    position = 16;
+    int temp = *(int*)&data.constData()[position];
+    position = 24;
+     temp = *(int*)&data.constData()[position];
+    format.setSampleRate(temp);
+    position = 22;
+    temp = *(short*)&data.constData()[position];
+    format.setChannels(temp);
+    position = 34;
+    temp = *(short*)&data.constData()[position];
+    format.setSampleSize(temp);
+    format.setCodec("audio/pcm");
+    format.setByteOrder(QAudioFormat::LittleEndian);
+    format.setSampleType(QAudioFormat::SignedInt);
+
+
+
+    //data.clear();
+
+    output_ = new QAudioOutput(format,0);
+    output_->setBufferSize(*(int*)&data.constData()[40] * 2);
+    int i = data.remove(0,44);
+    tempdata = data;
+    //data=file.readAll();
+/*
+    buffer_ = new QBuffer(&data,NULL);
+    buffer_->open(QIODevice::ReadWrite);
+    output_->start(buffer_);*/
+
+    buff = output_->start();
+    buff->write(data);
+
+    connect(output_,SIGNAL(stateChanged(QAudio::State)),this,SLOT(addToOutput(QAudio::State)));
+    //buffer_->write(data);
+}
+void AudioComponent::addToOutput(QAudio::State newState){
+    switch (newState) {
+        case QAudio::StoppedState:
+            if (output_->error() != QAudio::NoError) {
+             // Perform error handling
+                qDebug("blahhhhhh error");
+            } else {
+             // Normal stop
+            }
+            break;
+
+        case QAudio::SuspendedState:
+            qDebug("blahhhhhh suspended");
+            buff->write(data);
+            output_->resume();
+            break;
+            case QAudio::ActiveState:
+            qDebug("blahhhhhh active");
+            //
+            break;
+            case QAudio::IdleState:
+            qDebug("blahhhhhh idle");
+            buff->write(data);
+            break;
+    }
+
+
+}
+
+
+
+

@@ -35,6 +35,7 @@ public:
     void gotoIndex(int index);
     QMediaPlaylist* getPlaylist();
     int getIndex();
+    void testwav(QString fileName);
 
 private:
     QMediaPlayer* player_;
@@ -43,11 +44,13 @@ private:
     //Phonon::AudioOutput* output_;
     QDir sourceFolder_;
 
-
+QByteArray data;
     QAudioInput* input_;
+    QAudioOutput* output_;
     QFile outputFile;
     QAudioFormat format;
     QBuffer* buffer_;
+    QIODevice* buff;
     QBuffer* inputBuffer_;
     QList<QBuffer*> allBuffers_;
 signals:
@@ -58,6 +61,8 @@ void pause();
 void stop();
 void next();
 void previous();
+
+void addToOutput(QAudio::State);
 
 void startMic();
 void startMic(QIODevice* stream);
