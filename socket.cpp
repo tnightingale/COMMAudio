@@ -1,8 +1,9 @@
 #include "socket.h"
+#include "buffer.h"
 
 Socket::Socket(HWND hWnd, int addressFamily, int connectionType, int protocol)
-: hWnd_(hWnd), outputBuffer_(new QBuffer()), inputBuffer_(new QBuffer()),
-  nextTxBuff_(NULL) {
+: hWnd_(hWnd), outputBuffer_(new Buffer()), inputBuffer_(new Buffer()),
+  nextTxBuff_(NULL), sendLock_(new QMutex()), receiveLock_(new QMutex()) {
 
     if ((socket_ = WSASocket(addressFamily, connectionType, protocol, NULL, 0,
                              WSA_FLAG_OVERLAPPED)) == INVALID_SOCKET) {
@@ -11,15 +12,14 @@ Socket::Socket(HWND hWnd, int addressFamily, int connectionType, int protocol)
         throw "Socket::Socket(); Can't create socket.";
     }
 
-    lock_ = new QMutex();
-
     connect(this, SIGNAL(signalSocketClosed()),
             this, SLOT(deleteLater()));
 }
 
 Socket::Socket(SOCKET socket, HWND hWnd)
-: socket_(socket), hWnd_(hWnd), outputBuffer_(new QBuffer()),
-  inputBuffer_(new QBuffer()), nextTxBuff_(NULL) {
+: socket_(socket), hWnd_(hWnd), outputBuffer_(new Buffer()),
+  inputBuffer_(new Buffer()), nextTxBuff_(NULL),
+  sendLock_(new QMutex()), receiveLock_(new QMutex()) {
 
     connect(this, SIGNAL(signalSocketClosed()),
             this, SLOT(deleteLater()));
@@ -29,15 +29,10 @@ qint64 Socket::readData(char * data, qint64 maxSize) {
     qint64 bytesRead = 0;
 
     // Mutex lock here.
-    QMutexLocker locker(lock_);
-    inputBuffer_->open(QBuffer::ReadOnly);
-    bytesRead = inputBuffer_->read(data, maxSize);
-    inputBuffer_->close();
-
-    // Removing stuff that was read from the buffer.
-    QByteArray buffer = inputBuffer_->buffer();
-    buffer.remove(0, bytesRead);
-    inputBuffer_->setData(buffer);
+    QMutexLocker locker(receiveLock_);
+    QByteArray readData = inputBuffer_->read(maxSize);
+    bytesRead = readData.size();
+    memcpy(data, readData.data(), bytesRead);
     // Mutex unlock.
 
     return bytesRead;
@@ -47,15 +42,55 @@ qint64 Socket::writeData(const char * data, qint64 maxSize) {
     qint64 bytesWritten = 0;
 
     // Mutex lock here.
-    QMutexLocker locker(lock_);
-    outputBuffer_->open(QBuffer::Append);
-    bytesWritten = outputBuffer_->write(data, maxSize);
-    outputBuffer_->close();
+    QMutexLocker locker(sendLock_);
+    QByteArray writeData(data, maxSize);
+    outputBuffer_->write(writeData);
+    bytesWritten = maxSize;
+    locker.unlock();
     // Mutex unlock.
 
     emit readyWrite(bytesWritten);
-
     return bytesWritten;
+}
+
+void Socket::slotWriteData(qint64 bytesToWrite) {
+    if (loadBuffer(bytesToWrite) < 0) {
+        return;
+    }
+
+    MSG msg;
+    msg.wParam = socket_;
+    msg.lParam = 0;
+    PMSG pMsg = &msg;
+    send(pMsg);
+}
+
+int Socket::loadBuffer(size_t bytesToRead) {
+    // Lock mutex here
+    QMutexLocker locker(sendLock_);
+    if (outputBuffer_->size() == 0) {
+        return 0;
+    }
+
+    nextTxBuff_ = new QByteArray(outputBuffer_->read(bytesToRead));
+    int bytesRead = nextTxBuff_->size();
+    locker.unlock();
+    // Unlock mutex.
+
+    return bytesRead;
+}
+
+
+qint64 Socket::size() const {
+    return bytesAvailable();
+}
+
+qint64 Socket::bytesAvailable() const {
+    QMutexLocker locker(receiveLock_);
+    qDebug("Socket::bytesAvailable(); Bytes: %d", inputBuffer_->size() + QIODevice::bytesAvailable());
+    qint64 size = inputBuffer_->size() + QIODevice::bytesAvailable();
+
+    return size;
 }
 
 bool Socket::listen(PSOCKADDR_IN pSockAddr) {
@@ -83,8 +118,8 @@ void Socket::close(PMSG pMsg) {
 
 void Socket::slotProcessWSAEvent(PMSG pMsg) {
     if (WSAGETSELECTERROR(pMsg->lParam)) {
-        qDebug("Socket::slotProcessWSAEvent(): %d: Socket failed with error %d",
-              (int) pMsg->wParam, WSAGETSELECTERROR(pMsg->lParam));
+        //qDebug("Socket::slotProcessWSAEvent(): %d: Socket failed with error %d",
+              //(int) pMsg->wParam, WSAGETSELECTERROR(pMsg->lParam));
         return;
     }
 
@@ -95,11 +130,16 @@ void Socket::slotProcessWSAEvent(PMSG pMsg) {
     switch (WSAGETSELECTEVENT(pMsg->lParam)) {
 
         case FD_CLOSE:
-            qDebug("Socket::slotProcessWSAEvent(); %d: FD_CLOSE.",
-                   (int) pMsg->wParam);
+            //qDebug("Socket::slotProcessWSAEvent(); %d: FD_CLOSE.",
+                   //(int) pMsg->wParam);
             close(pMsg);
             break;
     }
 
     return;
+}
+
+bool Socket::isSequential() const
+{
+    return true;
 }

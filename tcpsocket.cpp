@@ -1,4 +1,5 @@
 #include "tcpsocket.h"
+#include "buffer.h"
 
 TCPSocket::TCPSocket(HWND hWnd)
 : Socket(hWnd, AF_INET, SOCK_STREAM, IPPROTO_TCP) {}
@@ -20,11 +21,11 @@ bool TCPSocket::open(OpenMode mode) {
             break;
 
         case QIODevice::ReadWrite:
-             flags |= FD_CONNECT | FD_READ | FD_WRITE | FD_ACCEPT;
+            flags |= FD_CONNECT | FD_READ | FD_WRITE | FD_ACCEPT;
             break;
 
         case QIODevice::NotOpen:
-             flags = 0;
+            flags = 0;
             break;
 
         case QIODevice::Append:
@@ -48,17 +49,6 @@ bool TCPSocket::open(OpenMode mode) {
     return QIODevice::open(mode);
 }
 
-void TCPSocket::slotWriteData(qint64 bytesToWrite) {
-    if (loadBuffer(bytesToWrite) < 0) {
-        return;
-    }
-    MSG msg;
-    msg.wParam = socket_;
-    msg.lParam = 0;
-    PMSG pMsg = &msg;
-    send(pMsg);
-}
-
 void TCPSocket::accept(PMSG pMsg) {
     SOCKET newSocket;
     SOCKADDR_IN client;
@@ -73,10 +63,12 @@ void TCPSocket::accept(PMSG pMsg) {
     }
 
     TCPSocket * clientSocket = new TCPSocket(newSocket, hWnd_);
-    QObject::connect(clientSocket, SIGNAL(signalDataReceived(TCPSocket*)),
-                     this, SIGNAL(signalDataReceived(TCPSocket*)));
+    QObject::connect(clientSocket, SIGNAL(signalDataReceived(Socket*)),
+                     this, SIGNAL(signalDataReceived(Socket*)));
+
     connectedIp_ = QString(inet_ntoa(client.sin_addr));
-    connectedPort_ = client.sin_port;
+    //connectedPort_ = client.sin_port;
+
     emit signalClientConnected(clientSocket);
 }
 
@@ -97,8 +89,6 @@ void TCPSocket::send(PMSG pMsg) {
     winsockBuff.buf = nextTxBuff_->data();
     winsockBuff.len = nextTxBuff_->size();
 
-    // TODO: I think i should actually be checking something here, like the
-    //       outputBuffer_ status or something.
     while (TRUE) {
         result = WSASend(pMsg->wParam, &winsockBuff, 1, &numSent, 0,
                          NULL, NULL);
@@ -133,7 +123,7 @@ void TCPSocket::receive(PMSG pMsg) {
     WSABUF winsockBuff;
 
     winsockBuff.len = MAXUDPDGRAMSIZE;
-    winsockBuff.buf = (char *) calloc(winsockBuff.len, sizeof(char));
+    winsockBuff.buf = (char*) calloc(winsockBuff.len, sizeof(char));
 
     if (WSARecv(pMsg->wParam, &(winsockBuff), 1, &numReceived, &flags,
                 NULL, NULL) == SOCKET_ERROR) {
@@ -144,20 +134,17 @@ void TCPSocket::receive(PMSG pMsg) {
         }
     }
 
-    //qDebug() << "TCPSocket::receive(); DataRx: " << winsockBuff.buf;
-
-    while (numReceived > 0) {
-        // Lock mutex here.
-        inputBuffer_->open(QBuffer::WriteOnly);
-        bytesWritten = inputBuffer_->write(winsockBuff.buf, numReceived);
-        numReceived -= bytesWritten;
-        inputBuffer_->close();
-        // Unlock mutex.
-
-        if (numReceived == 0) {
-            break;
-        }
+    if (numReceived == 0) {
+        return;
     }
+
+    QByteArray writeData(winsockBuff.buf, numReceived);
+
+    // CRITICAL SECTION: Lock mutex here.
+    QMutexLocker locker(receiveLock_);
+    inputBuffer_->write(writeData);
+    locker.unlock();
+    // END CRITICAL SECTION: Unlock mutex.
 
     delete[] winsockBuff.buf;
 
@@ -170,28 +157,6 @@ void TCPSocket::connect(PMSG) {
         qDebug("TCPSocket::connect(); Cannot read from data source!");
         throw "TCPSocket::connect(); Cannot read from data source!";
     }
-}
-
-int TCPSocket::loadBuffer(size_t bytesToRead) {
-    // Lock mutex here
-    if (outputBuffer_->bytesAvailable() == 0) {
-        return 0;
-    }
-    nextTxBuff_ = new QByteArray(bytesToRead, '\0');
-    // TODO: I had problems with this, might need to call
-    //       QByteArray::readRawData().
-    outputBuffer_->open(QIODevice::ReadOnly);
-    int bytesRead = outputBuffer_->read(nextTxBuff_->data(), bytesToRead);
-    outputBuffer_->close();
-
-    // Removing stuff that was read from the buffer.
-    QByteArray buffer = outputBuffer_->buffer();
-    buffer.remove(0, bytesRead);
-    outputBuffer_->setData(buffer);
-    // Unlock mutex.
-
-    nextTxBuff_->resize(bytesRead);
-    return bytesRead;
 }
 
 bool TCPSocket::listen(int port) {
@@ -212,6 +177,7 @@ bool TCPSocket::listen(int port) {
         return false;
     }
 
+    connectedPort_ = port;
     return true;
 }
 
@@ -222,7 +188,7 @@ bool TCPSocket::connectRemote(QString address, int port) {
 
     if ((host = gethostbyname(address.toAscii().data())) == NULL) {
         err = GetLastError();
-        qDebug("Client::writeTCP(): Unknown server address. Error: %d.", err);
+        //qDebug("Client::writeTCP(): Unknown server address. Error: %d.", err);
         return false;
     }
 
@@ -233,23 +199,23 @@ bool TCPSocket::connectRemote(QString address, int port) {
     if ((err = ::connect(socket_, (PSOCKADDR) &serverSockAddrIn,
                    sizeof(SOCKADDR_IN))) == SOCKET_ERROR) {
         if ((err = WSAGetLastError()) != WSAEWOULDBLOCK) {
-            qDebug("TCPSocket::connectRemote(): Connect failed. Error: %d",
-                   WSAGetLastError());
+            //qDebug("TCPSocket::connectRemote(): Connect failed. Error: %d",
+                   //WSAGetLastError());
             return false;
         }
     }
+
     connectedIp_ = address;
-    connectedPort_ = port;
     return true;
 }
 
-//void TCPSocket::slotProcessWSAEvent(PMSG pMsg) {
-void TCPSocket::slotProcessWSAEvent(int wParam, int lParam) {
+void TCPSocket::slotProcessWSAEvent(int socket, int lParam) {
     MSG msg;
-    msg.wParam = wParam;
+    msg.wParam = socket;
     msg.lParam = lParam;
     PMSG pMsg = &msg;
 
+    // Filtering out messages for other sockets.
     if (pMsg->wParam != socket_) {
         return;
     }

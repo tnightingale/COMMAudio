@@ -9,6 +9,24 @@
 class TCPSocket : public Socket
 {
     Q_OBJECT
+
+protected:
+    /**
+     *
+     * @param pMsg
+     *
+     * @author Tom Nightingale
+     */
+    virtual void receive(PMSG pMsg);
+
+    /**
+     *
+     * @param pMsg
+     *
+     * @author Tom Nightingale
+     */
+    virtual void send(PMSG pMsg);
+
 public:
     TCPSocket(HWND hWnd);
     TCPSocket(SOCKET socket, HWND hWnd);
@@ -29,31 +47,7 @@ public:
      *
      * @author Tom Nightingale
      */
-    void receive(PMSG pMsg);
-
-    /**
-     *
-     * @param pMsg
-     *
-     * @author Tom Nightingale
-     */
-    void send(PMSG pMsg);
-
-    /**
-     *
-     * @param pMsg
-     *
-     * @author Tom Nightingale
-     */
     void connect(PMSG pMsg);
-
-    /**
-     *
-     * @param bytesToRead
-     *
-     * @author Tom Nightingale
-     */
-    int loadBuffer(size_t bytesToRead);
 
     /**
      *
@@ -71,26 +65,6 @@ public:
      */
     bool connectRemote(QString address, int port);
 
-    /**
-     * Returns the connected IP address of the socket.
-     *
-     * @author Luke Queenan
-     */
-    QString getIp()
-    {
-        return connectedIp_;
-    }
-
-    /**
-     * Returns the connected port of the socket.
-     *
-     * @author Luke Queenan
-     */
-    short getPort()
-    {
-        return connectedPort_;
-    }
-
 signals:
     /**
      *
@@ -98,20 +72,9 @@ signals:
      *
      * @author Tom Nightingale
      */
-    void signalClientConnected(TCPSocket * clientSocket);
-
-    /**
-     *
-     * @param socket
-     * @param buffer
-     *
-     * @author Tom Nightingale
-     */
-    void signalDataReceived(TCPSocket *tcpSocket);
+    void signalClientConnected(Socket * clientSocket);
 
 public slots:
-    void slotWriteData(qint64);
-
     /**
      *
      * @param pMsg
@@ -122,8 +85,6 @@ public slots:
     void slotProcessWSAEvent(int, int);
 
 private:
-    QString connectedIp_;
-    short connectedPort_;
 };
 
 #endif // TCPSOCKET_H

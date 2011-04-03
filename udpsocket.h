@@ -14,31 +14,13 @@ private:
 public:
     UDPSocket(HWND hWnd);
 
-    /**
-     *
-     * @param pMsg
-     *
-     * @author Tom Nightingale
-     */
-    void receive(PMSG pMsg);
-
-    /**
-     *
-     * @param pMsg
-     *
-     * @author Tom Nightingale
-     */
-    void send(PMSG pMsg);
+    bool open(OpenMode mode);
 
     /**
      *
      * @author Tom Nightingale.
      */
-    void setDest(PHOSTENT host, size_t port) {
-        memcpy((char*) &serverSockAddrIn_.sin_addr, host->h_addr, host->h_length);
-        serverSockAddrIn_.sin_family = AF_INET;
-        serverSockAddrIn_.sin_port = htons(port);
-    }
+    void setDest(QString hostAddr, size_t port);
 
 public slots:
     /**
@@ -49,61 +31,22 @@ public slots:
      */
     void slotProcessWSAEvent(int socket, int lParam);
 
-public:
+protected:
     /**
      *
-     * @param error
+     * @param pMsg
      *
      * @author Tom Nightingale
      */
-    static void CALLBACK recvWorkerRoutine(DWORD error, DWORD bytesTransferred,
-                                           LPWSAOVERLAPPED overlapped,
-                                           DWORD inFlags) {
-/*
-        QString output;
-        QTextStream log(&output, QIODevice::WriteOnly);
-
-        int num = 0;
-        PDATA data;
-
-        if (error != 0) {
-          qDebug("I/O operation failed with error %d\n", (int) error);
-          return;
-        }
-
-        data = (PDATA) overlapped->hEvent;
-
-        QDataStream * fileOutput = data->socket->getDataStream();
-        if ((num = fileOutput->writeRawData(data->winsockBuff.buf, bytesTransferred)) < 0) {
-            qDebug("STATIC UDPSocket::recvWorkerRoutine(): Error writing to file.");
-        }
-
-        QFile * file = (QFile *) fileOutput->device();
-        if (!file->flush()) qDebug("error flushing file");
-
-        free(data);
-        free(overlapped);
-*/
-    }
+    virtual void receive(PMSG pMsg);
 
     /**
      *
-     * @param error
+     * @param pMsg
      *
      * @author Tom Nightingale
      */
-    static void CALLBACK sendWorkerRoutine(DWORD error, DWORD bytesTransferred,
-                                           LPWSAOVERLAPPED overlapped,
-                                           DWORD inFlags) {
-        if (error != 0) {
-          qDebug("I/O operation failed with error %d\n", (int) error);
-          return;
-        }
-
-        char* buff = (char*) overlapped->hEvent;
-        free(buff);
-        free(overlapped);
-    }
+    virtual void send(PMSG pMsg);
 };
 
 #endif // UDPSOCKET_H

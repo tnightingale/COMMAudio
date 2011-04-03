@@ -28,10 +28,10 @@ Workstation::Workstation(MainWindow* mainWindow)
     tcpSocket_->open(QIODevice::ReadWrite);
 
     // Connect signal and slot for processing a new connection
-    connect(tcpSocket_, SIGNAL(signalClientConnected(TCPSocket*)),
-            this, SLOT(processConnection(TCPSocket*)));
-    connect(tcpSocket_, SIGNAL(signalDataReceived(TCPSocket*)),
-            this, SLOT(decodeControlMessage(TCPSocket*)));
+    connect(tcpSocket_, SIGNAL(signalClientConnected(Socket*)),
+            this, SLOT(processConnection(Socket*)));
+    connect(tcpSocket_, SIGNAL(signalDataReceived(Socket*)),
+            this, SLOT(decodeControlMessage(Socket*)));
 
     // Connect signal and slot for WSA events.
     udpSocket_ = new UDPSocket(mainWindow->winId());
@@ -51,9 +51,7 @@ Workstation::Workstation(MainWindow* mainWindow)
     }
 
     tcpSocket_->moveToThread(socketThread_);
-
     socketThread_->start();
-
 }
 
 Workstation::~Workstation() {
@@ -62,13 +60,10 @@ Workstation::~Workstation() {
     // Should delete the current transfers map here too?
 }
 
-void Workstation::sendFile(TCPSocket* socket)
+void Workstation::sendFile(Socket *socket, QByteArray *data)
 {
-    // Get file name from packet
-    QByteArray packet = socket->readAll();
-
     // Create file name
-    QDataStream fileNameStream(&packet, QIODevice::ReadOnly);
+    QDataStream fileNameStream(&(*data), QIODevice::ReadOnly);
     QString fileName;
     fileNameStream >> fileName;
 
@@ -79,17 +74,16 @@ void Workstation::sendFile(TCPSocket* socket)
         return;
     }
 
-    // Stream in the file and stream it out into a byte array
-    QDataStream in(&file);
-    QByteArray byteArray;
-    QDataStream out(&byteArray, QIODevice::WriteOnly);
-    out << in;
+    // Read file into a byte array for sending
+    QByteArray packet = file.readAll();
 
     // Create the control packet
-    byteArray.append('\n');
+    int length = packet.size();
+    QByteArray len((const char *)&length, sizeof(int));
+    packet.insert(0, len);
 
     // Send our file to the other client
-    socket->write(byteArray);
+    socket->write(packet);
 }
 
 void Workstation::acceptVoiceChat()
@@ -122,22 +116,19 @@ void Workstation::connectToServer()
 
 void Workstation::requestFile(QString ip, short port, QString songPath)
 {
-    qDebug("Workstation::requestFileList(); Requesting File");
-
     // Create the socket
     TCPSocket *requestSocket = new TCPSocket(mainWindowPointer_->winId());
     connect(mainWindowPointer_, SIGNAL(signalWMWSASyncTCPRx(int,int)),
             requestSocket, SLOT(slotProcessWSAEvent(int,int)));
+
     // Connect to a remote host
     if (!requestSocket->connectRemote(ip, port)) {
         qDebug("Workstation::requestFile(); Failed to connect to remote.");
         return;
     }
 
-    qDebug("Workstation::requestFileList(); Assuming connection suceeded!.");
-
-    requestSocket->moveToThread(socketThread_);
     requestSocket->open(QIODevice::ReadWrite);
+    requestSocket->moveToThread(socketThread_);
 
     // Convert the file path into a byte array via a stream.
     QByteArray byteArray;
@@ -145,23 +136,18 @@ void Workstation::requestFile(QString ip, short port, QString songPath)
     stream << songPath;
 
     // Create the control packet
-
-
     byteArray.insert(0, FILE_TRANSFER);
-
     byteArray.append('\n');
 
-    // Send our own file list to the other client
+    // Send the file path to the client
     requestSocket->write(byteArray);
 
-    qDebug("Workstation::requestFile(); Sent file");
+    // Put the transfer into the current transfer map
+    currentTransfers.insert(requestSocket, new FileData(this, songPath, port));
 
-    // Put the socket into the current transfers map
-    currentTransfers.insert(requestSocket, new FileData(this, port));
-
-    // Connect the signal for receiving the other client's file list
-    connect(requestSocket, SIGNAL(signalDataReceived(TCPSocket*)),
-            this, SLOT(receiveFileController(TCPSocket*)));
+    // Connect the signal for receiving the file
+    connect(requestSocket, SIGNAL(signalDataReceived(Socket*)),
+            this, SLOT(receiveFileController(Socket*)));
 }
 
 /*
@@ -187,22 +173,19 @@ void Workstation::requestFile(QString ip, short port, QString songPath)
 */
 void Workstation::requestFileList(QString ip, short port)
 {
-    qDebug("Workstation::requestFileList(); Requesting file list.");
-
     // Create the socket
     TCPSocket *requestSocket = new TCPSocket(mainWindowPointer_->winId());
     connect(mainWindowPointer_, SIGNAL(signalWMWSASyncTCPRx(int,int)),
             requestSocket, SLOT(slotProcessWSAEvent(int,int)));
+
     // Connect to a remote host
     if (!requestSocket->connectRemote(ip, port)) {
         qDebug("Workstation::requestFileList(); Failed to connect to remote.");
         return;
     }
 
-    qDebug("Workstation::requestFileList(); Assuming connection suceeded!.");
-
-    requestSocket->moveToThread(socketThread_);
     requestSocket->open(QIODevice::ReadWrite);
+    requestSocket->moveToThread(socketThread_);
 
     // Get our local file list and convert it to a data stream
     QStringList fileList = mainWindowPointer_->getLocalFileList();
@@ -210,28 +193,22 @@ void Workstation::requestFileList(QString ip, short port)
     QDataStream stream(&byteArray, QIODevice::WriteOnly);
     stream << fileList.toSet();
 
-    /* Stream out test
-    QDataStream s(&byteArray, QIODevice::ReadOnly);
-    QSet<QString> test;
-    QStringList temp;
-    s >> temp;
-//*/
     // Create the control packet
     byteArray.insert(0, FILE_LIST);
+    short myPort = tcpSocket_->getPort();
+    QByteArray portArray((const char *)&myPort, sizeof(short));
+    byteArray.insert(1, portArray);
     byteArray.append('\n');
 
     // Send our own file list to the other client
     requestSocket->write(byteArray);
 
-
-    qDebug("Workstation::requestFileList(); Sent file list");
-
     // Put the socket into the current transfers map
     currentTransfers.insert(requestSocket, new FileData(this,port));
 
     // Connect the signal for receiving the other client's file list
-    connect(requestSocket, SIGNAL(signalDataReceived(TCPSocket*)),
-            this, SLOT(requestFileListController(TCPSocket*)));
+    connect(requestSocket, SIGNAL(signalDataReceived(Socket*)),
+            this, SLOT(requestFileListController(Socket*)));
 }
 
 /*
@@ -253,10 +230,8 @@ void Workstation::requestFileList(QString ip, short port)
 -- The function gets called when a new connection is established. It connects
 -- the socket's receive signal to the workstation's decode message function.
 */
-void Workstation::processConnection(TCPSocket* socket)
+void Workstation::processConnection(Socket* socket)
 {
-    qDebug("Workstation::processConnection(); processing connection.");
-
     // Connect the socket to the window's message loop.
     if (!connect(mainWindowPointer_, SIGNAL(signalWMWSASyncTCPRx(int, int)),
                  socket, SLOT(slotProcessWSAEvent(int, int)))) {
@@ -288,50 +263,48 @@ void Workstation::processConnection(TCPSocket* socket)
 -- the correct corresponding transfer function to deal with the rest of the
 -- transfer.
 */
-void Workstation::decodeControlMessage(TCPSocket *socket)
+void Workstation::decodeControlMessage(Socket *socket)
 {
-    qDebug("Workstation::decodeControlMessage(); Decoding...");
-
     // Disconnect from decode control message
-    disconnect(socket, SIGNAL(signalDataReceived(TCPSocket*)),
-               this, SLOT(decodeControlMessage(TCPSocket*)));
+    disconnect(socket, SIGNAL(signalDataReceived(Socket*)),
+               tcpSocket_, SIGNAL(signalDataReceived(Socket*)));
 
     // Read and store the first byte for the control message
     QByteArray messageType = socket->read(1);
+    // TODO: For some reason we seem to receive a bunch of '\0' chars before the
+    //       SIGNAL(signalDataReceived()) is disconnected. The sanity check
+    //       and return; below shouldn't be necessary. It is just a bandaid fix
+    //       and doesn't actually solve the problem. However, at the end of the
+    //       day, sending extra NULL data is the least of our concerns.
+    if (messageType.size() == 0) {
+        return;
+    }
 
     // Check for type of message
     switch (messageType.at(0))
     {
     case FILE_LIST:
         // Connect the signal in case we receive more data
-        connect(socket, SIGNAL(signalDataReceived(TCPSocket*)),
-                this, SLOT(receiveFileListController(TCPSocket*)));
+        connect(socket, SIGNAL(signalDataReceived(Socket*)),
+                this, SLOT(receiveFileListController(Socket*)));
+        // Create transfer object
+        currentTransfers.insert(socket, new FileData());
         // Call function now to deal with rest of packet
-        currentTransfers.insert(socket, new FileData);
         receiveFileListController(&(*socket));
         break;
     case FILE_TRANSFER:
-        //shouldnt this be sending a file back not receiving one?
-        //should take rest of data -> songName
-        //no need to listen for more data on this socket.
-        connect (socket, SIGNAL(signalDataReceived(TCPSocket*)),
-                 this, SLOT( decodeControlMessage(TCPSocket*)));
+        // Connect the signal in case we receive more data
+        connect(socket, SIGNAL(signalDataReceived(Socket*)),
+                this, SLOT(sendFileController(Socket*)));
         currentTransfers.insert(socket, new FileData);
-        sendFile(&(*socket));
-        /*
-        // Connect the signal for the type of transfer
-        connect(socket, SIGNAL(signalDataReceived(TCPSocket*)),
-                this, SLOT(receiveFileController(TCPSocket*)));
-        // Call function now to deal with rest of packet
-        currentTransfers.insert(socket, new FileData);
-        receiveFileController(&(*socket));*/
+        sendFileController(&(*socket));
         break;
     case VOICE_CHAT:
         // Connect to voice chat here
         break;
     default:
         // Since the message is not recognized, close the connection
-        delete socket;
+        //socket->deleteLater();
         break;
     }
 }
@@ -341,47 +314,44 @@ void Workstation::receiveUDP()
 
 }
 
-void Workstation::receiveFileController(TCPSocket* socket)
+void Workstation::sendFileController(Socket *socket)
 {
-    qDebug("Workstation::requestFileController(); Receiving other file");
     // Read the packet from the socket
     QByteArray packet = socket->readAll();
 
     // If processing is finished
-    if(processReceivingFile(&(*socket), &packet))
+    if (processReceivingFileRequest(&(*socket), &packet))
     {
         // Disconnect this slot from the received packet signal
-        disconnect(socket, SIGNAL(signalDataReceived(TCPSocket*)),
-                   this, SLOT(requestFileListController(TCPSocket*)));
-
-        // Close the socket
-        delete socket;
+        disconnect(socket, SIGNAL(signalDataReceived(Socket*)),
+                   this, SLOT(sendFileController(Socket*)));
     }
 }
 
-bool Workstation::processReceivingFile(TCPSocket* socket, QByteArray* packet)
+bool Workstation::processReceivingFileRequest(Socket *socket, QByteArray *packet)
 {
-    bool isFileListTransferComplete = false;
+    bool isReceivingFileRequestFinished = false;
 
-    // Check to see if this is the last packet
-    if (*packet[packet->length() - 1] == '\n')
+    if (packet->at(packet->length() - 1) == '\n')
     {
-
         // Get rid of the newline character
         packet->truncate(packet->length() - 1);
 
         FileData *fileData = currentTransfers.value(socket);
+
         // Append any new data to any existing data
         fileData->append(*packet);
 
-        // Write the all the data to the file
-        fileData->writeToFile();
+        // Send the file
+        sendFile(socket, &(fileData->getData()));
 
         // Remove the file transfer
+        // Not sure if we can do this right after sending the data, this might
+        // destroy the socket?
         currentTransfers.remove(socket);
 
         // Since processing of the transfer is complete, return true
-        isFileListTransferComplete = true;
+        isReceivingFileRequestFinished = true;
     }
     else
     {
@@ -390,10 +360,86 @@ bool Workstation::processReceivingFile(TCPSocket* socket, QByteArray* packet)
         fileData->append(*packet);
 
         // Since the transfer is not yet complete, return false
-        isFileListTransferComplete = false;
+        isReceivingFileRequestFinished = false;
     }
-    return isFileListTransferComplete;
 
+    return isReceivingFileRequestFinished;
+}
+
+void Workstation::receiveFileController(Socket *socket)
+{
+    // TODO: PLEASE READ ME:
+    // Because we use readAll() to read data from the socket, it is quite
+    // possible for us to read two or more packets worth of data from the
+    // socket. This causes a problem as this method gets called once for
+    // EVERY packet received. This leads to the possibility that we have
+    // already read the entire file from the socket and quite likely deleted
+    // the socket already, leaving the *socket parameter passed into this
+    // method a segfaulting monster! Fortunately we track our sockets in the
+    // currentTransfers map and can very easily validate the *socket.
+    if (!currentTransfers.contains(socket)) {
+        return;
+    }
+
+    // Read the packet from the socket
+    QByteArray packet = socket->readAll();
+
+    // TODO: PLEASE READ ME:
+    // This is ensuring that we haven't read a bunch of NULLs off the socket.
+    // (This does actually seem to occur sometimes, please see the beginning of
+    // decodeControlMessage() for details.
+    if (packet.size() == 0) {
+        return;
+    }
+
+    // If processing is finished
+    if(processReceivingFile(&(*socket), &packet))
+    {
+        // Disconnect this slot from the received packet signal
+        if (!disconnect(socket, SIGNAL(signalDataReceived(Socket*)),
+                   this, SLOT(receiveFileController(Socket*)))) {
+        }
+
+        // Close the socket
+        socket->deleteLater();
+    }
+}
+
+bool Workstation::processReceivingFile(Socket* socket, QByteArray* packet)
+{
+    bool isFileListTransferComplete = false;
+
+    // Get the file data object for this transfer
+    FileData *fileData = currentTransfers.value(socket);
+
+    // Check to see if we have the size of the packet yet (first packet)
+    if (fileData->getTotalSize() == 0)
+    {
+        // Get the first eight bytes, convert them to a long long, remove them
+        // from the packet and set the length in the file data
+        QByteArray length = packet->left(4);
+        int packetLength;
+        memcpy(&packetLength, length, sizeof(int));
+        *packet = packet->right(packet->size() - 4);
+        fileData->setTotalSize(packetLength);
+    }
+
+    // Append any new data to any existing data
+    fileData->append(*packet);
+
+    // Check to see if we have received all the data
+    if (fileData->transferComplete())
+    {
+        // Write all the data to disk
+        fileData->writeToFile();
+
+        // Remove the file transfer
+        currentTransfers.remove(socket);
+
+        isFileListTransferComplete = true;
+    }
+
+    return isFileListTransferComplete;
 }
 
 /*
@@ -417,9 +463,23 @@ bool Workstation::processReceivingFile(TCPSocket* socket, QByteArray* packet)
 -- the list has been received the function returns true, or if there is more
 -- data expected, false.
 */
-bool Workstation::processReceivingFileList(TCPSocket *socket, QByteArray *packet)
+bool Workstation::processReceivingFileList(Socket *socket, QByteArray *packet)
 {
     bool isFileListTransferComplete = false;
+
+    // Get the file transfer object
+    FileData *fileData = currentTransfers.value(socket);
+
+    // Check to see if this is the first packet
+    if (fileData->getPort() == 0)
+    {
+        QByteArray portArray = packet->left(2);
+        short port;
+        memcpy(&port, portArray, sizeof(short));
+        *packet = packet->right(packet->size() - 2);
+        fileData->setPort(port);
+    }
+
     // Check to see if this is the last packet
     if (packet->at(packet->length() - 1) == '\n')
     {
@@ -428,7 +488,6 @@ bool Workstation::processReceivingFileList(TCPSocket *socket, QByteArray *packet
 
         QStringList fileList;
 
-        FileData *fileData = currentTransfers.value(socket);
         // Append any new data to any existing data
         fileData->append(*packet);
 
@@ -453,9 +512,6 @@ bool Workstation::processReceivingFileList(TCPSocket *socket, QByteArray *packet
     else
     {
         // Append newly received data
-
-        FileData *fileData = currentTransfers.value(socket);
-
         fileData->append(*packet);
 
         // Since the transfer is not yet complete, return false
@@ -483,7 +539,7 @@ bool Workstation::processReceivingFileList(TCPSocket *socket, QByteArray *packet
 -- This function is the controller function for the server side file list
 -- transfer. It receives a file list and then sends its own.
 */
-void Workstation::receiveFileListController(TCPSocket *socket)
+void Workstation::receiveFileListController(Socket *socket)
 {
     // Read the packet from the socket
     QByteArray packet = socket->readAll();
@@ -492,8 +548,8 @@ void Workstation::receiveFileListController(TCPSocket *socket)
     if(processReceivingFileList(&(*socket), &packet))
     {
         // Disconnect this slot from the received packet signal
-        disconnect(socket, SIGNAL(signalDataReceived(TCPSocket*)),
-                   this, SLOT(receiveFileListController(TCPSocket*)));
+        disconnect(socket, SIGNAL(signalDataReceived(Socket*)),
+                   this, SLOT(receiveFileListController(Socket*)));
 
         // Send our own file list to the other client
         QStringList fileList = mainWindowPointer_->getLocalFileList();
@@ -528,19 +584,24 @@ void Workstation::receiveFileListController(TCPSocket *socket)
 -- This function is the controller function for the client side file list
 -- transfer. It receives a file list and then disconnects.
 */
-void Workstation::requestFileListController(TCPSocket *socket)
+void Workstation::requestFileListController(Socket *socket)
 {
-    qDebug("Workstation::requestFileListController(); Receiving other file list");
-    // Read the packet from the socket
+    // TODO: There is a possiblility that for REALLY long filelists socket will
+    //       have been deleted. This should be investigated further.
+    //       See receiveFileController() for details.)
+    if (!currentTransfers.contains(socket)) {
+        return;
+    }
 
+    // Read the packet from the socket
     QByteArray packet = socket->readAll();
 
     // If processing is finished
     if(processReceivingFileList(&(*socket), &packet))
     {
         // Disconnect this slot from the received packet signal
-        disconnect(socket, SIGNAL(signalDataReceived(TCPSocket*)),
-                   this, SLOT(requestFileListController(TCPSocket*)));
+        disconnect(socket, SIGNAL(signalDataReceived(Socket*)),
+                   this, SLOT(requestFileListController(Socket*)));
 
         // Close the socket
         delete socket;
