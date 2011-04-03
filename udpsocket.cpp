@@ -46,6 +46,21 @@ bool UDPSocket::open(OpenMode mode) {
     return QIODevice::open(mode);
 }
 
+void UDPSocket::setDest(QString hostAddr, size_t port) {
+    int err = 0;
+    PHOSTENT host;
+
+    if ((host = gethostbyname(hostAddr.toAscii().constData())) == NULL) {
+        err = GetLastError();
+        qDebug("UDPSocket::setDest(): Unknown server address. Error: %d.", err);
+        return;
+    }
+
+    memcpy((char*) &serverSockAddrIn_.sin_addr, host->h_addr, host->h_length);
+    serverSockAddrIn_.sin_family = AF_INET;
+    serverSockAddrIn_.sin_port = htons(port);
+}
+
 void UDPSocket::send(PMSG pMsg) {
     int err = 0;
     int result = 0;
