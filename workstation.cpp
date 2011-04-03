@@ -89,7 +89,8 @@ void Workstation::sendFile(TCPSocket *socket, QByteArray *data)
     */
 
     // Send our file to the other client
-    socket->write(packet);
+    int test = socket->write(packet);
+    return;
 }
 
 void Workstation::acceptVoiceChat()
@@ -411,10 +412,6 @@ bool Workstation::processReceivingFile(TCPSocket* socket, QByteArray* packet)
 {
     bool isFileListTransferComplete = false;
 
-    // Check to see if this is the last packet
-    // TODO: DANGER!!! WE CANNOT ASSUME THAT AN AUDIO FILE WILL *NOT* CONTAIN
-    //       '\n's!!!!! NEED TO COME UP WITH AN ALTERNATIVE APPROACH.
-
     // Get the file data object for this transfer
     FileData *fileData = currentTransfers.value(socket);
 
@@ -423,10 +420,10 @@ bool Workstation::processReceivingFile(TCPSocket* socket, QByteArray* packet)
     {
         // Get the first eight bytes, convert them to a long long, remove them
         // from the packet and set the length in the file data
-        QByteArray length = packet->left(8);
+        QByteArray length = packet->left(4);
         int packetLength;
         memcpy(&packetLength, length, sizeof(int));
-        *packet = packet->right(packet->size() - 8);
+        *packet = packet->right(packet->size() - 4);
         fileData->setTotalSize(packetLength);
     }
 

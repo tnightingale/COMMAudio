@@ -3,21 +3,25 @@
 FileData::FileData(QObject *parent) :
     QObject(parent)
 {
+    totalSize_ = 0;
 }
 
 FileData::FileData(QObject *parent, QString path, short port) : QObject(parent){
     port_ = port;
     path_ = path;
+    totalSize_ = 0;
 }
 
 FileData::FileData(QObject *parent, short port) : QObject(parent){
     port_ = port;
+    totalSize_ = 0;
 }
 
 FileData::FileData(QObject *parent, QString path, QByteArray data, short port) : QObject(parent){
     path_ = path;
     data_ = data;
     port_ = port;
+    totalSize_ = 0;
 }
 
 bool FileData::writeToFile() {
