@@ -580,6 +580,10 @@ void Workstation::requestFileListController(TCPSocket *socket)
     // TODO: There is a possiblility that for REALLY long filelists socket will
     //       have been deleted. This should be investigated further.
     //       See receiveFileController() for details.)
+    if (!currentTransfers.contains(socket)) {
+        return;
+    }
+
     // Read the packet from the socket
     QByteArray packet = socket->readAll();
 
