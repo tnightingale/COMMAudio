@@ -7,7 +7,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     slider_(0),
-    muted_(false)
+    muted_(false),
+    voiceCallActive_(FALSE)
 {
     ui->setupUi(this);
     this->setFixedSize(861,598);
@@ -403,6 +404,13 @@ QStringList MainWindow::getLocalFileList()
 
 void MainWindow::on_talkButton_pressed()
 {
+    if (!voiceCallActive_) {
+        if (joinServer_.exec() != QDialog::Accepted) {
+            return;
+        }
+        emit initiateVoiceStream(joinServer_.getPort(), joinServer_.getIp());
+        voiceCallActive_ = TRUE;
+    }
     player_->startMic();
 }
 

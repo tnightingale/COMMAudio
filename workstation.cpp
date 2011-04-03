@@ -37,6 +37,8 @@ Workstation::Workstation(MainWindow* mainWindow)
     udpSocket_ = new UDPSocket(mainWindow->winId());
     connect(mainWindow, SIGNAL(signalWMWSASyncUDPRx(int, int)),
             udpSocket_, SLOT(slotProcessWSAEvent(int, int)));
+    connect(mainWindow, SIGNAL(initiateVoiceStream(short, QString)),
+            this, SLOT(startVoiceStream(short, QString)));
 
     // Connect the GUI button signals to the functions in here
     connect(mainWindow, SIGNAL(requestPlaylist(QString, short)),
@@ -58,6 +60,46 @@ Workstation::~Workstation() {
     delete tcpSocket_;
     delete udpSocket_;
     // Should delete the current transfers map here too?
+}
+
+void Workstation::startVoiceStream(short port, QString hostAddr) {
+    qDebug("Workstation::startVoiceStream(); Starting voice chat...");
+    // Create the socket
+    TCPSocket* controlSocket = new TCPSocket(mainWindowPointer_->winId());
+    connect(mainWindowPointer_, SIGNAL(signalWMWSASyncTCPRx(int,int)),
+            controlSocket, SLOT(slotProcessWSAEvent(int,int)));
+
+    // Connect to a remote host
+    if (!controlSocket->connectRemote(hostAddr, port)) {
+        qDebug("Workstation::startVoiceStream(); Failed to connect to remote.");
+        return;
+    }
+
+    controlSocket->open(QIODevice::ReadWrite);
+    controlSocket->moveToThread(socketThread_);
+
+    // Create the control packet
+    QByteArray packet;
+    packet.insert(0, VOICE_CHAT);
+    packet.append(QByteArray().setNum((udpSocket_->getPort())));
+
+    // Send the file path to the client
+    controlSocket->write(packet);
+
+    // Put the transfer into the current transfer map
+    //currentTransfers.insert(controlSocket, new FileData(this, port));
+
+    // Connect the signal for receiving the file
+    connect(controlSocket, SIGNAL(signalSocketClosed()),
+            this, SLOT(stopVoiceStream()));
+
+    udpSocket_->setDest(hostAddr, port);
+    AudioComponent* player = mainWindowPointer_->getAudioPlayer();
+    player->startMic(udpSocket_);
+}
+
+void Workstation::stopVoiceStream() {
+    qDebug("Workstation::stopVoiceStream(); Called.");
 }
 
 void Workstation::sendFile(Socket *socket, QByteArray *data)

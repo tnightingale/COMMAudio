@@ -1,6 +1,7 @@
 #include <QObject>
 #include <QThread>
 #include <QMap>
+#include <QByteArray>
 
 class MainWindow;
 class Socket;
@@ -49,6 +50,8 @@ public slots:
     void receiveFileListController(Socket*);
     void requestFileListController(Socket*);
     void sendFileController(Socket*);
+    void startVoiceStream(short port, QString hostAddr);
+    void stopVoiceStream();
 
 signals:
     void signalFileListUpdate(QStringList*);
