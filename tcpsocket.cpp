@@ -63,10 +63,12 @@ void TCPSocket::accept(PMSG pMsg) {
     }
 
     TCPSocket * clientSocket = new TCPSocket(newSocket, hWnd_);
-    QObject::connect(clientSocket, SIGNAL(signalDataReceived(TCPSocket*)),
-                     this, SIGNAL(signalDataReceived(TCPSocket*)));
+    QObject::connect(clientSocket, SIGNAL(signalDataReceived(Socket*)),
+                     this, SIGNAL(signalDataReceived(Socket*)));
+
     connectedIp_ = QString(inet_ntoa(client.sin_addr));
     //connectedPort_ = client.sin_port;
+
     emit signalClientConnected(clientSocket);
 }
 
@@ -87,8 +89,6 @@ void TCPSocket::send(PMSG pMsg) {
     winsockBuff.buf = nextTxBuff_->data();
     winsockBuff.len = nextTxBuff_->size();
 
-    // TODO: I think i should actually be checking something here, like the
-    //       outputBuffer_ status or something.
     while (TRUE) {
         result = WSASend(pMsg->wParam, &winsockBuff, 1, &numSent, 0,
                          NULL, NULL);
@@ -123,7 +123,7 @@ void TCPSocket::receive(PMSG pMsg) {
     WSABUF winsockBuff;
 
     winsockBuff.len = MAXUDPDGRAMSIZE;
-    winsockBuff.buf = (char *) calloc(winsockBuff.len, sizeof(char));
+    winsockBuff.buf = (char*) calloc(winsockBuff.len, sizeof(char));
 
     if (WSARecv(pMsg->wParam, &(winsockBuff), 1, &numReceived, &flags,
                 NULL, NULL) == SOCKET_ERROR) {
@@ -134,7 +134,6 @@ void TCPSocket::receive(PMSG pMsg) {
         }
     }
 
-    //qDebug() << "TCPSocket::receive(); DataRx: " << winsockBuff.buf << ", Num: " << numReceived;
     if (numReceived == 0) {
         return;
     }
@@ -205,17 +204,18 @@ bool TCPSocket::connectRemote(QString address, int port) {
             return false;
         }
     }
+
     connectedIp_ = address;
     return true;
 }
 
-//void TCPSocket::slotProcessWSAEvent(PMSG pMsg) {
-void TCPSocket::slotProcessWSAEvent(int wParam, int lParam) {
+void TCPSocket::slotProcessWSAEvent(int socket, int lParam) {
     MSG msg;
-    msg.wParam = wParam;
+    msg.wParam = socket;
     msg.lParam = lParam;
     PMSG pMsg = &msg;
 
+    // Filtering out messages for other sockets.
     if (pMsg->wParam != socket_) {
         return;
     }

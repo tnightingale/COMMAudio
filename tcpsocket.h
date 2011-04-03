@@ -65,26 +65,6 @@ public:
      */
     bool connectRemote(QString address, int port);
 
-    /**
-     * Returns the connected IP address of the socket.
-     *
-     * @author Luke Queenan
-     */
-    QString getIp()
-    {
-        return connectedIp_;
-    }
-
-    /**
-     * Returns the connected port of the socket.
-     *
-     * @author Luke Queenan
-     */
-    short getPort()
-    {
-        return connectedPort_;
-    }
-
 signals:
     /**
      *
@@ -92,16 +72,7 @@ signals:
      *
      * @author Tom Nightingale
      */
-    void signalClientConnected(TCPSocket * clientSocket);
-
-    /**
-     *
-     * @param socket
-     * @param buffer
-     *
-     * @author Tom Nightingale
-     */
-    void signalDataReceived(TCPSocket *tcpSocket);
+    void signalClientConnected(Socket * clientSocket);
 
 public slots:
     /**
@@ -114,8 +85,6 @@ public slots:
     void slotProcessWSAEvent(int, int);
 
 private:
-    QString connectedIp_;
-    short connectedPort_;
 };
 
 #endif // TCPSOCKET_H
