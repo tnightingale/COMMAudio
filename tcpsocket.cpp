@@ -66,7 +66,7 @@ void TCPSocket::accept(PMSG pMsg) {
     QObject::connect(clientSocket, SIGNAL(signalDataReceived(TCPSocket*)),
                      this, SIGNAL(signalDataReceived(TCPSocket*)));
     connectedIp_ = QString(inet_ntoa(client.sin_addr));
-    connectedPort_ = client.sin_port;
+    //connectedPort_ = client.sin_port;
     emit signalClientConnected(clientSocket);
 }
 
@@ -178,6 +178,7 @@ bool TCPSocket::listen(int port) {
         return false;
     }
 
+    connectedPort_ = port;
     return true;
 }
 
@@ -205,7 +206,6 @@ bool TCPSocket::connectRemote(QString address, int port) {
         }
     }
     connectedIp_ = address;
-    connectedPort_ = port;
     return true;
 }
 

@@ -195,7 +195,8 @@ void Workstation::requestFileList(QString ip, short port)
 
     // Create the control packet
     byteArray.insert(0, FILE_LIST);
-    QByteArray portArray((const char *)&port, sizeof(port));
+    short myPort = tcpSocket_->getPort();
+    QByteArray portArray((const char *)&myPort, sizeof(short));
     byteArray.insert(1, portArray);
     byteArray.append('\n');
 
@@ -475,7 +476,7 @@ bool Workstation::processReceivingFileList(TCPSocket *socket, QByteArray *packet
         QByteArray portArray = packet->left(2);
         short port;
         memcpy(&port, portArray, sizeof(short));
-        *packet = packet->right(packet->size() - 4);
+        *packet = packet->right(packet->size() - 2);
         fileData->setPort(port);
     }
 
