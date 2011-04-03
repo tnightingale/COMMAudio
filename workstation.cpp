@@ -108,7 +108,8 @@ void Workstation::acceptVoiceChat(Socket *socket)
     // Get the user's response
     if (mainWindowPointer_->requestVoiceChat(ip))
     {
-        // Create the voice connection here
+        AudioComponent *audio = mainWindowPointer_->getAudioPlayer();
+        audio->startMic(udpSocket_);
     }
     else
     {
