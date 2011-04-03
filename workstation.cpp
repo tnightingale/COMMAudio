@@ -79,7 +79,14 @@ void Workstation::sendFile(TCPSocket *socket, QByteArray *data)
     QByteArray packet = file.readAll();
 
     // Create the control packet
-    packet.append('\n');
+    long long length = packet.size();
+    QByteArray len((const char *)&length, sizeof(long long));
+    packet.insert(0, len);
+
+    /* Test for retrieving length
+    long long test;
+    memcpy(&test, len, sizeof(long long));
+    */
 
     // Send our file to the other client
     socket->write(packet);
@@ -341,6 +348,8 @@ bool Workstation::processReceivingFileRequest(TCPSocket *socket, QByteArray *pac
         sendFile(socket, &(fileData->getData()));
 
         // Remove the file transfer
+        // Not sure if we can do this right after sending the data, this might
+        // destroy the socket?
         currentTransfers.remove(socket);
 
         // Since processing of the transfer is complete, return true
