@@ -23,7 +23,7 @@ public:
     void setpath(QString path) {
         path_ = path;
     }
-    QString getname() {
+    QString getPath() {
         return path_;
     }
     void setData(QByteArray data) {

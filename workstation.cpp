@@ -310,7 +310,7 @@ void Workstation::decodeControlMessage(TCPSocket *socket)
         break;
     default:
         // Since the message is not recognized, close the connection
-        socket->deleteLater();
+        //socket->deleteLater();
         break;
     }
 }
@@ -331,9 +331,6 @@ void Workstation::sendFileController(TCPSocket *socket)
         // Disconnect this slot from the received packet signal
         disconnect(socket, SIGNAL(signalDataReceived(TCPSocket*)),
                    this, SLOT(sendFileController(TCPSocket*)));
-
-        // Close the socket
-        delete socket;
     }
 }
 
@@ -352,7 +349,7 @@ bool Workstation::processReceivingFileRequest(TCPSocket *socket, QByteArray *pac
         fileData->append(*packet);
 
         // Send the file
-        sendFile(socket, packet);
+        sendFile(socket, &(fileData->getData()));
 
         // Remove the file transfer
         //currentTransfers.remove(socket);
