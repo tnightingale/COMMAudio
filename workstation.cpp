@@ -86,9 +86,30 @@ void Workstation::sendFile(Socket *socket, QByteArray *data)
     socket->write(packet);
 }
 
-void Workstation::acceptVoiceChat()
+void Workstation::acceptVoiceChat(Socket *socket)
 {
+    QString ip;
+    QByteArray data;
+    QByteArray packet;
+    short port = 0;
 
+    // Read the packet
+    packet = socket->readAll();
+
+    // Get the port
+    data = packet.left(2);
+    memcpy(&port, data, sizeof(short));
+    packet = packet.right((packet.size() - 2));
+
+    // Get the ip
+    memcpy(&ip, data, sizeof(data));
+
+    // Get the user's response
+    if (mainWindowPointer_->requestVoiceChat(ip))
+    {
+        // Create the connection here
+    }
+    // Respond with something? Or just disconnect?
 }
 
 /*
@@ -300,7 +321,8 @@ void Workstation::decodeControlMessage(Socket *socket)
         sendFileController(&(*socket));
         break;
     case VOICE_CHAT:
-        // Connect to voice chat here
+        // Call the voice chat controller
+        acceptVoiceChat(socket);
         break;
     default:
         // Since the message is not recognized, close the connection
