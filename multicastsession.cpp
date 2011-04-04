@@ -1,4 +1,5 @@
 #include "multicastsession.h"
+#include "audiocomponent.h"
 
 MulticastSession::MulticastSession(UDPSocket* socket, QStringList* playlist)
 : multicastSocket_(socket), playlist_(playlist), timer_(new QTimer(this)), 
@@ -37,7 +38,8 @@ void MulticastSession::loadBuffer() {
 
 QByteArray* MulticastSession::generateBuffer() {
     QByteArray* tempArray = new QByteArray;
-
+    tempArray->append(header_);
+    tempArray->append(current_->read(1024*8))
     current_->close();
     current_->deleteLater();
     current_=NULL;
