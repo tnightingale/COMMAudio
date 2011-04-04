@@ -16,7 +16,7 @@
   <widget class="QProgressBar" name="downloadbar1">
    <property name="geometry">
     <rect>
-     <x>210</x>
+     <x>260</x>
      <y>30</y>
      <width>141</width>
      <height>23</height>
@@ -29,7 +29,7 @@
   <widget class="QProgressBar" name="downloadbar2">
    <property name="geometry">
     <rect>
-     <x>210</x>
+     <x>260</x>
      <y>70</y>
      <width>141</width>
      <height>23</height>
@@ -42,7 +42,7 @@
   <widget class="QProgressBar" name="downloadbar3">
    <property name="geometry">
     <rect>
-     <x>210</x>
+     <x>260</x>
      <y>110</y>
      <width>141</width>
      <height>23</height>
@@ -55,8 +55,8 @@
   <widget class="QProgressBar" name="downloadbar4">
    <property name="geometry">
     <rect>
-     <x>210</x>
-     <y>150</y>
+     <x>260</x>
+     <y>160</y>
      <width>141</width>
      <height>23</height>
     </rect>
@@ -68,7 +68,7 @@
   <widget class="QProgressBar" name="downloadbar5">
    <property name="geometry">
     <rect>
-     <x>210</x>
+     <x>260</x>
      <y>200</y>
      <width>141</width>
      <height>23</height>
@@ -83,7 +83,7 @@
     <rect>
      <x>30</x>
      <y>30</y>
-     <width>161</width>
+     <width>221</width>
      <height>31</height>
     </rect>
    </property>
@@ -93,7 +93,7 @@
     <rect>
      <x>30</x>
      <y>70</y>
-     <width>161</width>
+     <width>221</width>
      <height>31</height>
     </rect>
    </property>
@@ -103,7 +103,7 @@
     <rect>
      <x>30</x>
      <y>110</y>
-     <width>161</width>
+     <width>221</width>
      <height>31</height>
     </rect>
    </property>
@@ -113,7 +113,7 @@
     <rect>
      <x>30</x>
      <y>150</y>
-     <width>161</width>
+     <width>221</width>
      <height>31</height>
     </rect>
    </property>
@@ -123,7 +123,7 @@
     <rect>
      <x>30</x>
      <y>200</y>
-     <width>161</width>
+     <width>221</width>
      <height>31</height>
     </rect>
    </property>

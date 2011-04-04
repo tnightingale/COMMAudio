@@ -871,7 +871,12 @@ bool MainWindow::requestVoiceChat(QString fromIp)
 }
 
 void MainWindow::downloadStarted(int filesize, int packsizeRecv, QString file) {
-        downloads_.downloadFile(filesize, packsizeRecv, file);
+
+    QString songTitle;
+    int n = file.lastIndexOf('/');
+    int s = file.size() - n - 1;
+    songTitle = file.right(s);
+    downloads_.downloadFile(filesize, packsizeRecv, songTitle);
 }
 
 void MainWindow::on_viewDownloadButton_clicked()
