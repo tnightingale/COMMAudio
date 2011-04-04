@@ -12,6 +12,7 @@
 #include "ui_colors.h"
 #include "ui_joinserver.h"
 #include "remoteSong.h"
+#include "downloads.h"
 #include <QGraphicsView>
 #include <QGraphicsItem>
 #include <QTimeLine>
@@ -100,6 +101,7 @@ private:
     QStringList songList_;
     QStringList playlistData_;
     QMap<QString,RemoteSong> remoteList_;
+    Downloads downloads_;
 
 private slots:
     void playlistIndexChanged(int index);
@@ -135,7 +137,8 @@ private slots:
     void on_action_Song_triggered();
     void on_action_Tiger_triggered();
     void on_action_Default_triggered();
-    void downloadStarted(int filesize, int packsizeRecv);
+    void downloadStarted(int filesize, int packsizeRecv, QString file);
+    void on_viewDownloadButton_clicked();
 };
 
 #endif // MAINWINDOW_H

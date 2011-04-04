@@ -50,6 +50,8 @@ MainWindow::MainWindow(QWidget *parent) :
     // player->startMic();
 
     ui->remoteListWidget->setSortingEnabled(true);
+    //downloads_.exec();
+    //downloads_.hide();
     // ui->clientListWidget->setSortingEnabled(true);
     //working player code for wav files. will play following 3 files from internet in succession
 
@@ -532,6 +534,7 @@ void MainWindow::backgroundColor(QString background, QString font) {
     ui->clearPlaylistButton->setStyleSheet(button);
     ui->clearRemoteButton->setStyleSheet(button);
     ui->removeButton->setStyleSheet(button);
+    ui->viewDownloadButton->setStyleSheet(button);
     slider_->setStyleSheet(sliderMods);
     ui->horizontalSlider->setStyleSheet(sliderMods);
     ui->playlistWidget->setStyleSheet(border);
@@ -831,13 +834,13 @@ bool MainWindow::requestVoiceChat(QString fromIp)
     return false;
 }
 
-void MainWindow::downloadStarted(int filesize, int packsizeRecv) {
-    ui->downloadBar->setMaximum(filesize);
-    ui->downloadBar->setValue(ui->downloadBar->value() + packsizeRecv);
-    if(ui->downloadBar->value() == ui->downloadBar->maximum()) {
-            ui->downloadBar->reset();
-            ui->remoteListWidget->setDisabled(false);
-    }else if(ui->downloadBar->value() > 0) {
-        ui->remoteListWidget->setDisabled(true);
+void MainWindow::downloadStarted(int filesize, int packsizeRecv, QString file) {
+    if(downloads_.countCurrentDownloads() <= 5) {
+        downloads_.downloadFile(filesize, packsizeRecv, file);
     }
+}
+
+void MainWindow::on_viewDownloadButton_clicked()
+{
+    downloads_.show();
 }

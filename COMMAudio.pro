@@ -25,7 +25,8 @@ SOURCES  += main.cpp \
             audiocomponent.cpp \
             remoteSong.cpp \
             filedata.cpp \
-            colors.cpp
+            colors.cpp \
+    downloads.cpp
 
 HEADERS  += mainwindow.h \
             socket.h \
@@ -37,10 +38,12 @@ HEADERS  += mainwindow.h \
             audiocomponent.h \
             remoteSong.h \
             filedata.h \
-            colors.h
+            colors.h \
+    downloads.h
 
 FORMS    += mainwindow.ui \
             joinServer.ui \
-            colors.ui
+            colors.ui \
+    downloads.ui
 
 LIBS     += C:/Qt/2010.05/mingw/lib/libws2_32.a
