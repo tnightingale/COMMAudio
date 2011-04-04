@@ -189,13 +189,13 @@ void Workstation::sendFile(Socket *socket, QByteArray *data)
 
 void Workstation::acceptVoiceChat(Socket *socket)
 {
-    TCPSocket *mySocket = (TCPSocket*)socket;
+    voiceControlSocket_ = (TCPSocket*)socket;
     QString ip;
     QByteArray data;
     short port = 0;
 
     // Read the packet
-    QByteArray packet = mySocket->readAll();
+    QByteArray packet = voiceControlSocket_->readAll();
 
     // Get the port
     data = packet.left(2);
@@ -203,17 +203,29 @@ void Workstation::acceptVoiceChat(Socket *socket)
     //packet = packet.right((packet.size() - 2));
 
     // Get the ip
-    ip = mySocket->getIp();
+    ip = voiceControlSocket_->getIp();
 
     // Get the user's response
     if (mainWindowPointer_->requestVoiceChat(ip))
     {
         udpSocket_->open(QIODevice::ReadWrite);
+        udpSocket_->setDest(ip, port);
         // The user wants to voice chat
         AudioComponent *audio = mainWindowPointer_->getAudioPlayer();
         mainWindowPointer_->setVoiceCallActive(true);
+
         audio->playStream(udpSocket_);
         audio->startMic(udpSocket_);
+
+        // Connect signals
+        connect(voiceControlSocket_, SIGNAL(signalSocketClosed()),
+                this, SLOT(endVoiceStream()));
+        connect(mainWindowPointer_, SIGNAL(disconnectVoiceStream()),
+                this, SLOT(endVoiceStreamUser()));
+        connect(mainWindowPointer_, SIGNAL(voicePressed(AudioComponent*)),
+                this, SLOT(startVoice(AudioComponent*)));
+        connect(mainWindowPointer_, SIGNAL(voiceReleased(AudioComponent*)),
+                this, SLOT(stopVoice(AudioComponent*)));
     }
     else
     {
