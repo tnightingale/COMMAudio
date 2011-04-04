@@ -17,6 +17,8 @@ private:
     /**  */
     TCPSocket *tcpSocket_;
 
+    TCPSocket *voiceControlSocket_;
+
     /**  */
     UDPSocket *udpSocket_;
 
@@ -43,6 +45,7 @@ public slots:
     void connectToServer();
     void requestFile(QString, short, QString);
     void requestFileList(QString, short);
+    void endVoiceStreamUser();
     // Triggered by sockets
     void processConnection(Socket*);
     void decodeControlMessage(Socket*);
