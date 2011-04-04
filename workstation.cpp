@@ -91,9 +91,6 @@ void Workstation::initializeVoiceStream(short port, QString hostAddr) {
     // Send the file path to the client
     controlSocket->write(packet);
 
-    // Put the transfer into the current transfer map
-    //currentTransfers.insert(controlSocket, new FileData(this, port));
-
     // Connect the signal for receiving the file
     connect(controlSocket, SIGNAL(signalSocketClosed()),
             this, SLOT(endVoiceStream()));
