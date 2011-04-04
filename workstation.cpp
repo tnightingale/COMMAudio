@@ -510,6 +510,8 @@ bool Workstation::processReceivingFile(Socket* socket, QByteArray* packet)
         memcpy(&packetLength, length, sizeof(int));
         *packet = packet->right(packet->size() - 4);
         fileData->setTotalSize(packetLength);
+        connect(this, SIGNAL(signalFileProgress(int,int)),
+                mainWindowPointer_, SLOT(downloadStarted(int, int)));
     }
 
     // Append any new data to any existing data
@@ -526,7 +528,7 @@ bool Workstation::processReceivingFile(Socket* socket, QByteArray* packet)
 
         isFileListTransferComplete = true;
     }
-
+    emit signalFileProgress(fileData->getTotalSize(), packet->size());
     return isFileListTransferComplete;
 }
 

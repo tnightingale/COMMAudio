@@ -58,6 +58,7 @@ public slots:
 
 signals:
     void signalFileListUpdate(QStringList*);
+    void signalFileProgress(int, int);
 
 public:
     Workstation(MainWindow *mainWindow);
