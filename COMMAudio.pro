@@ -25,7 +25,8 @@ SOURCES  += main.cpp \
             audiocomponent.cpp \
             remoteSong.cpp \
             filedata.cpp \
-            colors.cpp
+            colors.cpp \
+            multicastsession.cpp
 
 HEADERS  += mainwindow.h \
             socket.h \
@@ -37,7 +38,8 @@ HEADERS  += mainwindow.h \
             audiocomponent.h \
             remoteSong.h \
             filedata.h \
-            colors.h
+            colors.h \
+            multicastsession.h
 
 FORMS    += mainwindow.ui \
             joinServer.ui \
