@@ -37,6 +37,9 @@ public:
     int getIndex();
     void testwav(QString fileName);
 
+    void writeToMulticast(QString fileName, QIODevice* socket);
+
+    void joinMulticast();
 private:
     QMediaPlayer* player_;
     QMediaPlaylist* playlist_;
@@ -52,10 +55,12 @@ QByteArray data;
     QBuffer* buffer_;
     QIODevice* buff;
     QBuffer* inputBuffer_;
-    QList<QByteArray> allBuffers_;
+    QList<QBuffer*> allBuffers_;
+    QList<QAudioFormat> allFormats_;
 signals:
 
 public slots:
+    void addFromMulticast(QIODevice* socket);
 void play();
 void pause();
 void stop();
