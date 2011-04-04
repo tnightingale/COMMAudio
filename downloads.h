@@ -2,10 +2,7 @@
 #define DOWNLOADS_H
 
 #include <QDialog>
-/*#include "mainwindow.h"
-#include "ui_mainwindow.h"
-class MainWindow;
-*/
+
 namespace Ui {
     class Downloads;
 }
@@ -23,7 +20,8 @@ public:
 
 private:
     Ui::Downloads *ui;
-   // Ui::MainWindow *mainPointer_;
+signals:
+    void queueFull(bool full);
 };
 
 #endif // DOWNLOADS_H

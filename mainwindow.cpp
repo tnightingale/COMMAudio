@@ -50,6 +50,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // player->startMic();
 
     ui->remoteListWidget->setSortingEnabled(true);
+    connect(&downloads_,SIGNAL(queueFull(bool)),this,SLOT(downloadQueueFull(bool)));
     //downloads_.exec();
     //downloads_.hide();
     // ui->clientListWidget->setSortingEnabled(true);
@@ -319,20 +320,22 @@ void MainWindow::on_remoteListWidget_itemDoubleClicked(QListWidgetItem* item)
 void MainWindow::on_playButton_clicked()
 {
 
-    if(ui->playButton->text() == "Pause") {
-        ui->playButton->setText("Play");
-        ui->playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
-        player_->pause();
-        timer_->setPaused(true);
-    } else {
-        ui->playButton->setText("Pause");
-        ui->playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPause));
-        player_->play();
-
-        if(ui->tabWidget->currentIndex() == 1) {
-            timer_->setPaused(false);
-        } else {
+    if(ui->playlistWidget->count() > 0) {
+        if(ui->playButton->text() == "Pause") {
+            ui->playButton->setText("Play");
+            ui->playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+            player_->pause();
             timer_->setPaused(true);
+        } else {
+            ui->playButton->setText("Pause");
+            ui->playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPause));
+            player_->play();
+
+            if(ui->tabWidget->currentIndex() == 1) {
+                timer_->setPaused(false);
+            } else {
+                timer_->setPaused(true);
+            }
         }
     }
 
@@ -429,46 +432,50 @@ void MainWindow::on_tabWidget_currentChanged(int index)
 
 void MainWindow::on_nextButton_clicked()
 {
-    int max = (ui->playlistWidget->count() - 1);
-    int current = ui->playlistWidget->currentIndex().row();
-    if(current == max) {
-        player_->gotoIndex(-1);
-        ui->playlistWidget->setCurrentRow(0);
-        ui->currentSongEditBox->setText(ui->playlistWidget->currentItem()->text());
-        ui->currentSongEditBox_2->setText(ui->playlistWidget->currentItem()->text());
-        player_->play();
-    } else {
-        player_->next();
-        if(playlist_->currentIndex() == 0) {
+    if(ui->playlistWidget->count() > 0) {
+        int max = (ui->playlistWidget->count() - 1);
+        int current = ui->playlistWidget->currentIndex().row();
+        if(current == max) {
+            player_->gotoIndex(-1);
+            ui->playlistWidget->setCurrentRow(0);
+            ui->currentSongEditBox->setText(ui->playlistWidget->currentItem()->text());
+            ui->currentSongEditBox_2->setText(ui->playlistWidget->currentItem()->text());
+            player_->play();
+        } else {
             player_->next();
+            if(playlist_->currentIndex() == 0) {
+                player_->next();
+            }
+            ui->playlistWidget->setCurrentRow(playlist_->currentIndex());
+            ui->currentSongEditBox->setText(ui->playlistWidget->currentItem()->text());
+            ui->currentSongEditBox_2->setText(ui->playlistWidget->currentItem()->text());
+            player_->play();
         }
-        ui->playlistWidget->setCurrentRow(playlist_->currentIndex());
-        ui->currentSongEditBox->setText(ui->playlistWidget->currentItem()->text());
-        ui->currentSongEditBox_2->setText(ui->playlistWidget->currentItem()->text());
-        player_->play();
     }
 }
 
 void MainWindow::on_previousButton_clicked()
 {
-    int max = (ui->playlistWidget->count() - 1);
-    int current = ui->playlistWidget->currentIndex().row();
-    if(current == 0) {
-        player_->gotoIndex(max);
-        ui->playlistWidget->setCurrentRow(max);
-        ui->currentSongEditBox->setText(ui->playlistWidget->currentItem()->text());
-        ui->currentSongEditBox_2->setText(ui->playlistWidget->currentItem()->text());
-        player_->play();
-    } else {
-        player_->previous();
-        if(playlist_->currentIndex() == -1) {
-            ui->playlistWidget->setCurrentRow(0);
+    if(ui->playlistWidget->count() > 0) {
+        int max = (ui->playlistWidget->count() - 1);
+        int current = ui->playlistWidget->currentIndex().row();
+        if(current == 0) {
+            player_->gotoIndex(max);
+            ui->playlistWidget->setCurrentRow(max);
+            ui->currentSongEditBox->setText(ui->playlistWidget->currentItem()->text());
+            ui->currentSongEditBox_2->setText(ui->playlistWidget->currentItem()->text());
+            player_->play();
         } else {
-            ui->playlistWidget->setCurrentRow(playlist_->currentIndex());
+            player_->previous();
+            if(playlist_->currentIndex() == -1) {
+                ui->playlistWidget->setCurrentRow(0);
+            } else {
+                ui->playlistWidget->setCurrentRow(playlist_->currentIndex());
+            }
+            ui->currentSongEditBox->setText(ui->playlistWidget->currentItem()->text());
+            ui->currentSongEditBox_2->setText(ui->playlistWidget->currentItem()->text());
+            player_->play();
         }
-        ui->currentSongEditBox->setText(ui->playlistWidget->currentItem()->text());
-        ui->currentSongEditBox_2->setText(ui->playlistWidget->currentItem()->text());
-        player_->play();
     }
 }
 
@@ -645,6 +652,8 @@ void MainWindow::updateMusicContent(QStringList currentSongs){
 void MainWindow::loadlastPlaylist() {
     QBuffer buffer;
     QByteArray data;
+    int size;
+    QString song;
     QString filename = QFileDialog::getOpenFileName(
             this,
             tr("Load Playlist"),
@@ -654,7 +663,11 @@ void MainWindow::loadlastPlaylist() {
     if(file.open(QIODevice::ReadOnly)) {
         QDataStream in(&file);
         in >> data;
-        in >> playlistData_;
+        in >> size;
+        for (int i = 0; i < size;++i){
+            in >> song;
+            playlistData_.append(song);
+        }
         file.close();
         buffer.close();
         buffer.setData(data);
@@ -662,7 +675,8 @@ void MainWindow::loadlastPlaylist() {
         playlist_->clear();
         playlist_->load(&buffer, "m3u");
         updatePlaylist();
-        player_->play();
+        playlist_->setCurrentIndex(-1);
+        ui->playButton->click();
     }
 }
 
@@ -679,7 +693,10 @@ void MainWindow::savePlaylist() {
     playlist_->save(&buffer, "m3u");
     QDataStream out(&file);
     out << buffer.buffer();
-    out << playlistData_.toSet();
+    out << playlistData_.size();
+    for (int i = 0; i < playlistData_.size();++i){
+        out << playlistData_.at(i);
+    }
     file.close();
 }
 
@@ -689,6 +706,7 @@ void MainWindow::updatePlaylist(){
     ui->playlistWidget->clear();
     for (int i = 0; i < playlistData_.size();++i){
         songTitle = playlistData_.at(i);
+        qDebug(qPrintable(songTitle));
         ui->playlistWidget->addItem(new QListWidgetItem(songTitle));
     }
 }
@@ -708,6 +726,8 @@ void MainWindow::on_clearPlaylistButton_clicked()
     ui->playlistWidget->clear();
     playlist_->clear();
     playlistData_.clear();
+    ui->playButton->setText("Play");
+    ui->playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
 }
 
 void MainWindow::on_clearLocalButton_clicked()
@@ -843,4 +863,12 @@ void MainWindow::downloadStarted(int filesize, int packsizeRecv, QString file) {
 void MainWindow::on_viewDownloadButton_clicked()
 {
     downloads_.show();
+}
+
+void MainWindow::downloadQueueFull(bool full) {
+    if(full) {
+        ui->remoteListWidget->setDisabled(true);
+    }else {
+        ui->remoteListWidget->setDisabled(false);
+    }
 }

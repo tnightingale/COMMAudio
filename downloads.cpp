@@ -6,6 +6,11 @@ Downloads::Downloads(QWidget *parent) :
     ui(new Ui::Downloads)
 {
     ui->setupUi(this);
+    ui->download1->setReadOnly(true);
+    ui->download2->setReadOnly(true);
+    ui->download3->setReadOnly(true);
+    ui->download4->setReadOnly(true);
+    ui->download5->setReadOnly(true);
 }
 
 
@@ -52,12 +57,12 @@ void Downloads::downloadFile(int filesize, int packetsize, QString file){
         }
     }
 
-    /*if(countCurrentDownloads() < 5) {
-        mainPointer_->remoteListWidget->setDisabled(false);
+    if(countCurrentDownloads() < 5) {
+       emit queueFull(false);
     }else{
-        mainPointer_->remoteListWidget->setDisabled(true);
+        emit queueFull(true);
     }
-    */
+
 }
 
 int Downloads::countCurrentDownloads(){
@@ -75,4 +80,3 @@ int Downloads::countCurrentDownloads(){
     }
     return count;
 }
-

@@ -139,6 +139,7 @@ private slots:
     void on_action_Default_triggered();
     void downloadStarted(int filesize, int packsizeRecv, QString file);
     void on_viewDownloadButton_clicked();
+    void downloadQueueFull(bool full);
 };
 
 #endif // MAINWINDOW_H
