@@ -5,11 +5,11 @@
 #include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow),
-    slider_(0),
-    muted_(false),
-    voiceCallActive_(FALSE)
+        QMainWindow(parent),
+        ui(new Ui::MainWindow),
+        slider_(0),
+        muted_(false),
+        voiceCallActive_(FALSE)
 {
     ui->setupUi(this);
     QWidget::setWindowIcon(style()->standardIcon(QStyle::SP_MediaPlay));
@@ -243,7 +243,7 @@ void MainWindow::appendToRemote(QStringList songList_, QString ipAddress, short 
     QList<QString>::iterator it;
     for(it = list.begin(); it!= list.end(); ++it)
     {
-       ui->remoteListWidget->addItem(new QListWidgetItem((*it)));
+        ui->remoteListWidget->addItem(new QListWidgetItem((*it)));
     }
 }
 
@@ -326,7 +326,6 @@ void MainWindow::on_remoteListWidget_itemDoubleClicked(QListWidgetItem* item)
 */
 void MainWindow::on_playButton_clicked()
 {
-
     if(ui->playlistWidget->count() > 0) {
         if(ui->playButton->text() == "Pause") {
             ui->playButton->setText("Play");
@@ -414,15 +413,17 @@ QStringList MainWindow::getLocalFileList()
 }
 
 
+
 void MainWindow::on_talkButton_pressed()
 {
-    if (!voiceCallActive_) {
-        if (joinServer_.exec() != QDialog::Accepted) {
+    if (!voiceCallActive_)
+    {
+        if (joinServer_.exec() != QDialog::Accepted)
+        {
             return;
         }
-        emit initiateVoiceStream(joinServer_.getPort(), joinServer_.getIp());
-        voiceCallActive_ = TRUE;
-        //return;
+        emit initiateVoiceStream(joinServer_.getPort(), joinServer_.getIp(), player_);
+        voiceCallActive_ = true;
     }
 
     emit voicePressed(player_);
@@ -524,11 +525,11 @@ void MainWindow::backgroundColor(QString background, QString font) {
     hover.prepend("QPushButton:pressed {border-style:ridge;border-width:3px;border-color:" + fontColor + ";background-color:");
     hover.append(font);
     hover += " QPushButton {border-style:ridge;border-width:3px;border-color:" + backColor + ";background-color:" +
-            fontColor + ";color:" + backColor + ";}";
+             fontColor + ";color:" + backColor + ";}";
     QString sliderColor = "QSlider::groove:horizontal {background:" +  fontColor + ";position: absolute;"
-            "border-style:solid;border-width:3px;border-color:" + backColor + ";}";
+                          "border-style:solid;border-width:3px;border-color:" + backColor + ";}";
     sliderColor += "QSlider::handle:horizontal {height: 20px;background:" + backColor + ";width:4px;"
-            "border-style:solid;border-width:1px;border-color:" + fontColor + ";}";
+                   "border-style:solid;border-width:1px;border-color:" + fontColor + ";}";
     sliderColor += "QSlider::add-page:horizontal {background:" + fontColor + ";}";
     sliderColor += "QSlider::sub-page:horizontal {background:" + backColor + ";}";
     sliderColor += "QSlider {border-style:groove;border-width:2px;border-color:" + backColor + ";}";
@@ -540,8 +541,8 @@ void MainWindow::backgroundColor(QString background, QString font) {
     const QString button = hover;
     const QString border = "* {border-style:groove;border-width:1px;border-color:" + fontColor + ";}";
     const QString tabColor = "QTabWidget::tab-bar {background: Red;} QTabBar::tab"
-            "{background:" + backColor + ";color:" + fontColor + ";}" + color +
-            "QTabBar::tab:hover{background:" + fontColor + ";color:" + backColor + ";}";
+                             "{background:" + backColor + ";color:" + fontColor + ";}" + color +
+                             "QTabBar::tab:hover{background:" + fontColor + ";color:" + backColor + ";}";
     ui->tabWidget->setStyleSheet(tabColor);
     ui->volumeLcdNumber->setStyleSheet(color);
     ui->playbackBox->setStyleSheet(color);
@@ -768,10 +769,10 @@ void MainWindow::on_removeButton_clicked()
     qDebug("%d", index);
     if(index <= 0) {
         ui->playlistWidget->clear();
-         playlist_->clear();
-         playlistData_.clear();
-         ui->currentSongEditBox->setText(" ");
-         ui->currentSongEditBox_2->setText(" ");
+        playlist_->clear();
+        playlistData_.clear();
+        ui->currentSongEditBox->setText(" ");
+        ui->currentSongEditBox_2->setText(" ");
     } else {
         playlist_->removeMedia(index);
         playlistData_.removeAt(index);
@@ -851,7 +852,7 @@ void MainWindow::addSongToLocal(QString filename){
 }
 
 void MainWindow::on_action_Tiger_triggered() {
-   backgroundColor("OrangeRed", "Black");
+    backgroundColor("OrangeRed", "Black");
 }
 
 void MainWindow::on_action_Default_triggered() {
@@ -901,4 +902,35 @@ void MainWindow::on_action_Host_Multicast_triggered()
 {
     emit multicastList(&songList_);
     multicast_->show();
+}
+
+bool MainWindow::getVoiceCallActive()
+{
+    return voiceCallActive_;
+}
+
+void MainWindow::setVoiceCallActive(bool status)
+{
+    voiceCallActive_ = status;
+}
+
+void MainWindow::on_actionConnect_triggered()
+{
+    if (!voiceCallActive_)
+    {
+        if (joinServer_.exec() != QDialog::Accepted)
+        {
+            return;
+        }
+        emit initiateVoiceStream(joinServer_.getPort(), joinServer_.getIp(), player_);
+        voiceCallActive_ = true;
+        // Should enable the disconnect button here
+    }
+}
+
+void MainWindow::on_actionDisconnect_triggered()
+{
+    voiceCallActive_ = false;
+    // Should disable this menu item here
+    emit disconnectVoiceStream();
 }

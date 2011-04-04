@@ -84,12 +84,17 @@ public:
 
     bool requestVoiceChat(QString);
 
+    bool getVoiceCallActive();
+
+    void setVoiceCallActive(bool);
+
 signals:
     void signalWMWSASyncTCPRx(int, int);
     void signalWMWSASyncUDPRx(int, int);
     void requestPlaylist(QString, short);
     void requestFile(QString,short, QString);
-    void initiateVoiceStream(short port, QString hostAddr);
+    void initiateVoiceStream(short port, QString hostAddr, AudioComponent* player);
+    void disconnectVoiceStream();
     void voicePressed(AudioComponent*);
     void voiceReleased(AudioComponent*);
     void multicastList(QStringList *songs);
@@ -115,6 +120,8 @@ private:
     JoinMulticast *joinMulticast_;
 
 private slots:
+    void on_actionDisconnect_triggered();
+    void on_actionConnect_triggered();
     void playlistIndexChanged(int index);
     void seek(int seconds);
     void durationChanged(qint64 duration);

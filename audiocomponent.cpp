@@ -9,7 +9,7 @@
 
 
 AudioComponent::AudioComponent(QObject *parent) :
-    QObject(parent)
+        QObject(parent)
 {
     player_ = new QMediaPlayer;
     playlist_ = new QMediaPlaylist;
@@ -18,8 +18,6 @@ AudioComponent::AudioComponent(QObject *parent) :
     //output_ = new Phonon::AudioOutput(Phonon::MusicCategory,this);
     //Phonon::createPath(playlist_,output_);
     //playlist_->setTransitionTime(-100);
-
-
 }
 
 void AudioComponent::setSourceFolder(){
@@ -39,11 +37,11 @@ int AudioComponent::getIndex(){
 QStringList AudioComponent::getFileList(){
     QStringList stuff;
     QStringList filters;
-    filters<< "*.wav" << "*.mp3";
+    filters << "*.wav" << "*.mp3";
     sourceFolder_.setNameFilters(filters);
     QDirIterator it(sourceFolder_, QDirIterator::Subdirectories);
     while (it.hasNext()) {
-         stuff += it.next();//.entryInfoList(filters,QDir::Files,QDir::Name);
+        stuff += it.next();//.entryInfoList(filters,QDir::Files,QDir::Name);
     }
 
     return stuff;
@@ -60,7 +58,7 @@ QList<QMediaContent> AudioComponent::getQueue() {
         temp.append(playlist_->media(i));
     }
     return temp;
-// return playlist_->queue();
+    // return playlist_->queue();
 }
 
 bool AudioComponent::addSongToBegining(QString filename) {
@@ -75,8 +73,7 @@ void AudioComponent::setCurrentSong(QString fileName){
 }
 
 bool AudioComponent::addSong(QString filename) {
-
-   return playlist_->addMedia(QUrl::fromLocalFile(filename));
+    return playlist_->addMedia(QUrl::fromLocalFile(filename));
 }
 void AudioComponent::play() {
     player_->play();
@@ -115,9 +112,6 @@ QMediaPlaylist* AudioComponent::getPlaylist() {
 }
 
 void AudioComponent::startMic(){
-
-
-
     format.setFrequency(8000);
     format.setChannels(1);
     format.setSampleSize(8);
@@ -141,8 +135,6 @@ void AudioComponent::startMic(){
 
     input_->start(qoutput_->start());
 
-
-
     //return micData;
 }
 void AudioComponent::startMic(QIODevice* stream) {
@@ -161,6 +153,22 @@ void AudioComponent::stopMic(){
     input_->stop();
     input_->deleteLater();
     //delete input_;
+}
+
+void AudioComponent::pauseMic()
+{
+    if (input_->state() == QAudio::ActiveState)
+    {
+        input_->suspend();
+    }
+}
+
+void AudioComponent::resumeMic()
+{
+    if (input_->state() == QAudio::SuspendedState)
+    {
+        input_->resume();
+    }
 }
 
 void AudioComponent::playStream(QIODevice* stream){
@@ -194,7 +202,7 @@ void AudioComponent::testwav(QString fileName){
 
 
     position = 24;
-     temp = *(int*)&data.constData()[position];
+    temp = *(int*)&data.constData()[position];
     format.setSampleRate(temp);
     position = 22;
     temp = *(short*)&data.constData()[position];
@@ -257,32 +265,26 @@ void AudioComponent::checkBuff(){
 
 void AudioComponent::addToOutput(QAudio::State newState){
     switch (newState) {
-        case QAudio::StoppedState:
-            if (output_->error() != QAudio::NoError) {
-             // Perform error handling
-                qDebug("blahhhhhh error");
-            } else {
-             // Normal stop
-            }
-            break;
+    case QAudio::StoppedState:
+        if (output_->error() != QAudio::NoError) {
+            // Perform error handling
+            qDebug("blahhhhhh error");
+        } else {
+            // Normal stop
+        }
+        break;
 
-        case QAudio::SuspendedState:
-            qDebug("blahhhhhh suspended");
+    case QAudio::SuspendedState:
+        qDebug("blahhhhhh suspended");
 
-            break;
-            case QAudio::ActiveState:
-            qDebug("blahhhhhh active");
-            //
-            break;
-            case QAudio::IdleState:
-            qDebug("blahhhhhh idle");
-            buff->write(data);
-            break;
+        break;
+    case QAudio::ActiveState:
+        qDebug("blahhhhhh active");
+        //
+        break;
+    case QAudio::IdleState:
+        qDebug("blahhhhhh idle");
+        buff->write(data);
+        break;
     }
-
-
 }
-
-
-
-
