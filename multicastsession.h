@@ -5,6 +5,7 @@
 #include <QStringList>
 #include <QTimer>
 #include <QByteArray>
+#include <QFile>
 
 class MulticastSession : public QObject {
   Q_Object
@@ -15,6 +16,7 @@ private:
     QStringListIterator playlistIterator_;
     QFile* current_;
     QByteArray* nextBuff_;
+    QByteArray* header_;
 
     /**
      *

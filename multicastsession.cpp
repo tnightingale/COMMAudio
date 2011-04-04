@@ -25,17 +25,22 @@ void MulticastSession::loadBuffer() {
         if (!playlistIterator_.hasNext()) {
             endSession();
         }
-        current_ = new Qfile(playlistIterator_.next());
+        current_ = new QFile(playlistIterator_.next());
         if (!current_->open(QIODevice::ReadOnly)) {
             endSession();
         }
+        header_ = current_->read(44);
     }
 
     nextBuff_ = generateBuffer();
 }
 
 QByteArray* MulticastSession::generateBuffer() {
+    QByteArray* tempArray = new QByteArray;
 
+    current_->close();
+    current_->deleteLater();
+    current_=NULL;
 }
 
 void MulticastSession::endSession() {
