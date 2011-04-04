@@ -36,7 +36,10 @@ public:
     QMediaPlaylist* getPlaylist();
     int getIndex();
     void testwav(QString fileName);
+    void addFromMulticast(QIODevice* socket);
+    void writeToMulticast(QString fileName, QIODevice* socket);
 
+    void joinMulticast();
 private:
     QMediaPlayer* player_;
     QMediaPlaylist* playlist_;
