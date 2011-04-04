@@ -102,6 +102,21 @@ void UDPSocket::send(PMSG pMsg) {
     }
 }
 
+bool UDPSocket::listen(int port) {
+    SOCKADDR_IN sockAddrIn;
+
+    sockAddrIn.sin_family = AF_INET;
+    sockAddrIn.sin_port = htons(port);
+    sockAddrIn.sin_addr.s_addr = htonl(INADDR_ANY);
+
+    if (!Socket::listen(&sockAddrIn)) {
+        return false;
+    }
+
+    connectedPort_ = port;
+    return true;
+}
+
 void UDPSocket::receive(PMSG pMsg) {
     int err = 0;
     DWORD flags = 0;

@@ -87,6 +87,8 @@ signals:
     void requestPlaylist(QString, short);
     void requestFile(QString,short, QString);
     void initiateVoiceStream(short port, QString hostAddr);
+    void voicePressed(AudioComponent*);
+    void voiceReleased(AudioComponent*);
 
 private:
     QSlider *slider_;

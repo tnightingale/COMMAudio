@@ -8,6 +8,7 @@ class Socket;
 class TCPSocket;
 class UDPSocket;
 class FileData;
+class AudioComponent;
 
 class Workstation : public QObject {
   Q_OBJECT
@@ -50,8 +51,10 @@ public slots:
     void receiveFileListController(Socket*);
     void requestFileListController(Socket*);
     void sendFileController(Socket*);
-    void startVoiceStream(short port, QString hostAddr);
-    void stopVoiceStream();
+    void initializeVoiceStream(short port, QString hostAddr);
+    void startVoice(AudioComponent*);
+    void stopVoice(AudioComponent*);
+    void endVoiceStream();
 
 signals:
     void signalFileListUpdate(QStringList*);

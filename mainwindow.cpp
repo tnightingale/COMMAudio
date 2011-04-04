@@ -412,12 +412,13 @@ void MainWindow::on_talkButton_pressed()
         emit initiateVoiceStream(joinServer_.getPort(), joinServer_.getIp());
         voiceCallActive_ = TRUE;
     }
-    player_->startMic();
+
+    emit voicePressed(player_);
 }
 
 void MainWindow::on_talkButton_released()
 {
-    player_->stopMic();
+    emit voiceReleased(player_);
 }
 
 void MainWindow::on_tabWidget_currentChanged(int index)

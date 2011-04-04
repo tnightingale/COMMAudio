@@ -16,6 +16,8 @@ public:
 
     bool open(OpenMode mode);
 
+    virtual bool listen(int port);
+
     /**
      *
      * @author Tom Nightingale.
