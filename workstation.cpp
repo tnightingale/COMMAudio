@@ -84,9 +84,10 @@ void Workstation::initializeVoiceStream(short port, QString hostAddr) {
     controlSocket->moveToThread(socketThread_);
 
     // Create the control packet
+    short thisPort = udpSocket_->getPort();
     QByteArray packet;
     packet.insert(0, VOICE_CHAT);
-    packet.append(QByteArray().setNum((udpSocket_->getPort())));
+    packet += QByteArray::fromRawData((const char*)&thisPort, sizeof(short));
 
     // Send the file path to the client
     controlSocket->write(packet);
