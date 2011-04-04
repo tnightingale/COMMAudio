@@ -2,12 +2,14 @@
 #include "ui_mainwindow.h"
 #include "audiocomponent.h"
 #include <QFileDialog>
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     slider_(0),
-    muted_(false)
+    muted_(false),
+    voiceCallActive_(FALSE)
 {
     ui->setupUi(this);
     this->setFixedSize(861,598);
@@ -404,12 +406,21 @@ QStringList MainWindow::getLocalFileList()
 
 void MainWindow::on_talkButton_pressed()
 {
-    player_->startMic();
+    if (!voiceCallActive_) {
+        if (joinServer_.exec() != QDialog::Accepted) {
+            return;
+        }
+        emit initiateVoiceStream(joinServer_.getPort(), joinServer_.getIp());
+        voiceCallActive_ = TRUE;
+        //return;
+    }
+
+    emit voicePressed(player_);
 }
 
 void MainWindow::on_talkButton_released()
 {
-    player_->stopMic();
+    emit voiceReleased(player_);
 }
 
 void MainWindow::on_tabWidget_currentChanged(int index)
@@ -812,4 +823,32 @@ void MainWindow::on_action_Tiger_triggered() {
 
 void MainWindow::on_action_Default_triggered() {
     backgroundColor("Black", "White");
+}
+
+bool MainWindow::requestVoiceChat(QString fromIp)
+{
+    QMessageBox prompt;
+    prompt.setText("IP " + fromIp + " would like to voice chat.");
+    prompt.setInformativeText("Do you accept this challenge?");
+    prompt.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    prompt.setDefaultButton((QMessageBox::No));
+
+    int result = prompt.exec();
+
+    if (result == QMessageBox::Yes)
+    {
+        return true;
+    }
+    return false;
+}
+
+void MainWindow::downloadStarted(int filesize, int packsizeRecv) {
+    ui->downloadBar->setMaximum(filesize);
+    ui->downloadBar->setValue(ui->downloadBar->value() + packsizeRecv);
+    if(ui->downloadBar->value() == ui->downloadBar->maximum()) {
+            ui->downloadBar->reset();
+            ui->remoteListWidget->setDisabled(false);
+    }else if(ui->downloadBar->value() > 0) {
+        ui->remoteListWidget->setDisabled(true);
+    }
 }

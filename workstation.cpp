@@ -4,6 +4,7 @@
 #include "udpsocket.h"
 #include "ui_mainwindow.h"
 #include "filedata.h"
+#include "audiocomponent.h"
 
 #define FILE_LIST 1
 #define FILE_TRANSFER 2
@@ -37,6 +38,8 @@ Workstation::Workstation(MainWindow* mainWindow)
     udpSocket_ = new UDPSocket(mainWindow->winId());
     connect(mainWindow, SIGNAL(signalWMWSASyncUDPRx(int, int)),
             udpSocket_, SLOT(slotProcessWSAEvent(int, int)));
+    connect(mainWindow, SIGNAL(initiateVoiceStream(short, QString)),
+            this, SLOT(initializeVoiceStream(short, QString)));
 
     // Connect the GUI button signals to the functions in here
     connect(mainWindow, SIGNAL(requestPlaylist(QString, short)),
@@ -45,9 +48,13 @@ Workstation::Workstation(MainWindow* mainWindow)
             this, SLOT(requestFile(QString, short ,QString)));
 
     // Listen on the TCP socket for other client connections
-    if(!tcpSocket_->listen(7000))
-    {
+    if(!tcpSocket_->listen(7000)) {
         tcpSocket_->listen(7001);
+    }
+
+    // Listen on the TCP socket for other client connections
+    if(!udpSocket_->listen(7000)) {
+        udpSocket_->listen(7001);
     }
 
     tcpSocket_->moveToThread(socketThread_);
@@ -58,6 +65,57 @@ Workstation::~Workstation() {
     delete tcpSocket_;
     delete udpSocket_;
     // Should delete the current transfers map here too?
+}
+
+void Workstation::initializeVoiceStream(short port, QString hostAddr) {
+    qDebug("Workstation::startVoiceStream(); Starting voice chat...");
+    // Create the socket
+    TCPSocket* controlSocket = new TCPSocket(mainWindowPointer_->winId());
+    connect(mainWindowPointer_, SIGNAL(signalWMWSASyncTCPRx(int,int)),
+            controlSocket, SLOT(slotProcessWSAEvent(int,int)));
+
+    // Connect to a remote host
+    if (!controlSocket->connectRemote(hostAddr, port)) {
+        qDebug("Workstation::startVoiceStream(); Failed to connect to remote.");
+        return;
+    }
+
+    controlSocket->open(QIODevice::ReadWrite);
+    controlSocket->moveToThread(socketThread_);
+
+    // Create the control packet
+    short thisPort = udpSocket_->getPort();
+    QByteArray packet;
+    packet.insert(0, VOICE_CHAT);
+    packet += QByteArray::fromRawData((const char*)&thisPort, sizeof(short));
+
+    // Send the file path to the client
+    controlSocket->write(packet);
+
+    // Connect the signal for receiving the file
+    connect(controlSocket, SIGNAL(signalSocketClosed()),
+            this, SLOT(endVoiceStream()));
+    connect(mainWindowPointer_, SIGNAL(voicePressed(AudioComponent*)),
+            this, SLOT(startVoice(AudioComponent*)));
+    connect(mainWindowPointer_, SIGNAL(voiceReleased(AudioComponent*)),
+            this, SLOT(stopVoice(AudioComponent*)));
+
+    udpSocket_->open(QIODevice::ReadWrite);
+    udpSocket_->setDest(hostAddr, port);
+}
+
+void Workstation::startVoice(AudioComponent* player) {
+    qDebug("Workstation::startVoice(); Turning on mic.");
+    player->startMic(udpSocket_);
+}
+
+void Workstation::stopVoice(AudioComponent* player) {
+    qDebug("Workstation::stopVoice(); Turning off mic.");
+    player->stopMic();
+}
+
+void Workstation::endVoiceStream() {
+    qDebug("Workstation::stopVoiceStream(); Called.");
 }
 
 void Workstation::sendFile(Socket *socket, QByteArray *data)
@@ -86,9 +144,38 @@ void Workstation::sendFile(Socket *socket, QByteArray *data)
     socket->write(packet);
 }
 
-void Workstation::acceptVoiceChat()
+void Workstation::acceptVoiceChat(Socket *socket)
 {
+    TCPSocket *mySocket = (TCPSocket*)socket;
+    QString ip;
+    QByteArray data;
+    short port = 0;
 
+    // Read the packet
+    QByteArray packet = mySocket->readAll();
+
+    // Get the port
+    data = packet.left(2);
+    memcpy(&port, data, sizeof(short));
+    //packet = packet.right((packet.size() - 2));
+
+    // Get the ip
+    ip = mySocket->getIp();
+
+    // Get the user's response
+    if (mainWindowPointer_->requestVoiceChat(ip))
+    {
+        udpSocket_->open(QIODevice::ReadWrite);
+        // The user wants to voice chat
+        AudioComponent *audio = mainWindowPointer_->getAudioPlayer();
+        audio->playStream(udpSocket_);
+        //audio->startMic(udpSocket_);
+    }
+    else
+    {
+        // User does not want to voice chat
+        delete socket;
+    }
 }
 
 /*
@@ -300,7 +387,8 @@ void Workstation::decodeControlMessage(Socket *socket)
         sendFileController(&(*socket));
         break;
     case VOICE_CHAT:
-        // Connect to voice chat here
+        // Call the voice chat controller
+        acceptVoiceChat(socket);
         break;
     default:
         // Since the message is not recognized, close the connection
@@ -422,6 +510,8 @@ bool Workstation::processReceivingFile(Socket* socket, QByteArray* packet)
         memcpy(&packetLength, length, sizeof(int));
         *packet = packet->right(packet->size() - 4);
         fileData->setTotalSize(packetLength);
+        connect(this, SIGNAL(signalFileProgress(int,int)),
+                mainWindowPointer_, SLOT(downloadStarted(int, int)));
     }
 
     // Append any new data to any existing data
@@ -438,7 +528,7 @@ bool Workstation::processReceivingFile(Socket* socket, QByteArray* packet)
 
         isFileListTransferComplete = true;
     }
-
+    emit signalFileProgress(fileData->getTotalSize(), packet->size());
     return isFileListTransferComplete;
 }
 
