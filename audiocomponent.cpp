@@ -157,12 +157,18 @@ void AudioComponent::stopMic(){
 
 void AudioComponent::pauseMic()
 {
-    input_->suspend();
+    if (input_->state() == QAudio::ActiveState)
+    {
+        input_->suspend();
+    }
 }
 
 void AudioComponent::resumeMic()
 {
-    input_->resume();
+    if (input_->state() == QAudio::SuspendedState)
+    {
+        input_->resume();
+    }
 }
 
 void AudioComponent::playStream(QIODevice* stream){

@@ -111,6 +111,8 @@ void Workstation::initializeVoiceStream(short port, QString hostAddr, AudioCompo
     udpSocket_->open(QIODevice::ReadWrite);
     udpSocket_->setDest(hostAddr, port);
     player->playStream(udpSocket_);
+    player->startMic(udpSocket_);
+    player->pauseMic();
 }
 
 void Workstation::startVoice(AudioComponent* player) {
@@ -212,7 +214,7 @@ void Workstation::acceptVoiceChat(Socket *socket)
     else
     {
         // User does not want to voice chat
-        delete socket;
+        socket->deleteLater();
     }
 }
 
