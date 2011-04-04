@@ -881,5 +881,6 @@ void MainWindow::on_actionConnect_triggered()
 void MainWindow::on_actionDisconnect_triggered()
 {
     voiceCallActive_ = false;
+    // Should disable this menu item here
     emit disconnectVoiceStream();
 }

@@ -652,9 +652,6 @@
    </property>
   </action>
   <action name="actionDisconnect">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
    <property name="text">
     <string>Disconnect</string>
    </property>
