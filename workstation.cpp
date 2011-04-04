@@ -140,7 +140,8 @@ void Workstation::endVoiceStreamUser()
                this, SLOT(endVoiceStreamUser()));
 
     // Delete the socket, where the rest of the cleanup will be triggered from
-    voiceControlSocket_->deleteLater();
+    //voiceControlSocket_->deleteLater();
+    delete voiceControlSocket_;
 }
 
 void Workstation::sendFile(Socket *socket, QByteArray *data)
