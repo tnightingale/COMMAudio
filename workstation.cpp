@@ -53,8 +53,8 @@ Workstation::Workstation(MainWindow* mainWindow)
     }
 
     // Listen on the TCP socket for other client connections
-    if(!udpSocket_->listen(8000)) {
-        udpSocket_->listen(8001);
+    if(!udpSocket_->listen(7000)) {
+        udpSocket_->listen(7001);
     }
 
     tcpSocket_->moveToThread(socketThread_);
@@ -75,7 +75,7 @@ void Workstation::initializeVoiceStream(short port, QString hostAddr) {
             controlSocket, SLOT(slotProcessWSAEvent(int,int)));
 
     // Connect to a remote host
-    if (!controlSocket->connectRemote(hostAddr, 7000)) {
+    if (!controlSocket->connectRemote(hostAddr, port)) {
         qDebug("Workstation::startVoiceStream(); Failed to connect to remote.");
         return;
     }
