@@ -181,7 +181,7 @@ void AudioComponent::testwav(QString fileName){
     QFile file(fileName);
     file.open(QIODevice::ReadOnly);
     data = file.readAll();
-    QByteArray* tempdata = &data; //used to view data....
+    //QByteArray* tempdata = &data; //used to view data....
 
     int position = 0;
 
@@ -244,7 +244,7 @@ void AudioComponent::testwav(QString fileName){
 }
 void AudioComponent::checkBuff(){
     int i = output_->bytesFree();
-    int j = output_->notifyInterval();
+    //int j = output_->notifyInterval();
     while((i = output_->bytesFree()) > 1024*8){
         if(!allBuffers_.empty()){
             buff->write(allBuffers_.takeFirst());
@@ -324,7 +324,7 @@ void AudioComponent::writeToMulticast(QString fileName, QIODevice* socket){
     QFile file(fileName);
     file.open(QIODevice::ReadOnly);
     data = file.readAll();
-    QByteArray* tempdata = &data; //used to view data....
+    //QByteArray* tempdata = &data; //used to view data....
 
     int position = 0;
 
