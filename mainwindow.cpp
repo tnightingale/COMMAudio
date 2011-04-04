@@ -19,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
     this->statusBar()->setSizeGripEnabled(false);
     player_ = new AudioComponent(this);
 
+
     QFile file("mediaTracker.dat");
     if(file.open(QIODevice::ReadOnly)) {
         QDataStream in(&file);
@@ -317,7 +318,7 @@ void MainWindow::on_remoteListWidget_itemDoubleClicked(QListWidgetItem* item)
 */
 void MainWindow::on_playButton_clicked()
 {
-
+player_->testwav("./08\ -\ Heart\ of\ the\ City\ (Ain't\ No\ Love).wav");
     if(ui->playButton->text() == "Pause") {
         ui->playButton->setText("Play");
         ui->playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
