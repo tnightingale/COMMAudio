@@ -135,6 +135,7 @@ private slots:
     void on_action_Song_triggered();
     void on_action_Tiger_triggered();
     void on_action_Default_triggered();
+    void downloadStarted(int filesize, int packsizeRecv);
 };
 
 #endif // MAINWINDOW_H

@@ -830,3 +830,14 @@ bool MainWindow::requestVoiceChat(QString fromIp)
     }
     return false;
 }
+
+void MainWindow::downloadStarted(int filesize, int packsizeRecv) {
+    ui->downloadBar->setMaximum(filesize);
+    ui->downloadBar->setValue(ui->downloadBar->value() + packsizeRecv);
+    if(ui->downloadBar->value() == ui->downloadBar->maximum()) {
+            ui->downloadBar->reset();
+            ui->remoteListWidget->setDisabled(false);
+    }else if(ui->downloadBar->value() > 0) {
+        ui->remoteListWidget->setDisabled(true);
+    }
+}
