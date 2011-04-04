@@ -25,7 +25,10 @@ SOURCES  += main.cpp \
             audiocomponent.cpp \
             remoteSong.cpp \
             filedata.cpp \
-            colors.cpp
+            colors.cpp \
+    downloads.cpp \
+    hostmulticast.cpp \
+    joinmulticast.cpp
 
 HEADERS  += mainwindow.h \
             socket.h \
@@ -37,10 +40,16 @@ HEADERS  += mainwindow.h \
             audiocomponent.h \
             remoteSong.h \
             filedata.h \
-            colors.h
+            colors.h \
+    downloads.h \
+    hostmulticast.h \
+    joinmulticast.h
 
 FORMS    += mainwindow.ui \
             joinServer.ui \
-            colors.ui
+            colors.ui \
+    downloads.ui \
+    hostmulticast.ui \
+    joinmulticast.ui
 
 LIBS     += C:/Qt/2010.05/mingw/lib/libws2_32.a
