@@ -55,7 +55,7 @@ QByteArray data;
     QBuffer* buffer_;
     QIODevice* buff;
     QBuffer* inputBuffer_;
-    QList<QBuffer> allBuffers_;
+    QList<QBuffer*> allBuffers_;
     QList<QAudioFormat> allFormats_;
 signals:
 

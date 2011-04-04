@@ -287,40 +287,27 @@ void AudioComponent::addFromMulticast(QIODevice* socket) {
         tempformat.setSampleType(QAudioFormat::SignedInt);
     }
 
-    if(tempformat!=format){
-        //new audio format >.>
+    if(tempformat!=allFormats_.last()){
+        allFormats_.append(tempformat);
+        allBuffers_.append(new QBuffer);
+        //new audio format append to format list
     }
 
     newData.remove(0,44);
-    QDataStream dstream(&newData,QIODevice::ReadOnly);
+    allBuffers_.last()->open(QIODevice::ReadOnly);
+    allBuffers_.last()->write(newData);
+    allBuffers_.last()->close();
 
-    while(!dstream.atEnd()){
-        QByteArray miniData;
-        char* chard =(char*) malloc(1024*8);
-
-        dstream.readRawData(chard, 1024*8);
-        miniData.append(chard,1024*8);
-        allBuffers_.append(miniData);
-    }
-
-    while(output_->bytesFree()>1024*8){
-        if(!allBuffers_.empty()){
-            buff->write(allBuffers_.takeFirst());
-        }
-        else{
-            break;
-        }
-    }
 
 }
 void AudioComponent::joinMulticast(){
 
     output_ = new QAudioOutput(format,0);
-    output_->setBufferSize(1024*8*10);
+
 
     buff = output_->start();
-    output_->setNotifyInterval(100);
-    connect(output_,SIGNAL(notify()),this,SLOT(checkBuff()));
+
+    connect(output_,SIGNAL(stateChanged(QAudio::State)),this,SLOT(addToOutput(QAudio::State)));
 
 }
 
@@ -368,8 +355,8 @@ void AudioComponent::writeToMulticast(QString fileName, QIODevice* socket){
 
         dstream.readRawData(chard, 1024*8);
         newdata.append(chard,1024*8);
-        allBuffers_.append(newdata);
-        socket->write(allBuffers_.first().prepend(header));
+        //allBuffers_.append(newdata);
+        socket->write(newdata.prepend(header));
     }
 
     file.close();
@@ -378,7 +365,7 @@ void AudioComponent::writeToMulticast(QString fileName, QIODevice* socket){
     while(output_->bytesFree()>1024*8){
         if(!allBuffers_.empty()){
 
-            buff->write(allBuffers_.takeFirst());
+            //buff->write(allBuffers_.takeFirst());
         }
         else{
             break;
@@ -408,8 +395,15 @@ void AudioComponent::addToOutput(QAudio::State newState){
             //
             break;
             case QAudio::IdleState:
-            qDebug("blahhhhhh idle");
-            buff->write(data);
+            qDebug("blahhhhhh idle go to next song");
+            output_->stop();
+            allBuffers_.removeFirst();
+            allFormats_.removeFirst();
+            if(!allBuffers_.empty()){
+                output_->deleteLater();
+                output_ = new QAudioOutput(allFormats_.first());
+                output_->start((QIODevice*)allBuffers_.first());
+            }
             break;
     }
 
