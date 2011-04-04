@@ -60,6 +60,8 @@ public:
      */
     void appendToRemote(QStringList songList, QString ipAddress, short port);
 
+    AudioComponent* getAudioPlayer() { return player_; }
+
     void visualization(int n);
 
     QStringList getLocalFileList();
@@ -85,6 +87,9 @@ signals:
     void signalWMWSASyncUDPRx(int, int);
     void requestPlaylist(QString, short);
     void requestFile(QString,short, QString);
+    void initiateVoiceStream(short port, QString hostAddr);
+    void voicePressed(AudioComponent*);
+    void voiceReleased(AudioComponent*);
 
 private:
     QSlider *slider_;
@@ -98,6 +103,7 @@ private:
     QTimeLine *timer_;
     QMediaPlaylist* playlist_;
     bool muted_;
+    bool voiceCallActive_;
     QStringList songList_;
     QStringList playlistData_;
     QMap<QString,RemoteSong> remoteList_;

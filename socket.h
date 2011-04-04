@@ -79,7 +79,7 @@ protected:
 
 public:
     Socket(HWND hWnd, int addressFamily, int connectionType, int protocol);
-    Socket(SOCKET socket, HWND hWnd);
+    Socket(SOCKET socket, HWND hWnd, QString remoteAddr);
 
     virtual ~Socket() {
         qDebug("Socket::~Socket() %d", (int) socket_);

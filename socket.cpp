@@ -16,9 +16,9 @@ Socket::Socket(HWND hWnd, int addressFamily, int connectionType, int protocol)
             this, SLOT(deleteLater()));
 }
 
-Socket::Socket(SOCKET socket, HWND hWnd)
+Socket::Socket(SOCKET socket, HWND hWnd, QString remoteAddr)
 : socket_(socket), hWnd_(hWnd), outputBuffer_(new Buffer()),
-  inputBuffer_(new Buffer()), nextTxBuff_(NULL),
+  inputBuffer_(new Buffer()), nextTxBuff_(NULL), connectedIp_(remoteAddr),
   sendLock_(new QMutex()), receiveLock_(new QMutex()) {
 
     connect(this, SIGNAL(signalSocketClosed()),

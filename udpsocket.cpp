@@ -95,11 +95,26 @@ void UDPSocket::send(PMSG pMsg) {
         delete nextTxBuff_;
         nextTxBuff_ = NULL;
         if ((num = loadBuffer(bytesToRead)) <= 0) {
-            qDebug("TCPSocket::send(); Finishing...");
+            qDebug("UDPSocket::send(); Finishing...");
             break;
         }
         winsockBuff.len = num;
     }
+}
+
+bool UDPSocket::listen(int port) {
+    SOCKADDR_IN sockAddrIn;
+
+    sockAddrIn.sin_family = AF_INET;
+    sockAddrIn.sin_port = htons(port);
+    sockAddrIn.sin_addr.s_addr = htonl(INADDR_ANY);
+
+    if (!Socket::listen(&sockAddrIn)) {
+        return false;
+    }
+
+    connectedPort_ = port;
+    return true;
 }
 
 void UDPSocket::receive(PMSG pMsg) {

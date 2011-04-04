@@ -29,7 +29,7 @@ protected:
 
 public:
     TCPSocket(HWND hWnd);
-    TCPSocket(SOCKET socket, HWND hWnd);
+    TCPSocket(SOCKET socket, HWND hWnd, QString remoteAddr);
 
     virtual bool open(OpenMode mode);
 

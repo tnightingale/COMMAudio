@@ -4,8 +4,8 @@
 TCPSocket::TCPSocket(HWND hWnd)
 : Socket(hWnd, AF_INET, SOCK_STREAM, IPPROTO_TCP) {}
 
-TCPSocket::TCPSocket(SOCKET socket, HWND hWnd)
-: Socket(socket, hWnd) {}
+TCPSocket::TCPSocket(SOCKET socket, HWND hWnd, QString remoteAddr)
+: Socket(socket, hWnd, remoteAddr) {}
 
 bool TCPSocket::open(OpenMode mode) {
     int err = 0;
@@ -62,11 +62,11 @@ void TCPSocket::accept(PMSG pMsg) {
         }
     }
 
-    TCPSocket * clientSocket = new TCPSocket(newSocket, hWnd_);
+    QString remoteAddr = QString(inet_ntoa(client.sin_addr));
+    TCPSocket * clientSocket = new TCPSocket(newSocket, hWnd_, remoteAddr);
     QObject::connect(clientSocket, SIGNAL(signalDataReceived(Socket*)),
                      this, SIGNAL(signalDataReceived(Socket*)));
 
-    connectedIp_ = QString(inet_ntoa(client.sin_addr));
     //connectedPort_ = client.sin_port;
 
     emit signalClientConnected(clientSocket);

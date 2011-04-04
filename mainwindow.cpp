@@ -8,7 +8,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     slider_(0),
-    muted_(false)
+    muted_(false),
+    voiceCallActive_(FALSE)
 {
     ui->setupUi(this);
     this->setFixedSize(861,598);
@@ -17,6 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     this->statusBar()->setSizeGripEnabled(false);
     player_ = new AudioComponent(this);
+
 
     QFile file("mediaTracker.dat");
     if(file.open(QIODevice::ReadOnly)) {
@@ -409,12 +411,21 @@ QStringList MainWindow::getLocalFileList()
 
 void MainWindow::on_talkButton_pressed()
 {
-    player_->startMic();
+    if (!voiceCallActive_) {
+        if (joinServer_.exec() != QDialog::Accepted) {
+            return;
+        }
+        emit initiateVoiceStream(joinServer_.getPort(), joinServer_.getIp());
+        voiceCallActive_ = TRUE;
+        //return;
+    }
+
+    emit voicePressed(player_);
 }
 
 void MainWindow::on_talkButton_released()
 {
-    player_->stopMic();
+    emit voiceReleased(player_);
 }
 
 void MainWindow::on_tabWidget_currentChanged(int index)

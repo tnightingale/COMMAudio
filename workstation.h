@@ -1,12 +1,14 @@
 #include <QObject>
 #include <QThread>
 #include <QMap>
+#include <QByteArray>
 
 class MainWindow;
 class Socket;
 class TCPSocket;
 class UDPSocket;
 class FileData;
+class AudioComponent;
 
 class Workstation : public QObject {
   Q_OBJECT
@@ -49,9 +51,14 @@ public slots:
     void receiveFileListController(Socket*);
     void requestFileListController(Socket*);
     void sendFileController(Socket*);
+    void initializeVoiceStream(short port, QString hostAddr);
+    void startVoice(AudioComponent*);
+    void stopVoice(AudioComponent*);
+    void endVoiceStream();
 
 signals:
     void signalFileListUpdate(QStringList*);
+    void signalFileProgress(int, int);
 
 public:
     Workstation(MainWindow *mainWindow);
