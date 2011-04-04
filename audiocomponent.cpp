@@ -153,17 +153,16 @@ void AudioComponent::startMic(QIODevice* stream) {
     format.setByteOrder(QAudioFormat::LittleEndian);
     format.setSampleType(QAudioFormat::UnSignedInt);
 
-
-
-
     input_ = new QAudioInput(format,NULL);
     input_->start(stream);
-    //QIODevice* micData = input_->start();
 }
 
 void AudioComponent::stopMic(){
     input_->stop();
+    input_->deleteLater();
+    //delete input_;
 }
+
 void AudioComponent::playStream(QIODevice* stream){
     format.setFrequency(8000);
     format.setChannels(1);
@@ -172,12 +171,9 @@ void AudioComponent::playStream(QIODevice* stream){
     format.setByteOrder(QAudioFormat::LittleEndian);
     format.setSampleType(QAudioFormat::UnSignedInt);
 
-
-
     QAudioOutput* qoutput_;
     qoutput_ = new QAudioOutput(format,NULL);
     qoutput_->start(stream);
-
 }
 
 void AudioComponent::testwav(QString fileName){

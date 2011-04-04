@@ -53,8 +53,8 @@ Workstation::Workstation(MainWindow* mainWindow)
     }
 
     // Listen on the TCP socket for other client connections
-    if(!udpSocket_->listen(8000)) {
-        udpSocket_->listen(8001);
+    if(!udpSocket_->listen(7000)) {
+        udpSocket_->listen(7001);
     }
 
     tcpSocket_->moveToThread(socketThread_);
@@ -75,7 +75,7 @@ void Workstation::initializeVoiceStream(short port, QString hostAddr) {
             controlSocket, SLOT(slotProcessWSAEvent(int,int)));
 
     // Connect to a remote host
-    if (!controlSocket->connectRemote(hostAddr, 7000)) {
+    if (!controlSocket->connectRemote(hostAddr, port)) {
         qDebug("Workstation::startVoiceStream(); Failed to connect to remote.");
         return;
     }
@@ -84,9 +84,10 @@ void Workstation::initializeVoiceStream(short port, QString hostAddr) {
     controlSocket->moveToThread(socketThread_);
 
     // Create the control packet
+    short thisPort = udpSocket_->getPort();
     QByteArray packet;
     packet.insert(0, VOICE_CHAT);
-    packet.append(QByteArray().setNum((udpSocket_->getPort())));
+    packet += QByteArray::fromRawData((const char*)&thisPort, sizeof(short));
 
     // Send the file path to the client
     controlSocket->write(packet);
@@ -104,10 +105,12 @@ void Workstation::initializeVoiceStream(short port, QString hostAddr) {
 }
 
 void Workstation::startVoice(AudioComponent* player) {
+    qDebug("Workstation::startVoice(); Turning on mic.");
     player->startMic(udpSocket_);
 }
 
 void Workstation::stopVoice(AudioComponent* player) {
+    qDebug("Workstation::stopVoice(); Turning off mic.");
     player->stopMic();
 }
 
@@ -146,16 +149,15 @@ void Workstation::acceptVoiceChat(Socket *socket)
     TCPSocket *mySocket = (TCPSocket*)socket;
     QString ip;
     QByteArray data;
-    QByteArray packet;
     short port = 0;
 
     // Read the packet
-    packet = mySocket->readAll();
+    QByteArray packet = mySocket->readAll();
 
     // Get the port
     data = packet.left(2);
     memcpy(&port, data, sizeof(short));
-    packet = packet.right((packet.size() - 2));
+    //packet = packet.right((packet.size() - 2));
 
     // Get the ip
     ip = mySocket->getIp();
@@ -163,6 +165,7 @@ void Workstation::acceptVoiceChat(Socket *socket)
     // Get the user's response
     if (mainWindowPointer_->requestVoiceChat(ip))
     {
+        udpSocket_->open(QIODevice::ReadWrite);
         // The user wants to voice chat
         AudioComponent *audio = mainWindowPointer_->getAudioPlayer();
         audio->playStream(udpSocket_);
