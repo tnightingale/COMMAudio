@@ -153,15 +153,8 @@ void AudioComponent::startMic(QIODevice* stream) {
     format.setByteOrder(QAudioFormat::LittleEndian);
     format.setSampleType(QAudioFormat::UnSignedInt);
 
-    QAudioDeviceInfo info = QAudioDeviceInfo::defaultInputDevice();
-    if (!info.isFormatSupported(format));{
-        qWarning()<<"format not supported";
-        format = info.nearestFormat(format);
-    }
-    QStringList formatTypes = info.supportedCodecs();
-    for(int i = 0;i < formatTypes.size();++i){
-        qDebug()<< formatTypes.at(i);
-    }
+
+
 
     input_ = new QAudioInput(format,NULL);
     input_->start(stream);
@@ -179,15 +172,8 @@ void AudioComponent::playStream(QIODevice* stream){
     format.setByteOrder(QAudioFormat::LittleEndian);
     format.setSampleType(QAudioFormat::UnSignedInt);
 
-    QAudioDeviceInfo info = QAudioDeviceInfo::defaultInputDevice();
-    if (!info.isFormatSupported(format));{
-        qWarning()<<"format not supported";
-        format = info.nearestFormat(format);
-    }
-    QStringList formatTypes = info.supportedCodecs();
-    for(int i = 0;i < formatTypes.size();++i){
-        qDebug()<< formatTypes.at(i);
-    }
+
+
     QAudioOutput* qoutput_;
     qoutput_ = new QAudioOutput(format,NULL);
     qoutput_->start(stream);
