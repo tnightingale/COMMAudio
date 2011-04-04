@@ -839,6 +839,14 @@ bool MainWindow::getVoiceCallActive()
 
 void MainWindow::setVoiceCallActive(bool status)
 {
+    if (status)
+    {
+        ui->talkButton->setText("Stop Talking");
+    }
+    else
+    {
+        ui->talkButton->setText("Start Talking");
+    }
     voiceCallActive_ = status;
 }
 
@@ -846,16 +854,14 @@ void MainWindow::on_talkButton_clicked()
 {
     if (voiceCallActive_)
     {
-        ui->talkButton->setText("Start Talking");
-        voiceCallActive_ = false;
+        setVoiceCallActive(false);
         emit disconnectVoiceStream();
     }
     else
     {
         if (joinServer_.exec() == QDialog::Accepted)
         {
-            voiceCallActive_ = true;
-            ui->talkButton->setText("Stop Talking");
+            setVoiceCallActive(true);
             emit initiateVoiceStream(joinServer_.getPort(), joinServer_.getIp(), player_);
         }
     }
