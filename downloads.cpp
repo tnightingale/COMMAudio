@@ -11,6 +11,7 @@ Downloads::Downloads(QWidget *parent) :
     ui->download3->setReadOnly(true);
     ui->download4->setReadOnly(true);
     ui->download5->setReadOnly(true);
+    this->setFixedSize(400,300);
 }
 
 

@@ -51,8 +51,11 @@ MainWindow::MainWindow(QWidget *parent) :
     backgroundColor("black", "White");
     // player->startMic();
 
+    multicast_ = new HostMulticast();
+    joinMulticast_ = new JoinMulticast();
     ui->remoteListWidget->setSortingEnabled(true);
     connect(&downloads_,SIGNAL(queueFull(bool)),this,SLOT(downloadQueueFull(bool)));
+    connect(this,SIGNAL(multicastList(QStringList*)),multicast_,SLOT(loadLibrary(QStringList*)));
     //downloads_.exec();
     //downloads_.hide();
     // ui->clientListWidget->setSortingEnabled(true);
@@ -99,7 +102,8 @@ void MainWindow::on_action_Join_Multicast_triggered()
 {
     if (joinServer_.exec() == QDialog::Accepted)
     {
-
+        joinMulticast_->setIp(joinServer_.getIp());
+        joinMulticast_->show();
     }
 }
 
@@ -881,4 +885,10 @@ void MainWindow::downloadQueueFull(bool full) {
     }else {
         ui->remoteListWidget->setDisabled(false);
     }
+}
+
+void MainWindow::on_action_Host_Multicast_triggered()
+{
+    emit multicastList(&songList_);
+    multicast_->show();
 }
