@@ -402,28 +402,6 @@ QStringList MainWindow::getLocalFileList()
     return songList_;
 }
 
-
-
-void MainWindow::on_talkButton_pressed()
-{
-    if (!voiceCallActive_)
-    {
-        if (joinServer_.exec() != QDialog::Accepted)
-        {
-            return;
-        }
-        emit initiateVoiceStream(joinServer_.getPort(), joinServer_.getIp(), player_);
-        voiceCallActive_ = true;
-    }
-
-    emit voicePressed(player_);
-}
-
-void MainWindow::on_talkButton_released()
-{
-    emit voiceReleased(player_);
-}
-
 void MainWindow::on_tabWidget_currentChanged(int index)
 {
     if(ui->playButton->text() == "Pause") {
@@ -864,23 +842,21 @@ void MainWindow::setVoiceCallActive(bool status)
     voiceCallActive_ = status;
 }
 
-void MainWindow::on_actionConnect_triggered()
+void MainWindow::on_talkButton_clicked()
 {
-    if (!voiceCallActive_)
+    if (voiceCallActive_)
     {
-        if (joinServer_.exec() != QDialog::Accepted)
-        {
-            return;
-        }
-        emit initiateVoiceStream(joinServer_.getPort(), joinServer_.getIp(), player_);
-        voiceCallActive_ = true;
-        // Should enable the disconnect button here
+        ui->talkButton->setText("Start Talking");
+        voiceCallActive_ = false;
+        emit disconnectVoiceStream();
     }
-}
-
-void MainWindow::on_actionDisconnect_triggered()
-{
-    voiceCallActive_ = false;
-    // Should disable this menu item here
-    emit disconnectVoiceStream();
+    else
+    {
+        if (joinServer_.exec() == QDialog::Accepted)
+        {
+            voiceCallActive_ = true;
+            ui->talkButton->setText("Stop Talking");
+            emit initiateVoiceStream(joinServer_.getPort(), joinServer_.getIp(), player_);
+        }
+    }
 }

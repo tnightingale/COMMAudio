@@ -327,7 +327,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Push to Talk</string>
+     <string>Start Voice</string>
     </property>
    </widget>
    <widget class="QPushButton" name="previousButton">
@@ -453,15 +453,7 @@
     <property name="title">
      <string>&amp;Connections</string>
     </property>
-    <widget class="QMenu" name="menu_Voice">
-     <property name="title">
-      <string>&amp;Voice</string>
-     </property>
-     <addaction name="actionConnect"/>
-     <addaction name="actionDisconnect"/>
-    </widget>
     <addaction name="action_Request_Playlist"/>
-    <addaction name="menu_Voice"/>
     <addaction name="action_Join_Multicast"/>
     <addaction name="separator"/>
     <addaction name="action_Visible"/>
