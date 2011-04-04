@@ -52,7 +52,7 @@ QByteArray data;
     QBuffer* buffer_;
     QIODevice* buff;
     QBuffer* inputBuffer_;
-    QList<QBuffer*> allBuffers_;
+    QList<QByteArray> allBuffers_;
 signals:
 
 public slots:
@@ -63,6 +63,7 @@ void next();
 void previous();
 
 void addToOutput(QAudio::State);
+void checkBuff();
 
 void startMic();
 void startMic(QIODevice* stream);

@@ -199,8 +199,8 @@ void AudioComponent::testwav(QString fileName){
     QFile file(fileName);
     file.open(QIODevice::ReadOnly);
     data = file.readAll();
-    QByteArray tempdata = data; //used to view data....
-    file.close();
+    QByteArray* tempdata = &data; //used to view data....
+
     int position = 0;
 
     position = 16;
@@ -220,24 +220,52 @@ void AudioComponent::testwav(QString fileName){
 
 
 
-    //data.clear();
-
     output_ = new QAudioOutput(format,0);
-    output_->setBufferSize(*(int*)&data.constData()[40] * 2);
-    int i = data.remove(0,44);
-    tempdata = data;
-    //data=file.readAll();
-/*
-    buffer_ = new QBuffer(&data,NULL);
-    buffer_->open(QIODevice::ReadWrite);
-    output_->start(buffer_);*/
+    output_->setBufferSize(1024*8*10);//*(int*)&data.constData()[40]);
+
+
+
+    data.remove(0,44);
+    QDataStream dstream(&data,QIODevice::ReadOnly);
+
+    while(!dstream.atEnd()){
+    QByteArray newdata;
+    char* chard =(char*) malloc(1024*8);
+
+    dstream.readRawData(chard, 1024*8);
+    newdata.append(chard,1024*8);
+    allBuffers_.append(newdata);
+    }
+
+    file.close();
 
     buff = output_->start();
-    buff->write(data);
+    while(output_->bytesFree()>1024*8){
+        if(!allBuffers_.empty()){
+            buff->write(allBuffers_.takeFirst());
+        }
+        else{
+            break;
+        }
+    }
+    output_->setNotifyInterval(100);
+    connect(output_,SIGNAL(notify()),this,SLOT(checkBuff()));
+    //connect(output_,SIGNAL(stateChanged(QAudio::State)),this,SLOT(addToOutput(QAudio::State)));
 
-    connect(output_,SIGNAL(stateChanged(QAudio::State)),this,SLOT(addToOutput(QAudio::State)));
-    //buffer_->write(data);
 }
+void AudioComponent::checkBuff(){
+    int i = output_->bytesFree();
+    int j = output_->notifyInterval();
+    while((i = output_->bytesFree()) > 1024*8){
+        if(!allBuffers_.empty()){
+            buff->write(allBuffers_.takeFirst());
+        }
+        else {
+            break;
+        }
+    }
+}
+
 void AudioComponent::addToOutput(QAudio::State newState){
     switch (newState) {
         case QAudio::StoppedState:
@@ -251,8 +279,7 @@ void AudioComponent::addToOutput(QAudio::State newState){
 
         case QAudio::SuspendedState:
             qDebug("blahhhhhh suspended");
-            buff->write(data);
-            output_->resume();
+
             break;
             case QAudio::ActiveState:
             qDebug("blahhhhhh active");
