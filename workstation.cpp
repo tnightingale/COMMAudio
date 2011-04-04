@@ -51,8 +51,7 @@ Workstation::Workstation(MainWindow* mainWindow)
     if(!tcpSocket_->listen(7000)) {
         tcpSocket_->listen(7001);
     }
-
-    // Listen on the TCP socket for other client connections
+    // Listen on the UDP socket for other client connections
     if(!udpSocket_->listen(7000)) {
         udpSocket_->listen(7001);
     }
@@ -117,6 +116,24 @@ void Workstation::stopVoice(AudioComponent* player) {
 
 void Workstation::endVoiceStream() {
     qDebug("Workstation::stopVoiceStream(); Called.");
+}
+
+void Workstation::startMulticast() {
+    qDebug("Workstation::startMulticast(); Starting multicast.");
+
+    QString multiAddr("234.5.6.7");
+    udpSocket_->setDest(multiAddr, 0);
+    udpSocket_->open(QIODevice::WriteOnly);
+
+    QTimer *timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(broadcastMulti()));
+    timer->start(1000);
+}
+
+void Workstation::broadcastMulti() {
+    QDebug("Workstation::broadcastMulti(); Sending 1024 bytes.");
+    QByteArray data(1024, 'T');
+    udpSocket_->write(data);
 }
 
 void Workstation::sendFile(Socket *socket, QByteArray *data)

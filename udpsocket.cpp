@@ -61,6 +61,63 @@ void UDPSocket::setDest(QString hostAddr, size_t port) {
     serverSockAddrIn_.sin_port = htons(port);
 }
 
+void UDPSocket::initMulticastClient() {
+    bool fFlag = TRUE;
+    nRet = setsockopt(hSocket, 
+        SOL_SOCKET, 
+        SO_REUSEADDR, 
+        (char *) &fFlag, 
+
+    /** BIND **/
+
+    struct ip_mreq multicastAddr; /* Multicast interface structure */
+    char* achMCAddr /* Multicast address. */
+    multicastAddr.imr_multiaddr.s_addr = inet_addr(achMCAddr);
+    multicastAddr.imr_interface.s_addr = INADDR_ANY;
+    nRet = setsockopt(hSocket, 
+        IPPROTO_IP, 
+        IP_ADD_MEMBERSHIP, 
+        (char *) &multicastAddr, 
+        sizeof(multicastAddr));
+
+
+    /** LEAVE MULTICAST GROUP **/
+
+    /* Leave the multicast group: With IGMP v1 this is a noop, but 
+     *  with IGMP v2, it may send notification to multicast router.
+     *  Even if it's a noop, it's sanitary to cleanup after one's self.
+     */
+    multicastAddr.imr_multiaddr.s_addr = inet_addr(achMCAddr);
+    multicastAddr.imr_interface.s_addr = INADDR_ANY;
+    nRet = setsockopt(hSocket, 
+       IPPROTO_IP, 
+       IP_DROP_MEMBERSHIP, 
+       (char *)&multicastAddr, 
+       sizeof(multicastAddr));
+
+}
+
+void initMulticastServer() {
+    /* Bind the socket
+     * 
+     * NOTE: Normally, we wouldn't need to call bind unless we were 
+     *  assigning a local port number explicitly (naming the socket), 
+     *  however Microsoft requires that a socket be bound before it 
+     *  can join a multicast group with setsockopt() IP_ADD_MEMBERSHIP 
+     *  (or fails w/ WSAEINVAL).
+     */
+    SOCKADDR_IN openAddress;
+    openAddress.sin_family      = AF_INET; 
+    openAddress.sin_addr.s_addr = htonl(INADDR_ANY); /* any interface */
+    openAddress.sin_port        = 0;                 /* any port */
+    nRet = bind(hSocket, 
+            (struct sockaddr*) &openAddress, 
+            sizeof(openAddress));
+    if (nRet == SOCKET_ERROR) {
+        // FAIL
+    }
+}
+
 void UDPSocket::send(PMSG pMsg) {
     int err = 0;
     int result = 0;

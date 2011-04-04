@@ -55,6 +55,7 @@ public slots:
     void startVoice(AudioComponent*);
     void stopVoice(AudioComponent*);
     void endVoiceStream();
+    void startMulticast();
 
 signals:
     void signalFileListUpdate(QStringList*);
