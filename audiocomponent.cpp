@@ -286,7 +286,12 @@ void AudioComponent::addFromMulticast(QIODevice* socket) {
     }else{
         tempformat.setSampleType(QAudioFormat::SignedInt);
     }
-
+    if(allBuffers_.empty()){
+        allBuffers_.append(new QBuffer);
+        allFormats_.append(tempformat);
+        output_= new QAudioOutput(allFormats_.first());
+        output_->start(allBuffers_.first());
+    }
     if(tempformat!=allFormats_.last()){
         allFormats_.append(tempformat);
         allBuffers_.append(new QBuffer);
@@ -300,12 +305,17 @@ void AudioComponent::addFromMulticast(QIODevice* socket) {
 
 
 }
+/*
+ * creates the AudioOutput
+ *
+ */
 void AudioComponent::joinMulticast(){
+    allBuffers_.clear();;
+    allFormats_.clear();;
+    //output_ = new QAudioOutput(format,0);
 
-    output_ = new QAudioOutput(format,0);
 
-
-    buff = output_->start();
+    //buff = output_->start();
 
     connect(output_,SIGNAL(stateChanged(QAudio::State)),this,SLOT(addToOutput(QAudio::State)));
 
@@ -397,13 +407,15 @@ void AudioComponent::addToOutput(QAudio::State newState){
             case QAudio::IdleState:
             qDebug("blahhhhhh idle go to next song");
 
-            allBuffers_.removeFirst();
-            allFormats_.removeFirst();
-            if(!allBuffers_.empty()){
+            if(allBuffers_.size()!=1){
+
+                allBuffers_.removeFirst();
+                allFormats_.removeFirst();
                 output_->stop();
                 output_->deleteLater();
                 output_ = new QAudioOutput(allFormats_.first());
                 output_->start((QIODevice*)allBuffers_.first());
+                connect(output_,SIGNAL(stateChanged(QAudio::State)),this,SLOT(addToOutput(QAudio::State)));
             }
             break;
     }
