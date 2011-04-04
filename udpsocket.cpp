@@ -95,7 +95,7 @@ void UDPSocket::send(PMSG pMsg) {
         delete nextTxBuff_;
         nextTxBuff_ = NULL;
         if ((num = loadBuffer(bytesToRead)) <= 0) {
-            qDebug("TCPSocket::send(); Finishing...");
+            qDebug("UDPSocket::send(); Finishing...");
             break;
         }
         winsockBuff.len = num;

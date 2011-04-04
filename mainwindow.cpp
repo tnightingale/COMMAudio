@@ -412,6 +412,7 @@ void MainWindow::on_talkButton_pressed()
         }
         emit initiateVoiceStream(joinServer_.getPort(), joinServer_.getIp());
         voiceCallActive_ = TRUE;
+        //return;
     }
 
     emit voicePressed(player_);

@@ -108,10 +108,12 @@ void Workstation::initializeVoiceStream(short port, QString hostAddr) {
 }
 
 void Workstation::startVoice(AudioComponent* player) {
+    qDebug("Workstation::startVoice(); Turning on mic.");
     player->startMic(udpSocket_);
 }
 
 void Workstation::stopVoice(AudioComponent* player) {
+    qDebug("Workstation::stopVoice(); Turning off mic.");
     player->stopMic();
 }
 
@@ -150,16 +152,15 @@ void Workstation::acceptVoiceChat(Socket *socket)
     TCPSocket *mySocket = (TCPSocket*)socket;
     QString ip;
     QByteArray data;
-    QByteArray packet;
     short port = 0;
 
     // Read the packet
-    packet = mySocket->readAll();
+    QByteArray packet = mySocket->readAll();
 
     // Get the port
     data = packet.left(2);
     memcpy(&port, data, sizeof(short));
-    packet = packet.right((packet.size() - 2));
+    //packet = packet.right((packet.size() - 2));
 
     // Get the ip
     ip = mySocket->getIp();
@@ -167,6 +168,7 @@ void Workstation::acceptVoiceChat(Socket *socket)
     // Get the user's response
     if (mainWindowPointer_->requestVoiceChat(ip))
     {
+        udpSocket_->open(QIODevice::ReadWrite);
         // The user wants to voice chat
         AudioComponent *audio = mainWindowPointer_->getAudioPlayer();
         audio->playStream(udpSocket_);
