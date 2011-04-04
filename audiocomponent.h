@@ -47,7 +47,7 @@ private:
     //Phonon::AudioOutput* output_;
     QDir sourceFolder_;
 
-QByteArray data;
+    QByteArray data;
     QAudioInput* input_;
     QAudioOutput* output_;
     QFile outputFile;
@@ -61,19 +61,21 @@ signals:
 
 public slots:
     void addFromMulticast(QIODevice* socket);
-void play();
-void pause();
-void stop();
-void next();
-void previous();
+    void play();
+    void pause();
+    void stop();
+    void next();
+    void previous();
 
-void addToOutput(QAudio::State);
-void checkBuff();
+    void addToOutput(QAudio::State);
+    void checkBuff();
 
-void startMic();
-void startMic(QIODevice* stream);
-void stopMic();
-void playStream(QIODevice* stream);
+    void startMic();
+    void startMic(QIODevice* stream);
+    void pauseMic();
+    void resumeMic();
+    void stopMic();
+    void playStream(QIODevice* stream);
 };
 
 #endif // AUDIOCOMPONENT_H
