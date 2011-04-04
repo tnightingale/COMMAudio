@@ -396,10 +396,11 @@ void AudioComponent::addToOutput(QAudio::State newState){
             break;
             case QAudio::IdleState:
             qDebug("blahhhhhh idle go to next song");
-            output_->stop();
+
             allBuffers_.removeFirst();
             allFormats_.removeFirst();
             if(!allBuffers_.empty()){
+                output_->stop();
                 output_->deleteLater();
                 output_ = new QAudioOutput(allFormats_.first());
                 output_->start((QIODevice*)allBuffers_.first());
