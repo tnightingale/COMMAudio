@@ -12,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent) :
     voiceCallActive_(FALSE)
 {
     ui->setupUi(this);
+    QWidget::setWindowIcon(style()->standardIcon(QStyle::SP_MediaPlay));
     this->setFixedSize(861,598);
     ui->currentSongEditBox->setReadOnly(true);
     ui->currentSongEditBox_2->setReadOnly(true);

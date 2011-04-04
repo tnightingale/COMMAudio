@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Host Multicast</string>
   </property>
   <widget class="QListWidget" name="playlistWidget">
    <property name="geometry">

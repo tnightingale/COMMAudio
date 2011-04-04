@@ -6,6 +6,7 @@ HostMulticast::HostMulticast(QWidget *parent) :
     ui(new Ui::HostMulticast)
 {
     ui->setupUi(this);
+    QWidget::setWindowIcon(style()->standardIcon(QStyle::SP_MediaPlay));
     playlist_ = new QStringList();
     ui->playButton->setText("Play");
     ui->playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));

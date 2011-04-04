@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Downloads</string>
   </property>
   <widget class="QProgressBar" name="downloadbar1">
    <property name="geometry">

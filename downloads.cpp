@@ -6,6 +6,7 @@ Downloads::Downloads(QWidget *parent) :
     ui(new Ui::Downloads)
 {
     ui->setupUi(this);
+    QWidget::setWindowIcon(style()->standardIcon(QStyle::SP_DialogSaveButton));
     ui->download1->setReadOnly(true);
     ui->download2->setReadOnly(true);
     ui->download3->setReadOnly(true);

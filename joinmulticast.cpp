@@ -6,6 +6,7 @@ JoinMulticast::JoinMulticast(QWidget *parent) :
     ui(new Ui::JoinMulticast)
 {
     ui->setupUi(this);
+    QWidget::setWindowIcon(style()->standardIcon(QStyle::SP_MediaPlay));
     this->setFixedSize(407,57);
 }
 
