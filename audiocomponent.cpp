@@ -181,7 +181,7 @@ void AudioComponent::testwav(QString fileName){
     QFile file(fileName);
     file.open(QIODevice::ReadOnly);
     data = file.readAll();
-    QByteArray* tempdata = &data; //used to view data....
+    //QByteArray* tempdata = &data; //used to view data....
 
     int position = 0;
 
@@ -246,8 +246,10 @@ void AudioComponent::testwav(QString fileName){
 
 }
 void AudioComponent::checkBuff(){
-   /* int i = output_->bytesFree();
-    int j = output_->notifyInterval();
+/*
+    int i = output_->bytesFree();
+    //int j = output_->notifyInterval();
+
     while((i = output_->bytesFree()) > 1024*8){
         if(!allBuffers_.empty()){
             buff->write(allBuffers_.takeFirst());
@@ -256,6 +258,134 @@ void AudioComponent::checkBuff(){
             break;
         }
     }*/
+}
+
+void AudioComponent::addFromMulticast(QIODevice* socket) {
+
+    QByteArray newData = socket->read(1024*8+44);
+
+    QAudioFormat tempformat;
+    int position = 20;
+    int temp = *(short*)&newData.constData()[position];
+    if(temp!=1){
+        return;
+    }
+    position = 24;
+     temp = *(int*)&newData.constData()[position];
+    tempformat.setSampleRate(temp);
+    position = 22;
+    temp = *(short*)&newData.constData()[position];
+    tempformat.setChannels(temp);
+    position = 34;
+    temp = *(short*)&newData.constData()[position];
+    tempformat.setSampleSize(temp);
+    tempformat.setCodec("audio/pcm");
+    tempformat.setByteOrder(QAudioFormat::LittleEndian);
+    if(tempformat.sampleSize()==8){
+        tempformat.setSampleType(QAudioFormat::UnSignedInt);
+    }else{
+        tempformat.setSampleType(QAudioFormat::SignedInt);
+    }
+
+    if(tempformat!=format){
+        //new audio format >.>
+    }
+
+    newData.remove(0,44);
+    QDataStream dstream(&newData,QIODevice::ReadOnly);
+
+    while(!dstream.atEnd()){
+        QByteArray miniData;
+        char* chard =(char*) malloc(1024*8);
+
+        dstream.readRawData(chard, 1024*8);
+        miniData.append(chard,1024*8);
+        allBuffers_.append(miniData);
+    }
+
+    while(output_->bytesFree()>1024*8){
+        if(!allBuffers_.empty()){
+            buff->write(allBuffers_.takeFirst());
+        }
+        else{
+            break;
+        }
+    }
+
+}
+void AudioComponent::joinMulticast(){
+
+    output_ = new QAudioOutput(format,0);
+    output_->setBufferSize(1024*8*10);
+
+    buff = output_->start();
+    output_->setNotifyInterval(100);
+    connect(output_,SIGNAL(notify()),this,SLOT(checkBuff()));
+
+}
+
+void AudioComponent::writeToMulticast(QString fileName, QIODevice* socket){
+
+    QFile file(fileName);
+    file.open(QIODevice::ReadOnly);
+    data = file.readAll();
+    //QByteArray* tempdata = &data; //used to view data....
+
+    int position = 0;
+
+    position = 16;
+    position = 20;
+    int temp = *(short*)&data.constData()[position];
+    if(temp!=1){
+        return;
+    }
+
+
+    position = 24;
+     temp = *(int*)&data.constData()[position];
+    format.setSampleRate(temp);
+    position = 22;
+    temp = *(short*)&data.constData()[position];
+    format.setChannels(temp);
+    position = 34;
+    temp = *(short*)&data.constData()[position];
+    format.setSampleSize(temp);
+    format.setCodec("audio/pcm");
+    format.setByteOrder(QAudioFormat::LittleEndian);
+    if(format.sampleSize()==8){
+        format.setSampleType(QAudioFormat::UnSignedInt);
+    }else{
+        format.setSampleType(QAudioFormat::SignedInt);
+    }
+
+
+    QByteArray header = data.remove(0,44);
+    QDataStream dstream(&data,QIODevice::ReadOnly);
+
+    while(!dstream.atEnd()){
+        QByteArray newdata;
+        char* chard =(char*) malloc(1024*8);
+
+        dstream.readRawData(chard, 1024*8);
+        newdata.append(chard,1024*8);
+        allBuffers_.append(newdata);
+        socket->write(allBuffers_.first().prepend(header));
+    }
+
+    file.close();
+
+    buff = output_->start();
+    while(output_->bytesFree()>1024*8){
+        if(!allBuffers_.empty()){
+
+            buff->write(allBuffers_.takeFirst());
+        }
+        else{
+            break;
+        }
+    }
+    output_->setNotifyInterval(100);
+    connect(output_,SIGNAL(notify()),this,SLOT(checkBuff()));
 }
 
 void AudioComponent::addToOutput(QAudio::State newState){
