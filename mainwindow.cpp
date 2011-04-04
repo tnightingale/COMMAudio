@@ -410,7 +410,7 @@ void MainWindow::on_talkButton_pressed()
         if (joinServer_.exec() != QDialog::Accepted) {
             return;
         }
-        emit initiateVoiceStream(joinServer_.getPort(), joinServer_.getIp());
+        emit initiateVoiceStream(joinServer_.getPort(), joinServer_.getIp(), player_);
         voiceCallActive_ = TRUE;
         //return;
     }
