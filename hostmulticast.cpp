@@ -50,6 +50,7 @@ QString HostMulticast::findFullPath(QString filename) {
     return NULL;
 }
 void HostMulticast::loadLibrary(QStringList* library) {
+    ui->localLibraryList->clear();
     library_ = QStringList(*library);
     QString fileName, songTitle;
     for (int i = 0; i < library_.size();++i){

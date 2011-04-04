@@ -831,6 +831,7 @@ void MainWindow::on_action_Song_triggered() {
         }
     }
     updateMusicContent(songList_);
+    emit multicastList(&songList_);
 }
 
 void MainWindow::addSongToLocal(QString filename){
@@ -843,6 +844,7 @@ void MainWindow::addSongToLocal(QString filename){
     songList_.append(info.absoluteFilePath());
     updateMusicContent(songList_);
     ui->clientListWidget->addItem(new QListWidgetItem(info.filePath()));
+    emit multicastList(&songList_);
 }
 
 void MainWindow::on_action_Tiger_triggered() {
