@@ -42,6 +42,7 @@ MainWindow::MainWindow(QWidget *parent) :
     slider_->setGeometry(180,29,450,19);
     slider_->saveGeometry();
     connect(slider_, SIGNAL(sliderMoved(int)), this, SLOT(seek(int)));
+    connect(slider_, SIGNAL(valueChanged(int)), this, SLOT(seek(int)));
     connect(playlist_,SIGNAL(currentIndexChanged(int)), this, SLOT(playlistIndexChanged(int)));
 
     timer_ = new QTimeLine(50000);
@@ -672,6 +673,7 @@ void MainWindow::loadlastPlaylist() {
             tr("Documents (*.dat)") );
     QFile file(filename);
     if(file.open(QIODevice::ReadOnly)) {
+        ui->clearPlaylistButton->click();
         QDataStream in(&file);
         in >> data;
         in >> size;
