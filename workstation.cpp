@@ -97,10 +97,6 @@ void Workstation::initializeVoiceStream(short port, QString hostAddr, AudioCompo
             this, SLOT(endVoiceStream()));
     connect(mainWindowPointer_, SIGNAL(disconnectVoiceStream()),
             this, SLOT(endVoiceStreamUser()));
-    connect(mainWindowPointer_, SIGNAL(voicePressed(AudioComponent*)),
-            this, SLOT(startVoice(AudioComponent*)));
-    connect(mainWindowPointer_, SIGNAL(voiceReleased(AudioComponent*)),
-            this, SLOT(stopVoice(AudioComponent*)));
 
     // Disconnect the button and the initial dialog
     disconnect(mainWindowPointer_,
@@ -115,16 +111,6 @@ void Workstation::initializeVoiceStream(short port, QString hostAddr, AudioCompo
     mainWindowPointer_->setVoiceCallActive(true);
 }
 
-void Workstation::startVoice(AudioComponent* player) {
-    qDebug("Workstation::startVoice(); Turning on mic.");
-    player->resumeMic();
-}
-
-void Workstation::stopVoice(AudioComponent* player) {
-    qDebug("Workstation::stopVoice(); Turning off mic.");
-    player->pauseMic();
-}
-
 void Workstation::endVoiceStream() {
     qDebug("Workstation::endVoiceStream(); Ending voice chat.");
 
@@ -133,10 +119,6 @@ void Workstation::endVoiceStream() {
                this, SLOT(endVoiceStream()));
     disconnect(mainWindowPointer_, SIGNAL(disconnectVoiceStream()),
                this, SLOT(endVoiceStreamUser()));
-    disconnect(mainWindowPointer_, SIGNAL(voicePressed(AudioComponent*)),
-               this, SLOT(startVoice(AudioComponent*)));
-    disconnect(mainWindowPointer_, SIGNAL(voiceReleased(AudioComponent*)),
-               this, SLOT(stopVoice(AudioComponent*)));
 
     // Get the audio component
     AudioComponent *player = mainWindowPointer_->getAudioPlayer();
@@ -222,10 +204,6 @@ void Workstation::acceptVoiceChat(Socket *socket)
                 this, SLOT(endVoiceStream()));
         connect(mainWindowPointer_, SIGNAL(disconnectVoiceStream()),
                 this, SLOT(endVoiceStreamUser()));
-        connect(mainWindowPointer_, SIGNAL(voicePressed(AudioComponent*)),
-                this, SLOT(startVoice(AudioComponent*)));
-        connect(mainWindowPointer_, SIGNAL(voiceReleased(AudioComponent*)),
-                this, SLOT(stopVoice(AudioComponent*)));
     }
     else
     {

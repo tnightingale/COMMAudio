@@ -55,8 +55,6 @@ public slots:
     void requestFileListController(Socket*);
     void sendFileController(Socket*);
     void initializeVoiceStream(short port, QString hostAddr, AudioComponent* player);
-    void startVoice(AudioComponent*);
-    void stopVoice(AudioComponent*);
     void endVoiceStream();
 
 signals:
