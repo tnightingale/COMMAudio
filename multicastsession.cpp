@@ -40,9 +40,12 @@ QByteArray* MulticastSession::generateBuffer() {
     QByteArray* tempArray = new QByteArray;
     tempArray->append(header_);
     tempArray->append(current_->read(1024*8));
-    current_->close();
-    current_->deleteLater();
-    current_=NULL;
+    if(tempArray->size() != 1024*8 + 44);
+    if(current_->atEnd()){
+        current_->close();
+        current_->deleteLater();
+        current_=NULL;
+    }
     return tempArray;
 }
 
