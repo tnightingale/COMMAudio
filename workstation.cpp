@@ -38,8 +38,8 @@ Workstation::Workstation(MainWindow* mainWindow)
     udpSocket_ = new UDPSocket(mainWindow->winId());
     connect(mainWindow, SIGNAL(signalWMWSASyncUDPRx(int, int)),
             udpSocket_, SLOT(slotProcessWSAEvent(int, int)));
-    connect(mainWindow, SIGNAL(initiateVoiceStream(short, QString)),
-            this, SLOT(initializeVoiceStream(short, QString)));
+    connect(mainWindow, SIGNAL(initiateVoiceStream(short, QString, AudioComponent*)),
+            this, SLOT(initializeVoiceStream(short, QString, AudioComponent*)));
 
     // Connect the GUI button signals to the functions in here
     connect(mainWindow, SIGNAL(requestPlaylist(QString, short)),
