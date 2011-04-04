@@ -111,32 +111,6 @@ QMediaPlaylist* AudioComponent::getPlaylist() {
     return playlist_;
 }
 
-void AudioComponent::startMic(){
-    format.setFrequency(8000);
-    format.setChannels(1);
-    format.setSampleSize(8);
-    format.setCodec("audio/pcm");
-    format.setByteOrder(QAudioFormat::LittleEndian);
-    format.setSampleType(QAudioFormat::UnSignedInt);
-
-    QAudioDeviceInfo info = QAudioDeviceInfo::defaultInputDevice();
-    if (!info.isFormatSupported(format));{
-        qWarning()<<"format not supported";
-        format = info.nearestFormat(format);
-    }
-    QStringList formatTypes = info.supportedCodecs();
-    for(int i = 0;i < formatTypes.size();++i){
-        qDebug()<< formatTypes.at(i);
-    }
-
-    input_ = new QAudioInput(format,NULL);
-    QAudioOutput* qoutput_;
-    qoutput_ = new QAudioOutput(format,NULL);
-
-    input_->start(qoutput_->start());
-
-    //return micData;
-}
 void AudioComponent::startMic(QIODevice* stream) {
     format.setFrequency(8000);
     format.setChannels(1);
