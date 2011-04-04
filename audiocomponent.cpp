@@ -147,6 +147,7 @@ void AudioComponent::startMic(QIODevice* stream) {
 
     input_ = new QAudioInput(format,NULL);
     input_->start(stream);
+    input_->suspend();
 }
 
 void AudioComponent::stopMic(){
