@@ -92,13 +92,19 @@ void Workstation::initializeVoiceStream(short port, QString hostAddr, AudioCompo
     // Send the file path to the client
     controlSocket->write(packet);
 
-    // Connect the signal for receiving the file
+    // Connect the signals
     connect(controlSocket, SIGNAL(signalSocketClosed()),
             this, SLOT(endVoiceStream()));
     connect(mainWindowPointer_, SIGNAL(voicePressed(AudioComponent*)),
             this, SLOT(startVoice(AudioComponent*)));
     connect(mainWindowPointer_, SIGNAL(voiceReleased(AudioComponent*)),
             this, SLOT(stopVoice(AudioComponent*)));
+
+    // Disconnect the button and the initial dialog
+    disconnect(mainWindowPointer_,
+               SIGNAL(initiateVoiceStream(short, QString, AudioComponent*)),
+               this,
+               SLOT(initializeVoiceStream(short, QString, AudioComponent*)));
 
     udpSocket_->open(QIODevice::ReadWrite);
     udpSocket_->setDest(hostAddr, port);
@@ -117,6 +123,10 @@ void Workstation::stopVoice(AudioComponent* player) {
 
 void Workstation::endVoiceStream() {
     qDebug("Workstation::stopVoiceStream(); Called.");
+    connect(mainWindowPointer_,
+            SIGNAL(initiateVoiceStream(short, QString, AudioComponent*)),
+            this,
+            SLOT(initializeVoiceStream(short, QString, AudioComponent*)));
 }
 
 void Workstation::sendFile(Socket *socket, QByteArray *data)
@@ -697,4 +707,5 @@ void Workstation::requestFileListController(Socket *socket)
         // Close the socket
         delete socket;
     }
+
 }

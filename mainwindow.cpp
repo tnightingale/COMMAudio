@@ -403,15 +403,17 @@ QStringList MainWindow::getLocalFileList()
 }
 
 
+
 void MainWindow::on_talkButton_pressed()
 {
-    if (!voiceCallActive_) {
-        if (joinServer_.exec() != QDialog::Accepted) {
+    if (!voiceCallActive_)
+    {
+        if (joinServer_.exec() != QDialog::Accepted)
+        {
             return;
         }
         emit initiateVoiceStream(joinServer_.getPort(), joinServer_.getIp(), player_);
-        voiceCallActive_ = TRUE;
-        //return;
+        voiceCallActive_ = true;
     }
 
     emit voicePressed(player_);
@@ -850,4 +852,34 @@ void MainWindow::downloadStarted(int filesize, int packsizeRecv) {
     }else if(ui->downloadBar->value() > 0) {
         ui->remoteListWidget->setDisabled(true);
     }
+}
+
+bool MainWindow::getVoiceCallActive()
+{
+    return voiceCallActive_;
+}
+
+void MainWindow::setVoiceCallActive(bool status)
+{
+    voiceCallActive_ = status;
+}
+
+void MainWindow::on_actionConnect_triggered()
+{
+    if (!voiceCallActive_)
+    {
+        if (joinServer_.exec() != QDialog::Accepted)
+        {
+            return;
+        }
+        emit initiateVoiceStream(joinServer_.getPort(), joinServer_.getIp(), player_);
+        voiceCallActive_ = true;
+        // Should enable the disconnect button here
+    }
+}
+
+void MainWindow::on_actionDisconnect_triggered()
+{
+    voiceCallActive_ = false;
+    emit disconnectVoiceStream();
 }

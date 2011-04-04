@@ -155,6 +155,16 @@ void AudioComponent::stopMic(){
     //delete input_;
 }
 
+void AudioComponent::pauseMic()
+{
+    input_->suspend();
+}
+
+void AudioComponent::resumeMic()
+{
+    input_->resume();
+}
+
 void AudioComponent::playStream(QIODevice* stream){
     format.setFrequency(8000);
     format.setChannels(1);
