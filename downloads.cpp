@@ -24,58 +24,82 @@ void Downloads::downloadFile(int filesize, int packetsize, QString file){
         ui->downloadbar1->setMaximum(filesize);
         ui->downloadbar1->setValue(ui->downloadbar1->value() + packetsize);
         if(ui->downloadbar1->value() == ui->downloadbar1->maximum()) {
-                ui->downloadbar1->reset();
                 ui->download1->clear();
+                ui->downloadbar1->reset();
+
         }
     } else if(ui->download2->toPlainText() == file) {
         ui->downloadbar2->setMaximum(filesize);
         ui->downloadbar2->setValue(ui->downloadbar2->value() + packetsize);
         if(ui->downloadbar2->value() == ui->downloadbar2->maximum()) {
-                ui->downloadbar2->reset();
-                ui->download2->clear();
+            ui->download2->clear();
+            ui->downloadbar2->reset();
         }
-    } else if(ui->download3->toPlainText() == file) {
+    }else if(ui->download3->toPlainText() == file) {
         ui->downloadbar3->setMaximum(filesize);
         ui->downloadbar3->setValue(ui->downloadbar3->value() + packetsize);
         if(ui->downloadbar3->value() == ui->downloadbar3->maximum()) {
-                ui->downloadbar3->reset();
-                ui->download3->clear();
+            ui->download3->clear();
+            ui->downloadbar3->reset();
         }
-    } else if(ui->download4->toPlainText() == file) {
+    }else if(ui->download4->toPlainText() == file) {
         ui->downloadbar4->setMaximum(filesize);
         ui->downloadbar4->setValue(ui->downloadbar4->value() + packetsize);
         if(ui->downloadbar4->value() == ui->downloadbar4->maximum()) {
-                ui->downloadbar4->reset();
-                ui->download4->clear();
+            ui->download4->clear();
+            ui->downloadbar4->reset();
+
         }
     } else if(ui->download5->toPlainText() == file) {
         ui->downloadbar5->setMaximum(filesize);
         ui->downloadbar5->setValue(ui->downloadbar5->value() + packetsize);
         if(ui->downloadbar5->value() == ui->downloadbar5->maximum()) {
-                ui->downloadbar5->reset();
-                ui->download5->clear();
+             ui->download5->clear();
+            ui->downloadbar5->reset();
         }
+    } else if(ui->download1->toPlainText().size() <= 0) {
+        ui->download1->setText(file);
+        ui->downloadbar1->setMaximum(filesize);
+        ui->downloadbar1->setValue(packetsize);
+    }else if (ui->download2->toPlainText().size() <= 0) {
+        ui->download2->setText(file);
+        ui->downloadbar2->setMaximum(filesize);
+        ui->downloadbar2->setValue(packetsize);
+    }else if (ui->download3->toPlainText().size() <= 0) {
+        ui->download3->setText(file);
+        ui->downloadbar3->setMaximum(filesize);
+        ui->downloadbar3->setValue(packetsize);
+    } else if (ui->download4->toPlainText().size() <= 0) {
+        ui->download4->setText(file);
+        ui->downloadbar4->setMaximum(filesize);
+        ui->downloadbar4->setValue(packetsize);
+    }else if (ui->download5->toPlainText().size() <= 0) {
+        ui->download5->setText(file);
+        ui->downloadbar5->setMaximum(filesize);
+        ui->downloadbar5->setValue(packetsize);
     }
-
     if(countCurrentDownloads() < 5) {
        emit queueFull(false);
     }else{
         emit queueFull(true);
     }
-
 }
 
 int Downloads::countCurrentDownloads(){
     int count = 0;
     if(ui->download1->toPlainText().length() > 0) {
         count++;
-    } else if(ui->download2->toPlainText().length() > 0) {
+    }
+    if(ui->download2->toPlainText().length() > 0) {
         count++;
-    } else if(ui->download3->toPlainText().length() > 0) {
+    }
+    if(ui->download3->toPlainText().length() > 0) {
         count++;
-    } else if(ui->download4->toPlainText().length() > 0) {
+    }
+    if(ui->download4->toPlainText().length() > 0) {
         count++;
-    } else if(ui->download5->toPlainText().length() > 0) {
+    }
+    if(ui->download5->toPlainText().length() > 0) {
         count++;
     }
     return count;

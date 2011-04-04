@@ -867,9 +867,7 @@ bool MainWindow::requestVoiceChat(QString fromIp)
 }
 
 void MainWindow::downloadStarted(int filesize, int packsizeRecv, QString file) {
-    if(downloads_.countCurrentDownloads() <= 5) {
         downloads_.downloadFile(filesize, packsizeRecv, file);
-    }
 }
 
 void MainWindow::on_viewDownloadButton_clicked()
