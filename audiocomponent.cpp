@@ -204,7 +204,13 @@ void AudioComponent::testwav(QString fileName){
     int position = 0;
 
     position = 16;
-    int temp = *(int*)&data.constData()[position];
+    position = 20;
+    int temp = *(short*)&data.constData()[position];
+    if(temp!=1){
+        return;
+    }
+
+
     position = 24;
      temp = *(int*)&data.constData()[position];
     format.setSampleRate(temp);
@@ -216,25 +222,26 @@ void AudioComponent::testwav(QString fileName){
     format.setSampleSize(temp);
     format.setCodec("audio/pcm");
     format.setByteOrder(QAudioFormat::LittleEndian);
-    format.setSampleType(QAudioFormat::SignedInt);
-
+    if(format.sampleSize()==8){
+        format.setSampleType(QAudioFormat::UnSignedInt);
+    }else{
+        format.setSampleType(QAudioFormat::SignedInt);
+    }
 
 
     output_ = new QAudioOutput(format,0);
-    output_->setBufferSize(1024*8*10);//*(int*)&data.constData()[40]);
-
-
+    output_->setBufferSize(1024*8*10);
 
     data.remove(0,44);
     QDataStream dstream(&data,QIODevice::ReadOnly);
 
     while(!dstream.atEnd()){
-    QByteArray newdata;
-    char* chard =(char*) malloc(1024*8);
+        QByteArray newdata;
+        char* chard =(char*) malloc(1024*8);
 
-    dstream.readRawData(chard, 1024*8);
-    newdata.append(chard,1024*8);
-    allBuffers_.append(newdata);
+        dstream.readRawData(chard, 1024*8);
+        newdata.append(chard,1024*8);
+        allBuffers_.append(newdata);
     }
 
     file.close();
