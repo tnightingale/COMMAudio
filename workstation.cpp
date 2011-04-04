@@ -113,6 +113,7 @@ void Workstation::initializeVoiceStream(short port, QString hostAddr, AudioCompo
     player->playStream(udpSocket_);
     player->startMic(udpSocket_);
     player->pauseMic();
+    mainWindowPointer_->setVoiceCallActive(true);
 }
 
 void Workstation::startVoice(AudioComponent* player) {
@@ -144,6 +145,9 @@ void Workstation::endVoiceStream() {
     // Stop the audio input and playback
     player->stopMic();
     player->stop();
+
+    // Make sure that the boolean flag is false
+    mainWindowPointer_->setVoiceCallActive(false);
 }
 
 void Workstation::endVoiceStreamUser()
