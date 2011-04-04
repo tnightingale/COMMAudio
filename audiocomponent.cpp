@@ -212,10 +212,10 @@ void AudioComponent::testwav(QString fileName){
 
 
     output_ = new QAudioOutput(format,0);
-    output_->setBufferSize(1024*8*10);
+    //output_->setBufferSize(1024*8*10);
 
     data.remove(0,44);
-    QDataStream dstream(&data,QIODevice::ReadOnly);
+/*    QDataStream dstream(&data,QIODevice::ReadOnly);
 
     while(!dstream.atEnd()){
         QByteArray newdata;
@@ -224,10 +224,13 @@ void AudioComponent::testwav(QString fileName){
         dstream.readRawData(chard, 1024*8);
         newdata.append(chard,1024*8);
         allBuffers_.append(newdata);
-    }
+    }*/
 
     file.close();
-
+    buff = new QBuffer(&data,0);
+    buff->open(QIODevice::ReadOnly);
+    output_->start(buff);
+/*
     buff = output_->start();
     while(output_->bytesFree()>1024*8){
         if(!allBuffers_.empty()){
@@ -236,14 +239,14 @@ void AudioComponent::testwav(QString fileName){
         else{
             break;
         }
-    }
+    }*//*
     output_->setNotifyInterval(100);
-    connect(output_,SIGNAL(notify()),this,SLOT(checkBuff()));
+    connect(output_,SIGNAL(notify()),this,SLOT(checkBuff()));*/
     //connect(output_,SIGNAL(stateChanged(QAudio::State)),this,SLOT(addToOutput(QAudio::State)));
 
 }
 void AudioComponent::checkBuff(){
-    int i = output_->bytesFree();
+   /* int i = output_->bytesFree();
     int j = output_->notifyInterval();
     while((i = output_->bytesFree()) > 1024*8){
         if(!allBuffers_.empty()){
@@ -252,7 +255,7 @@ void AudioComponent::checkBuff(){
         else {
             break;
         }
-    }
+    }*/
 }
 
 void AudioComponent::addToOutput(QAudio::State newState){
