@@ -638,12 +638,13 @@ void MainWindow::on_action_Advanced_toggled(bool status) {
         ui->muteToolButton->setGeometry(650,70,93,28);
         ui->horizontalSlider->setGeometry(670,40,160,19);
         ui->currentSongEditBox->setGeometry(170,30,461,31);
+        ui->tabWidget->show();
     } else {
         slider_->hide();
         ui->playback_label->hide();
         ui->playbackBox->hide();
         ui->talkButton->hide();
-        this->setFixedSize(861,568);
+        this->setFixedSize(861,117);
         ui->tabWidget->setGeometry(0,70,861,451);
         ui->playButton->setGeometry(370,40,93,28);
         ui->stopButton->setGeometry(270,40,93,28);
@@ -653,6 +654,7 @@ void MainWindow::on_action_Advanced_toggled(bool status) {
         ui->muteToolButton->setGeometry(650,40,93,28);
         ui->horizontalSlider->setGeometry(670,10,160,19);
         ui->currentSongEditBox->setGeometry(170,0,461,31);
+        ui->tabWidget->hide();
     }
 }
 
