@@ -86,7 +86,7 @@ signals:
     void signalWMWSASyncUDPRx(int, int);
     void requestPlaylist(QString, short);
     void requestFile(QString,short, QString);
-    void initiateVoiceStream(short port, QString hostAddr);
+    void initiateVoiceStream(short port, QString hostAddr, AudioComponent* player);
     void voicePressed(AudioComponent*);
     void voiceReleased(AudioComponent*);
 

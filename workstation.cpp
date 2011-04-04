@@ -67,7 +67,7 @@ Workstation::~Workstation() {
     // Should delete the current transfers map here too?
 }
 
-void Workstation::initializeVoiceStream(short port, QString hostAddr) {
+void Workstation::initializeVoiceStream(short port, QString hostAddr, AudioComponent* player) {
     qDebug("Workstation::startVoiceStream(); Starting voice chat...");
     // Create the socket
     TCPSocket* controlSocket = new TCPSocket(mainWindowPointer_->winId());
@@ -102,6 +102,7 @@ void Workstation::initializeVoiceStream(short port, QString hostAddr) {
 
     udpSocket_->open(QIODevice::ReadWrite);
     udpSocket_->setDest(hostAddr, port);
+    player->playStream(udpSocket_);
 }
 
 void Workstation::startVoice(AudioComponent* player) {
@@ -169,7 +170,7 @@ void Workstation::acceptVoiceChat(Socket *socket)
         // The user wants to voice chat
         AudioComponent *audio = mainWindowPointer_->getAudioPlayer();
         audio->playStream(udpSocket_);
-        //audio->startMic(udpSocket_);
+        audio->startMic(udpSocket_);
     }
     else
     {
