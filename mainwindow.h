@@ -12,6 +12,9 @@
 #include "ui_colors.h"
 #include "ui_joinserver.h"
 #include "remoteSong.h"
+#include "downloads.h"
+#include "hostmulticast.h"
+#include "joinmulticast.h"
 #include <QGraphicsView>
 #include <QGraphicsItem>
 #include <QTimeLine>
@@ -94,6 +97,7 @@ signals:
     void disconnectVoiceStream();
     void voicePressed(AudioComponent*);
     void voiceReleased(AudioComponent*);
+    void multicastList(QStringList *songs);
 
 private:
     QSlider *slider_;
@@ -111,6 +115,9 @@ private:
     QStringList songList_;
     QStringList playlistData_;
     QMap<QString,RemoteSong> remoteList_;
+    Downloads downloads_;
+    HostMulticast *multicast_;
+    JoinMulticast *joinMulticast_;
 
 private slots:
     void on_actionDisconnect_triggered();
@@ -148,7 +155,10 @@ private slots:
     void on_action_Song_triggered();
     void on_action_Tiger_triggered();
     void on_action_Default_triggered();
-    void downloadStarted(int filesize, int packsizeRecv);
+    void downloadStarted(int filesize, int packsizeRecv, QString file);
+    void on_viewDownloadButton_clicked();
+    void downloadQueueFull(bool full);
+    void on_action_Host_Multicast_triggered();
 };
 
 #endif // MAINWINDOW_H

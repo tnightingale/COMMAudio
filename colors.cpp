@@ -6,6 +6,7 @@ Colors::Colors(QWidget *parent) :
     ui(new Ui::Colors)
 {
     ui->setupUi(this);
+    QWidget::setWindowIcon(style()->standardIcon(QStyle::SP_MediaPlay));
     backgroundColor_ = "Black";
     fontColor_ = "White";
     ui->testButton->setStyleSheet("QPushButton {background-color: Black;color: white;}");

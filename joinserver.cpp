@@ -45,6 +45,7 @@ JoinServer::JoinServer(QWidget *parent) :
     ui(new Ui::JoinServer)
 {
     ui->setupUi(this);
+    QWidget::setWindowIcon(style()->standardIcon(QStyle::SP_MediaPlay));
 }
 
 /*
