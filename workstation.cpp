@@ -182,6 +182,7 @@ void Workstation::sendFile(Socket *socket, QByteArray *data)
 
 void Workstation::acceptVoiceChat(Socket *socket)
 {
+    // Make sure that we are not already connected to another
     if (mainWindowPointer_->getVoiceCallActive())
     {
         return;

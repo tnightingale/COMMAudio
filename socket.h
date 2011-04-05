@@ -83,6 +83,7 @@ public:
 
     virtual ~Socket() {
         qDebug("Socket::~Socket() %d", (int) socket_);
+        emit signalSocketClosed();
         closesocket(socket_);
     }
 
