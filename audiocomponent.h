@@ -2,7 +2,7 @@
 #define AUDIOCOMPONENT_H
 
 #include <QObject>
-#include <Phonon>
+//#include <Phonon>
 #include <QDir>
 #include <QAudioInput>
 #include <QAudioOutput>
@@ -10,6 +10,8 @@
 #include <QtMultimediaKit/QMediaPlayer>
 #include <QtMultimediaKit/QMediaPlaylist>
 #include <QtMultimediaKit/QMediaObject>
+#include "socket.h"
+#include <QThread>
 
 class AudioComponent : public QObject
 {
@@ -37,9 +39,16 @@ public:
     int getIndex();
     void testwav(QString fileName);
 
+    void writeToMulticast(QString fileName, QIODevice* socket);
+
+    void joinMulticast();
+
+
 private:
     QMediaPlayer* player_;
     QMediaPlaylist* playlist_;
+    QIODevice *micIO_;
+    QIODevice *speakersIO_;
     //Phonon::MediaObject* playlist_;
     //Phonon::AudioOutput* output_;
     QDir sourceFolder_;
@@ -52,25 +61,29 @@ private:
     QBuffer* buffer_;
     QIODevice* buff;
     QBuffer* inputBuffer_;
-    QList<QByteArray> allBuffers_;
+    QList<QByteArray*> allBuffers_;
+    QList<QAudioFormat> allFormats_;
 signals:
 
 public slots:
+    void addFromMulticast(Socket* socket);
+    void stateChangeStream(QAudio::State);
+    void onNotify();
+
     void play();
     void pause();
     void stop();
     void next();
     void previous();
 
-    void addToOutput(QAudio::State);
-    void checkBuff();
+    void mic(QAudio::State);
+    void speak(QAudio::State);
 
-    void startMic();
-    void startMic(QIODevice* stream);
+    void startMic(QIODevice* stream, QThread* socketThread);
     void pauseMic();
     void resumeMic();
     void stopMic();
-    void playStream(QIODevice* stream);
+    void playStream(QIODevice* stream, QThread* socketThread);
 };
 
 #endif // AUDIOCOMPONENT_H

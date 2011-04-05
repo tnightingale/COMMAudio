@@ -20,7 +20,8 @@ public:
      * @author Joel Stewart
      */
     void setIp(QString ip);
-
+signals:
+    void play(QString ip);
 private:
     Ui::JoinMulticast *ui;
 };

@@ -64,3 +64,6 @@ void HostMulticast::loadLibrary(QStringList* library) {
         }
     }
 }
+QStringList* HostMulticast::getPlaylist() {
+    return playlist_;
+}

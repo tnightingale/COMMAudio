@@ -17,4 +17,5 @@ JoinMulticast::~JoinMulticast()
 
 void JoinMulticast::setIp(QString ip){
     ui->ipField->setText(ip);
+    emit play(ip);
 }

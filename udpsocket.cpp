@@ -61,6 +61,49 @@ void UDPSocket::setDest(QString hostAddr, size_t port) {
     serverSockAddrIn_.sin_port = htons(port);
 }
 
+void UDPSocket::listenMulticast(QString address, int port) {
+    int err = 0;
+    bool fFlag = TRUE;
+    struct ip_mreq multicastAddr;
+
+    err = setsockopt(socket_, SOL_SOCKET, SO_REUSEADDR, (char *) &fFlag,
+                     sizeof(fFlag));
+    if (err == SOCKET_ERROR) {
+        qDebug("UDPSocket::initMulticastClient(); SO_REUSEADDR failed: %d",
+               WSAGetLastError());
+    }
+
+    // Bind to listening port.
+    listen(port);
+
+    multicastAddr.imr_multiaddr.s_addr = inet_addr(address.toAscii().constData());
+    multicastAddr.imr_interface.s_addr = INADDR_ANY;
+
+    // Join multicast group.
+    err = setsockopt(socket_, IPPROTO_IP, IP_ADD_MEMBERSHIP,
+                     (char*) &multicastAddr, sizeof(multicastAddr));
+    if (err == SOCKET_ERROR) {
+        qDebug("UDPSocket::initMulticastClient(); IP_ADD_MEMBERSHIP failed: %d",
+               WSAGetLastError());
+    }
+
+    /** LEAVE MULTICAST GROUP **/
+
+    /* Leave the multicast group: With IGMP v1 this is a noop, but
+     *  with IGMP v2, it may send notification to multicast router.
+     *  Even if it's a noop, it's sanitary to cleanup after one's self.
+     */
+    /*
+    multicastAddr.imr_multiaddr.s_addr = inet_addr(achMCAddr);
+    multicastAddr.imr_interface.s_addr = INADDR_ANY;
+    nRet = setsockopt(hSocket,
+       IPPROTO_IP,
+       IP_DROP_MEMBERSHIP,
+       (char *)&multicastAddr,
+       sizeof(multicastAddr));
+    */
+}
+
 void UDPSocket::send(PMSG pMsg) {
     int err = 0;
     int result = 0;
@@ -78,9 +121,11 @@ void UDPSocket::send(PMSG pMsg) {
     winsockBuff.buf = nextTxBuff_->data();
     winsockBuff.len = nextTxBuff_->size();
 
+    int test = winsockBuff.len;
+
     while (TRUE) {
         result = WSASendTo(pMsg->wParam, &winsockBuff, 1, &numSent, 0,
-                           (PSOCKADDR) &serverSockAddrIn_, sizeof(serverSockAddrIn_), 
+                           (PSOCKADDR) &serverSockAddrIn_, sizeof(serverSockAddrIn_),
                            NULL, NULL);
 
         if ((err = WSAGetLastError()) > 0 && err != ERROR_IO_PENDING) {
@@ -95,7 +140,7 @@ void UDPSocket::send(PMSG pMsg) {
         delete nextTxBuff_;
         nextTxBuff_ = NULL;
         if ((num = loadBuffer(bytesToRead)) <= 0) {
-            qDebug("UDPSocket::send(); Finishing...");
+            qDebug("UDPSocket::send(); Finishing...%d", test);
             break;
         }
         winsockBuff.len = num;
@@ -124,7 +169,8 @@ void UDPSocket::receive(PMSG pMsg) {
     int bytesWritten = 0;
     WSABUF winsockBuff;
 
-    winsockBuff.len = MAXUDPDGRAMSIZE;
+    //winsockBuff.len = MAXUDPDGRAMSIZE;
+    winsockBuff.len = 1024 * 8 + 44;
     winsockBuff.buf = (char*) calloc(winsockBuff.len, sizeof(char));
 
     if (WSARecvFrom(pMsg->wParam, &(winsockBuff), 1, &numReceived, &flags,
@@ -135,7 +181,7 @@ void UDPSocket::receive(PMSG pMsg) {
             return;
         }
     }
-    
+
     if (numReceived == 0) {
         return;
     }

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>379</width>
+    <height>209</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,8 +16,8 @@
   <widget class="QProgressBar" name="downloadbar1">
    <property name="geometry">
     <rect>
-     <x>260</x>
-     <y>30</y>
+     <x>240</x>
+     <y>10</y>
      <width>141</width>
      <height>23</height>
     </rect>
@@ -29,8 +29,8 @@
   <widget class="QProgressBar" name="downloadbar2">
    <property name="geometry">
     <rect>
-     <x>260</x>
-     <y>70</y>
+     <x>240</x>
+     <y>50</y>
      <width>141</width>
      <height>23</height>
     </rect>
@@ -42,8 +42,8 @@
   <widget class="QProgressBar" name="downloadbar3">
    <property name="geometry">
     <rect>
-     <x>260</x>
-     <y>110</y>
+     <x>240</x>
+     <y>90</y>
      <width>141</width>
      <height>23</height>
     </rect>
@@ -55,8 +55,8 @@
   <widget class="QProgressBar" name="downloadbar4">
    <property name="geometry">
     <rect>
-     <x>260</x>
-     <y>160</y>
+     <x>240</x>
+     <y>130</y>
      <width>141</width>
      <height>23</height>
     </rect>
@@ -68,8 +68,8 @@
   <widget class="QProgressBar" name="downloadbar5">
    <property name="geometry">
     <rect>
-     <x>260</x>
-     <y>200</y>
+     <x>240</x>
+     <y>170</y>
      <width>141</width>
      <height>23</height>
     </rect>
@@ -81,8 +81,8 @@
   <widget class="QTextEdit" name="download1">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>30</y>
+     <x>10</x>
+     <y>10</y>
      <width>221</width>
      <height>31</height>
     </rect>
@@ -91,8 +91,8 @@
   <widget class="QTextEdit" name="download2">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>70</y>
+     <x>10</x>
+     <y>50</y>
      <width>221</width>
      <height>31</height>
     </rect>
@@ -101,8 +101,8 @@
   <widget class="QTextEdit" name="download3">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>110</y>
+     <x>10</x>
+     <y>90</y>
      <width>221</width>
      <height>31</height>
     </rect>
@@ -111,8 +111,8 @@
   <widget class="QTextEdit" name="download4">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>150</y>
+     <x>10</x>
+     <y>130</y>
      <width>221</width>
      <height>31</height>
     </rect>
@@ -121,8 +121,8 @@
   <widget class="QTextEdit" name="download5">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>200</y>
+     <x>10</x>
+     <y>170</y>
      <width>221</width>
      <height>31</height>
     </rect>

@@ -103,6 +103,7 @@ void MainWindow::on_action_Join_Multicast_triggered()
 {
     if (joinServer_.exec() == QDialog::Accepted)
     {
+        getAudioPlayer()->joinMulticast();
         joinMulticast_->setIp(joinServer_.getIp());
         joinMulticast_->show();
     }
@@ -268,6 +269,7 @@ void MainWindow::on_remoteListWidget_itemDoubleClicked(QListWidgetItem* item)
     RemoteSong songInfo = remoteList_.value(item->text());
     emit requestFile(songInfo.getIp(),songInfo.getPort(), songInfo.getFilePath());
     addSongToLocal(songInfo.getFilePath());
+    ui->songTransferedEditBox->setText(item->text());
 }
 
 void MainWindow::on_playButton_clicked()
@@ -319,28 +321,6 @@ bool MainWindow::winEvent(PMSG msg, long * result) {
 QStringList MainWindow::getLocalFileList()
 {
     return songList_;
-}
-
-
-
-void MainWindow::on_talkButton_pressed()
-{
-    if (!voiceCallActive_)
-    {
-        if (joinServer_.exec() != QDialog::Accepted)
-        {
-            return;
-        }
-        emit initiateVoiceStream(joinServer_.getPort(), joinServer_.getIp(), player_);
-        voiceCallActive_ = true;
-    }
-
-    emit voicePressed(player_);
-}
-
-void MainWindow::on_talkButton_released()
-{
-    emit voiceReleased(player_);
 }
 
 void MainWindow::on_tabWidget_currentChanged(int index)
@@ -809,7 +789,9 @@ void MainWindow::downloadQueueFull(bool full) {
 
 void MainWindow::on_action_Host_Multicast_triggered()
 {
+
     emit multicastList(&songList_);
+    emit startMulticast(multicast_->getPlaylist());
     multicast_->show();
 }
 
@@ -820,26 +802,30 @@ bool MainWindow::getVoiceCallActive()
 
 void MainWindow::setVoiceCallActive(bool status)
 {
+    if (status)
+    {
+        ui->talkButton->setText("Stop Talking");
+    }
+    else
+    {
+        ui->talkButton->setText("Start Talking");
+    }
     voiceCallActive_ = status;
 }
 
-void MainWindow::on_actionConnect_triggered()
+void MainWindow::on_talkButton_clicked()
 {
-    if (!voiceCallActive_)
+    if (voiceCallActive_)
     {
-        if (joinServer_.exec() != QDialog::Accepted)
-        {
-            return;
-        }
-        emit initiateVoiceStream(joinServer_.getPort(), joinServer_.getIp(), player_);
-        voiceCallActive_ = true;
-        // Should enable the disconnect button here
+        setVoiceCallActive(false);
+        emit disconnectVoiceStream();
     }
-}
-
-void MainWindow::on_actionDisconnect_triggered()
-{
-    voiceCallActive_ = false;
-    // Should disable this menu item here
-    emit disconnectVoiceStream();
+    else
+    {
+        if (joinServer_.exec() == QDialog::Accepted)
+        {
+            setVoiceCallActive(true);
+            emit initiateVoiceStream(joinServer_.getPort(), joinServer_.getIp(), player_);
+        }
+    }
 }

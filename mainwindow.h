@@ -79,6 +79,8 @@ public:
      * @author Joel Stewart
      */
     void visualization(int n);
+    HostMulticast* getHostMulticast() { return multicast_; }
+    JoinMulticast* getJoinMulticast() { return joinMulticast_; }
 
     /*
     -- FUNCTION: getLocalFileList
@@ -181,6 +183,8 @@ signals:
      * @author Joel Stewart
      */
     void multicastList(QStringList *songs);
+    void startMulticast(QStringList* list);
+
 
 private:
     QSlider *slider_;
@@ -203,8 +207,7 @@ private:
     JoinMulticast *joinMulticast_;
 
 private slots:
-    void on_actionDisconnect_triggered();
-    void on_actionConnect_triggered();
+    void on_talkButton_clicked();
     void playlistIndexChanged(int index);
     /**
      * seek bar for song playing
@@ -329,8 +332,6 @@ private slots:
     -- combined list of clients
     */
     void on_remoteListWidget_itemDoubleClicked(QListWidgetItem* item);
-    void on_talkButton_pressed();
-    void on_talkButton_released();
     /**
      * current tab in use
      *

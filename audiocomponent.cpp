@@ -111,41 +111,19 @@ QMediaPlaylist* AudioComponent::getPlaylist() {
     return playlist_;
 }
 
-void AudioComponent::startMic(){
-    format.setFrequency(8000);
-    format.setChannels(1);
+void AudioComponent::startMic(QIODevice* stream, QThread* micThread) {
+    micIO_ = stream;
+    format.setFrequency(44100);
+    format.setChannels(2);
     format.setSampleSize(8);
     format.setCodec("audio/pcm");
     format.setByteOrder(QAudioFormat::LittleEndian);
     format.setSampleType(QAudioFormat::UnSignedInt);
 
-    QAudioDeviceInfo info = QAudioDeviceInfo::defaultInputDevice();
-    if (!info.isFormatSupported(format));{
-        qWarning()<<"format not supported";
-        format = info.nearestFormat(format);
-    }
-    QStringList formatTypes = info.supportedCodecs();
-    for(int i = 0;i < formatTypes.size();++i){
-        qDebug()<< formatTypes.at(i);
-    }
-
-    input_ = new QAudioInput(format,NULL);
-    QAudioOutput* qoutput_;
-    qoutput_ = new QAudioOutput(format,NULL);
-
-    input_->start(qoutput_->start());
-
-    //return micData;
-}
-void AudioComponent::startMic(QIODevice* stream) {
-    format.setFrequency(8000);
-    format.setChannels(1);
-    format.setSampleSize(8);
-    format.setCodec("audio/pcm");
-    format.setByteOrder(QAudioFormat::LittleEndian);
-    format.setSampleType(QAudioFormat::UnSignedInt);
-
-    input_ = new QAudioInput(format,NULL);
+    input_ = new QAudioInput(format, NULL);
+    connect(input_, SIGNAL(stateChanged(QAudio::State)),
+            this, SLOT(mic(QAudio::State)));
+    input_->moveToThread(micThread);
     input_->start(stream);
 }
 
@@ -171,25 +149,163 @@ void AudioComponent::resumeMic()
     }
 }
 
-void AudioComponent::playStream(QIODevice* stream){
-    format.setFrequency(8000);
-    format.setChannels(1);
+void AudioComponent::playStream(QIODevice* stream, QThread* streamThread){
+    speakersIO_ = stream;
+    format.setFrequency(44100);
+    format.setChannels(2);
     format.setSampleSize(8);
     format.setCodec("audio/pcm");
     format.setByteOrder(QAudioFormat::LittleEndian);
     format.setSampleType(QAudioFormat::UnSignedInt);
 
-    QAudioOutput* qoutput_;
-    qoutput_ = new QAudioOutput(format,NULL);
-    qoutput_->start(stream);
+    output_ = new QAudioOutput(format,NULL);
+    connect(output_, SIGNAL(stateChanged(QAudio::State)),
+            this, SLOT(speak(QAudio::State)));
+    output_->moveToThread(streamThread);
+    output_->start(stream);
 }
 
-void AudioComponent::testwav(QString fileName){
+void AudioComponent::addFromMulticast(Socket* socket) {
+
+    QByteArray newData = socket->read(1024*8+44);
+
+    QAudioFormat tempformat;
+    int position = 20;
+    int temp = *(short*)&newData.constData()[position];
+    if(temp!=1){
+        return;
+    }
+    position = 24;
+    temp = *(int*)&newData.constData()[position];
+    tempformat.setSampleRate(temp);
+    position = 22;
+    temp = *(short*)&newData.constData()[position];
+    tempformat.setChannels(temp);
+    position = 34;
+    temp = *(short*)&newData.constData()[position];
+    tempformat.setSampleSize(temp);
+    tempformat.setCodec("audio/pcm");
+    tempformat.setByteOrder(QAudioFormat::LittleEndian);
+    if(tempformat.sampleSize()==8){
+        tempformat.setSampleType(QAudioFormat::UnSignedInt);
+    }else{
+        tempformat.setSampleType(QAudioFormat::SignedInt);
+    }
+    if(allBuffers_.isEmpty()){
+        //allBuffers_.append(new QBuffer);
+        allFormats_.append(tempformat);
+        output_= new QAudioOutput(allFormats_.first(),NULL);
+        connect(output_,SIGNAL(stateChanged(QAudio::State)),this,SLOT(stateChangeStream(QAudio::State)));
+        output_->setBufferSize(1024*8*10);
+        buff = output_->start();
+        connect(output_,SIGNAL(notify()),this,SLOT(onNotify()));
+
+    }
+    newData.remove(0,44);
+    if(!(tempformat==allFormats_.last())){
+        allFormats_.append(tempformat);
+
+        //new audio format append to format list
+    }
+    allBuffers_.append(&newData);
+
+   /* allBuffers_.last()->open(QIODevice::Append);
+    allBuffers_.last()->write(newData);
+    allBuffers_.last()->close();
+    allBuffers_.last()->bytesAvailable();*/
+   // output_->start(allBuffers_.first());
+    int i;
+
+    while((i = output_->bytesFree())>1024*8 ) {
+        if(!allBuffers_.isEmpty()){
+            buff->write(*(allBuffers_.takeFirst()));
+        }
+        else {
+            break;
+        }
+    }
+
+}
+
+void AudioComponent::onNotify(){
+    while(( output_->bytesFree()) > 1024*8){
+            if(!allBuffers_.empty()){
+                buff->write(*(allBuffers_.takeFirst()));
+            }
+            else {
+                break;
+            }
+        }
+}
+
+/*
+ * creates the AudioOutput
+ *
+ */
+void AudioComponent::joinMulticast(){
+    allBuffers_.clear();;
+    allFormats_.clear();;
+    //output_ = new QAudioOutput(format,0);
+
+
+    //buff = output_->start();
+
+
+
+}
+void AudioComponent::stateChangeStream(QAudio::State newState){
+    int error = 0;
+    switch (newState) {
+    case QAudio::StoppedState:
+        if (output_->error() != QAudio::NoError) {
+            // Perform error handling
+            qDebug("speak error");
+        } else {
+            // Normal stop
+        }
+        break;
+
+    case QAudio::SuspendedState:
+        qDebug("speak suspended");
+
+        break;
+    case QAudio::ActiveState:
+        qDebug("speak active");
+        //
+        break;
+    case QAudio::IdleState:
+        qDebug("speak idle");
+      /* if ((error = output_->error()) != QAudio::NoError) {
+            // Perform error handling
+            qDebug("speak error: %d", error);
+            if (error == QAudio::UnderrunError)
+            {
+                output_->start(speakersIO_);
+            }
+        } else {*/
+            qDebug("switch songs");
+           /* if(allBuffers_.size()!=1){
+                output_->stop();
+                output_->deleteLater();
+
+                allBuffers_.removeFirst();
+                allFormats_.removeFirst();
+                output_= new QAudioOutput(allFormats_.first());
+                buff = output_->start();*/
+           // }
+
+        //}
+        break;
+    }
+
+}
+/*
+void AudioComponent::writeToMulticast(QString fileName, QIODevice* socket){
 
     QFile file(fileName);
     file.open(QIODevice::ReadOnly);
     data = file.readAll();
-    QByteArray* tempdata = &data; //used to view data....
+    //QByteArray* tempdata = &data; //used to view data....
 
     int position = 0;
 
@@ -219,10 +335,7 @@ void AudioComponent::testwav(QString fileName){
     }
 
 
-    output_ = new QAudioOutput(format,0);
-    output_->setBufferSize(1024*8*10);
-
-    data.remove(0,44);
+    QByteArray header = data.remove(0,44);
     QDataStream dstream(&data,QIODevice::ReadOnly);
 
     while(!dstream.atEnd()){
@@ -231,7 +344,8 @@ void AudioComponent::testwav(QString fileName){
 
         dstream.readRawData(chard, 1024*8);
         newdata.append(chard,1024*8);
-        allBuffers_.append(newdata);
+        //allBuffers_.append(newdata);
+        socket->write(newdata.prepend(header));
     }
 
     file.close();
@@ -239,7 +353,8 @@ void AudioComponent::testwav(QString fileName){
     buff = output_->start();
     while(output_->bytesFree()>1024*8){
         if(!allBuffers_.empty()){
-            buff->write(allBuffers_.takeFirst());
+
+            //buff->write(allBuffers_.takeFirst());
         }
         else{
             break;
@@ -247,44 +362,72 @@ void AudioComponent::testwav(QString fileName){
     }
     output_->setNotifyInterval(100);
     connect(output_,SIGNAL(notify()),this,SLOT(checkBuff()));
-    //connect(output_,SIGNAL(stateChanged(QAudio::State)),this,SLOT(addToOutput(QAudio::State)));
-
 }
-void AudioComponent::checkBuff(){
-    int i = output_->bytesFree();
-    int j = output_->notifyInterval();
-    while((i = output_->bytesFree()) > 1024*8){
-        if(!allBuffers_.empty()){
-            buff->write(allBuffers_.takeFirst());
-        }
-        else {
-            break;
-        }
-    }
-}
-
-void AudioComponent::addToOutput(QAudio::State newState){
+*/
+void AudioComponent::mic(QAudio::State newState){
+    int error = 0;
     switch (newState) {
     case QAudio::StoppedState:
-        if (output_->error() != QAudio::NoError) {
+        if (input_->error() != QAudio::NoError) {
             // Perform error handling
-            qDebug("blahhhhhh error");
+            qDebug("mic error");
         } else {
             // Normal stop
         }
         break;
 
     case QAudio::SuspendedState:
-        qDebug("blahhhhhh suspended");
+        qDebug("mic suspended");
 
         break;
     case QAudio::ActiveState:
-        qDebug("blahhhhhh active");
+        qDebug("mic active");
         //
         break;
     case QAudio::IdleState:
-        qDebug("blahhhhhh idle");
-        buff->write(data);
+        qDebug("mic idle");
+        if ((error = input_->error()) != QAudio::NoError) {
+            // Perform error handling
+            qDebug("mic error: %d", error);
+            if (error == QAudio::UnderrunError)
+            {
+                input_->start(micIO_);
+            }
+        }
+        break;
+    }
+}
+
+void AudioComponent::speak(QAudio::State newState){
+    int error = 0;
+    switch (newState) {
+    case QAudio::StoppedState:
+        if (output_->error() != QAudio::NoError) {
+            // Perform error handling
+            qDebug("speak error");
+        } else {
+            // Normal stop
+        }
+        break;
+
+    case QAudio::SuspendedState:
+        qDebug("speak suspended");
+
+        break;
+    case QAudio::ActiveState:
+        qDebug("speak active");
+        //
+        break;
+    case QAudio::IdleState:
+        qDebug("speak idle");
+        if ((error = output_->error()) != QAudio::NoError) {
+            // Perform error handling
+            qDebug("speak error: %d", error);
+            if (error == QAudio::UnderrunError)
+            {
+                output_->start(speakersIO_);
+            }
+        }
         break;
     }
 }

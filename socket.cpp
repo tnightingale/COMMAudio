@@ -27,6 +27,7 @@ Socket::Socket(SOCKET socket, HWND hWnd, QString remoteAddr)
 
 qint64 Socket::readData(char * data, qint64 maxSize) {
     qint64 bytesRead = 0;
+    //qDebug("Socket::readData(); Socket: %d", (int) socket_);
 
     // Mutex lock here.
     QMutexLocker locker(receiveLock_);
@@ -114,6 +115,9 @@ void Socket::close(PMSG pMsg) {
     emit signalSocketClosed();
 }
 
+void Socket::closeConnection() {
+    ::shutdown(socket_, SD_BOTH);
+}
 
 
 void Socket::slotProcessWSAEvent(PMSG pMsg) {

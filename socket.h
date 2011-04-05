@@ -15,8 +15,8 @@
 #define WM_WSAASYNC_TCP (WM_USER + 1)
 #define WM_WSAASYNC_UDP (WM_USER + 2)
 #define DATABUFSIZE 2097152
-#define MAXUDPDGRAMSIZE 65507
-#define PACKETSIZE 4096
+#define MAXUDPDGRAMSIZE 4096
+#define PACKETSIZE 2048
 
 class Buffer;
 
@@ -83,6 +83,7 @@ public:
 
     virtual ~Socket() {
         qDebug("Socket::~Socket() %d", (int) socket_);
+        emit signalSocketClosed();
         closesocket(socket_);
     }
 
@@ -115,21 +116,16 @@ public:
      *
      * @author Luke Queenan
      */
-    QString getIp()
-    {
-        return connectedIp_;
-    }
+    QString getIp() { return connectedIp_; }
 
     /**
      * Returns the connected port of the socket.
      *
      * @author Luke Queenan
      */
-    short getPort()
-    {
-        return connectedPort_;
-    }
+    short getPort() { return connectedPort_; }
 
+    void closeConnection();
 
     bool isSequential() const;
     qint64 size() const;

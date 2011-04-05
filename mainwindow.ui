@@ -73,7 +73,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -102,7 +102,7 @@
      <widget class="QLabel" name="label_2">
       <property name="geometry">
        <rect>
-        <x>630</x>
+        <x>430</x>
         <y>0</y>
         <width>91</width>
         <height>21</height>
@@ -115,7 +115,7 @@
      <widget class="QLabel" name="label">
       <property name="geometry">
        <rect>
-        <x>70</x>
+        <x>10</x>
         <y>0</y>
         <width>81</width>
         <height>21</height>
@@ -148,8 +148,8 @@
      <widget class="QLabel" name="label_4">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>360</y>
+        <x>0</x>
+        <y>370</y>
         <width>161</width>
         <height>16</height>
        </rect>
@@ -161,8 +161,8 @@
      <widget class="QLabel" name="label_5">
       <property name="geometry">
        <rect>
-        <x>430</x>
-        <y>360</y>
+        <x>420</x>
+        <y>370</y>
         <width>151</width>
         <height>16</height>
        </rect>
@@ -327,7 +327,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Push to Talk</string>
+     <string>Start Voice</string>
     </property>
    </widget>
    <widget class="QPushButton" name="previousButton">
@@ -453,15 +453,7 @@
     <property name="title">
      <string>&amp;Connections</string>
     </property>
-    <widget class="QMenu" name="menu_Voice">
-     <property name="title">
-      <string>&amp;Voice</string>
-     </property>
-     <addaction name="actionConnect"/>
-     <addaction name="actionDisconnect"/>
-    </widget>
     <addaction name="action_Request_Playlist"/>
-    <addaction name="menu_Voice"/>
     <addaction name="action_Join_Multicast"/>
     <addaction name="separator"/>
     <addaction name="action_Visible"/>

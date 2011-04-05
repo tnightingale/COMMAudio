@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QDebug>
 #include "socket.h"
+#include <ws2tcpip.h>
 
 class UDPSocket : public Socket
 {
@@ -17,6 +18,7 @@ public:
     bool open(OpenMode mode);
 
     virtual bool listen(int port);
+    void listenMulticast(QString address, int port);
 
     /**
      *
