@@ -169,7 +169,8 @@ void UDPSocket::receive(PMSG pMsg) {
     int bytesWritten = 0;
     WSABUF winsockBuff;
 
-    winsockBuff.len = MAXUDPDGRAMSIZE;
+    //winsockBuff.len = MAXUDPDGRAMSIZE;
+    winsockBuff.len = 1024 * 8 + 44;
     winsockBuff.buf = (char*) calloc(winsockBuff.len, sizeof(char));
 
     if (WSARecvFrom(pMsg->wParam, &(winsockBuff), 1, &numReceived, &flags,

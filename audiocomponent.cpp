@@ -208,7 +208,7 @@ void AudioComponent::addFromMulticast(Socket* socket) {
     }
 
     newData.remove(0,44);
-    allBuffers_.last()->open(QIODevice::ReadOnly);
+    allBuffers_.last()->open(QIODevice::WriteOnly);
     allBuffers_.last()->write(newData);
     allBuffers_.last()->close();
 
