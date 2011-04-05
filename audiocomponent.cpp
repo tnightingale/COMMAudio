@@ -119,7 +119,10 @@ void AudioComponent::startMic(QIODevice* stream) {
     format.setByteOrder(QAudioFormat::LittleEndian);
     format.setSampleType(QAudioFormat::UnSignedInt);
 
+    QThread* inputThread = new QThread();
     input_ = new QAudioInput(format,NULL);
+    input_->moveToThread(inputThread);
+    inputThread->start();
     input_->start(stream);
 }
 
@@ -153,8 +156,10 @@ void AudioComponent::playStream(QIODevice* stream){
     format.setByteOrder(QAudioFormat::LittleEndian);
     format.setSampleType(QAudioFormat::UnSignedInt);
 
-    QAudioOutput* qoutput_;
-    qoutput_ = new QAudioOutput(format,NULL);
+    QThread* outputThread = new QThread();
+    QAudioOutput* qoutput_ = new QAudioOutput(format,NULL);
+    qoutput_->moveToThread(outputThread);
+    outputThread->start();
     qoutput_->start(stream);
 }
 

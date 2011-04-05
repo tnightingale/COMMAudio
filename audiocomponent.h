@@ -10,6 +10,7 @@
 #include <QtMultimediaKit/QMediaPlayer>
 #include <QtMultimediaKit/QMediaPlaylist>
 #include <QtMultimediaKit/QMediaObject>
+#include <QThread>
 
 class AudioComponent : public QObject
 {
