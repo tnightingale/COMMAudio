@@ -74,8 +74,9 @@ void Workstation::initializeVoiceStream(short port, QString hostAddr, AudioCompo
     voiceControlSocket_->open(QIODevice::ReadWrite);
     voiceControlSocket_->moveToThread(socketThread_);
 
+
     // Create the control packet
-    short thisPort = udpSocket_->getPort();
+    short thisPort = port;
     QByteArray packet;
     packet.insert(0, VOICE_CHAT);
     packet += QByteArray::fromRawData((const char*)&thisPort, sizeof(short));
@@ -101,12 +102,15 @@ void Workstation::initializeVoiceStream(short port, QString hostAddr, AudioCompo
             udpSocket_, SLOT(slotProcessWSAEvent(int, int)));
 
     // Listen on the TCP socket for other client connections
-    if(!udpSocket_->listen(7000)) {
-        udpSocket_->listen(7001);
+    if(!udpSocket_->listen(port)) {
+        qDebug("Workstation::initializeVoiceChat(); Failed to listen to port: %d",
+               port);
+        return;
     }
 
     udpSocket_->open(QIODevice::ReadWrite);
     udpSocket_->setDest(hostAddr, port);
+
     player->playStream(udpSocket_);
     player->startMic(udpSocket_);
     mainWindowPointer_->setVoiceCallActive(true);
