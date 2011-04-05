@@ -305,6 +305,7 @@ void MainWindow::on_remoteListWidget_itemDoubleClicked(QListWidgetItem* item)
     RemoteSong songInfo = remoteList_.value(item->text());
     emit requestFile(songInfo.getIp(),songInfo.getPort(), songInfo.getFilePath());
     addSongToLocal(songInfo.getFilePath());
+    ui->songTransferedEditBox->setText(item->text());
 }
 
 /*
