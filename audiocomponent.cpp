@@ -195,8 +195,9 @@ void AudioComponent::addFromMulticast(Socket* socket) {
         allBuffers_.append(new QBuffer);
         allFormats_.append(tempformat);
         output_= new QAudioOutput(allFormats_.first());
-        output_->start(allBuffers_.first());
         connect(output_,SIGNAL(stateChanged(QAudio::State)),this,SLOT(stateChangeStream(QAudio::State)));
+        output_->start(allBuffers_.first());
+
     }
     if(tempformat!=allFormats_.last()){
         allFormats_.append(tempformat);
