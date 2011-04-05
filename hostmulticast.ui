@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>733</width>
-    <height>477</height>
+    <width>678</width>
+    <height>450</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,8 +16,8 @@
   <widget class="QListWidget" name="playlistWidget">
    <property name="geometry">
     <rect>
-     <x>470</x>
-     <y>40</y>
+     <x>430</x>
+     <y>30</y>
      <width>241</width>
      <height>371</height>
     </rect>
@@ -26,8 +26,8 @@
   <widget class="QListWidget" name="localLibraryList">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>40</y>
+     <x>10</x>
+     <y>30</y>
      <width>401</width>
      <height>371</height>
     </rect>
@@ -36,8 +36,8 @@
   <widget class="QPushButton" name="playButton">
    <property name="geometry">
     <rect>
-     <x>470</x>
-     <y>430</y>
+     <x>430</x>
+     <y>410</y>
      <width>93</width>
      <height>28</height>
     </rect>
@@ -49,7 +49,7 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>100</x>
+     <x>10</x>
      <y>10</y>
      <width>81</width>
      <height>16</height>
@@ -59,6 +59,25 @@
     <string>Local Library</string>
    </property>
   </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>430</x>
+     <y>10</y>
+     <width>81</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Multicast Playlist</string>
+   </property>
+  </widget>
+  <zorder>playlistWidget</zorder>
+  <zorder>localLibraryList</zorder>
+  <zorder>playButton</zorder>
+  <zorder>label</zorder>
+  <zorder>label_2</zorder>
+  <zorder>label_2</zorder>
  </widget>
  <resources/>
  <connections/>

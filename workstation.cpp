@@ -684,7 +684,8 @@ bool Workstation::processReceivingFileList(Socket *socket, QByteArray *packet)
         stream >> fileList;
 
         // Send the file list to the main window for procesing
-        mainWindowPointer_->appendToRemote(fileList, socket->getIp(), fileData->getPort());
+        QString ip = socket->getIp();
+        mainWindowPointer_->appendToRemote(fileList, ip, fileData->getPort());
 
         // Remove the file transfer
         currentTransfers.remove(socket);
@@ -787,7 +788,8 @@ void Workstation::requestFileListController(Socket *socket)
                    this, SLOT(requestFileListController(Socket*)));
 
         // Close the socket
-        delete socket;
+        //delete socket;
+        socket->deleteLater();
     }
 
 }
