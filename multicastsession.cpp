@@ -30,7 +30,7 @@ void MulticastSession::loadBuffer() {
         if (!current_->open(QIODevice::ReadOnly)) {
             endSession();
         }
-        header_ = current_->read(44);
+        //header_ = &current_->read(44);
     }
 
     nextBuff_ = generateBuffer();
@@ -38,7 +38,7 @@ void MulticastSession::loadBuffer() {
 
 QByteArray* MulticastSession::generateBuffer() {
     QByteArray* tempArray = new QByteArray;
-    tempArray->append(header_);
+    //tempArray->append(header_);
     tempArray->append(current_->read(1024*8));
     /*if(tempArray->size() != 1024*8 + 44){
 

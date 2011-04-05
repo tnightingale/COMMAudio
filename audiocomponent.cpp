@@ -121,12 +121,12 @@ void AudioComponent::startMic(){
 
     QAudioDeviceInfo info = QAudioDeviceInfo::defaultInputDevice();
     if (!info.isFormatSupported(format));{
-        qWarning()<<"format not supported";
+        //qWarning()<<"format not supported";
         format = info.nearestFormat(format);
     }
     QStringList formatTypes = info.supportedCodecs();
     for(int i = 0;i < formatTypes.size();++i){
-        qDebug()<< formatTypes.at(i);
+        //qDebug()<< formatTypes.at(i);
     }
 
     input_ = new QAudioInput(format,NULL);

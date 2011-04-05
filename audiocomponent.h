@@ -2,7 +2,7 @@
 #define AUDIOCOMPONENT_H
 
 #include <QObject>
-#include <Phonon>
+//#include <Phonon>
 #include <QDir>
 #include <QAudioInput>
 #include <QAudioOutput>

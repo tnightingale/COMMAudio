@@ -6,9 +6,10 @@
 #include <QTimer>
 #include <QByteArray>
 #include <QFile>
+#include "udpsocket.h"
 
 class MulticastSession : public QObject {
-  Q_Object
+  Q_OBJECT
 private:
     UDPSocket* multicastSocket_;
     QStringList* playlist_;
@@ -23,9 +24,14 @@ private:
      * @author Tom Nightingale
      */
     void loadBuffer();
-
+    QByteArray* generateBuffer() ;
 public:
     MulticastSession(UDPSocket* socket, QStringList* playlist);
+
+
+
+
+
     virtual ~MulticastSession();
 
 public slots:
