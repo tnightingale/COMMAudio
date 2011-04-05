@@ -135,6 +135,9 @@ void Workstation::endVoiceStream() {
 
     // Make sure that the boolean flag is false
     mainWindowPointer_->setVoiceCallActive(false);
+
+    delete udpSocketReceive_;
+    delete udpSocketSend_;
 }
 
 void Workstation::endVoiceStreamUser()
@@ -203,24 +206,28 @@ void Workstation::acceptVoiceChat(Socket *socket)
     if (mainWindowPointer_->requestVoiceChat(ip))
     {
         // Connect signal and slot for WSA events.
-        udpSocket_ = new UDPSocket(mainWindowPointer_->winId());
+        udpSocketSend_ = new UDPSocket(mainWindowPointer_->winId());
+        udpSocketReceive_ = new UDPSocket(mainWindowPointer_->winId());
         connect(mainWindowPointer_, SIGNAL(signalWMWSASyncUDPRx(int, int)),
-                udpSocket_, SLOT(slotProcessWSAEvent(int, int)));
+                udpSocketReceive_, SLOT(slotProcessWSAEvent(int, int)));
 
         // Listen on the TCP socket for other client connections
-        if(!udpSocket_->listen(7000)) {
-            udpSocket_->listen(7001);
+        if(!udpSocketReceive_->listen(7000)) {
+            udpSocketReceive_->listen(7001);
         }
 
-        udpSocket_->open(QIODevice::ReadWrite);
-        udpSocket_->setDest(ip, port);
-        udpSocket_->moveToThread(socketThread_);
+        udpSocketReceive_->open(QIODevice::Read);
+        udpSocketReceive_->moveToThread(socketThread_);
+
+        udpSocketSend_->open(QIODevice::Write);
+        udpSocketSend_->setDest(ip, port);
+        udpSocketSend_->moveToThread(socketThread_);
         // The user wants to voice chat
         AudioComponent *audio = mainWindowPointer_->getAudioPlayer();
         mainWindowPointer_->setVoiceCallActive(true);
 
-        audio->playStream(udpSocket_);
-        audio->startMic(udpSocket_);
+        audio->playStream(udpSocketReceive_);
+        audio->startMic(udpSocketSend_);
 
         // Connect signals
         connect(voiceControlSocket_, SIGNAL(signalSocketClosed()),
