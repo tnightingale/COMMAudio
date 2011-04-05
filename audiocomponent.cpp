@@ -153,7 +153,7 @@ void AudioComponent::resumeMic()
 void AudioComponent::playStream(QIODevice* stream, QThread* socketThread){
     speakersIO_ = stream;
     format.setFrequency(44100);
-    format.setChannels(1);
+    format.setChannels(2);
     format.setSampleSize(8);
     format.setCodec("audio/pcm");
     format.setByteOrder(QAudioFormat::LittleEndian);
