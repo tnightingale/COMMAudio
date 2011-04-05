@@ -159,12 +159,12 @@ void AudioComponent::playStream(QIODevice* stream){
     format.setSampleType(QAudioFormat::UnSignedInt);
 
     QThread* outputThread = new QThread();
-    QAudioOutput* qoutput_ = new QAudioOutput(format,NULL);
-    connect(qoutput_, SIGNAL(stateChanged(QAudio::State)),
+    output_ = new QAudioOutput(format,NULL);
+    connect(output_, SIGNAL(stateChanged(QAudio::State)),
             this, SLOT(speak(QAudio::State)));
-    qoutput_->moveToThread(outputThread);
+    output_->moveToThread(outputThread);
     outputThread->start();
-    qoutput_->start(stream);
+    output_->start(stream);
 }
 
 void AudioComponent::testwav(QString fileName){
@@ -249,7 +249,7 @@ void AudioComponent::checkBuff(){
 void AudioComponent::mic(QAudio::State newState){
     switch (newState) {
     case QAudio::StoppedState:
-        if (output_->error() != QAudio::NoError) {
+        if (input_->error() != QAudio::NoError) {
             // Perform error handling
             qDebug("mic error");
         } else {
@@ -267,7 +267,7 @@ void AudioComponent::mic(QAudio::State newState){
         break;
     case QAudio::IdleState:
         qDebug("mic idle");
-        if (output_->error() != QAudio::NoError) {
+        if (input_->error() != QAudio::NoError) {
             // Perform error handling
             qDebug("mic error");
         }
