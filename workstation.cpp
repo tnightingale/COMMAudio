@@ -161,16 +161,19 @@ void Workstation::endVoiceStreamUser()
 void Workstation::startMulticast(QStringList* list) {
     qDebug("Workstation::startMulticast(); Starting multicast.");
 
-    //QString multiAddr("234.5.6.7");
-    //udpSocket_->setDest(multiAddr, 0);
+    udpSocket_ = new UDPSocket(mainWindowPointer_->winId());
     udpSocket_->open(QIODevice::WriteOnly);
-    multicastSession_ = new MulticastSession(udpSocket_,list);
-    connect(mainWindowPointer_->getHostMulticast(), SIGNAL(play()),multicastSession_,SLOT(start()));
+    multicastSession_ = new MulticastSession(udpSocket_, list);
+    connect(mainWindowPointer_->getHostMulticast(), SIGNAL(play()),
+            multicastSession_, SLOT(start()));
 }
-void Workstation::joinMulticast(QString address) {
-    udpSocket_->listenMulticast(address,7000);
-    connect(udpSocket_,SIGNAL(signalDataReceived(Socket*)),mainWindowPointer_->getAudioPlayer(),SLOT(addFromMulticast(Socket*)));
 
+void Workstation::joinMulticast(QString address) {
+    udpSocket_ = new UDPSocket(mainWindowPointer_->winId());
+    udpSocket_->listenMulticast(address,7000);
+    connect(udpSocket_, SIGNAL(signalDataReceived(Socket*)),
+            mainWindowPointer_->getAudioPlayer(),
+            SLOT(addFromMulticast(Socket*)));
 }
 
 void Workstation::sendFile(Socket *socket, QByteArray *data)
