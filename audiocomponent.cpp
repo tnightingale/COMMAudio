@@ -180,7 +180,7 @@ void AudioComponent::addFromMulticast(Socket* socket) {
         return;
     }
     position = 24;
-     temp = *(int*)&newData.constData()[position];
+    temp = *(int*)&newData.constData()[position];
     tempformat.setSampleRate(temp);
     position = 22;
     temp = *(short*)&newData.constData()[position];
@@ -248,7 +248,7 @@ void AudioComponent::writeToMulticast(QString fileName, QIODevice* socket){
 
 
     position = 24;
-     temp = *(int*)&data.constData()[position];
+    temp = *(int*)&data.constData()[position];
     format.setSampleRate(temp);
     position = 22;
     temp = *(short*)&data.constData()[position];
