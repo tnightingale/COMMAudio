@@ -1,13 +1,16 @@
 #include "multicastsession.h"
-#include "audiocomponent.h"
+
 
 MulticastSession::MulticastSession(UDPSocket* socket, QStringList* playlist)
 : multicastSocket_(socket), playlist_(playlist), timer_(new QTimer(this)), 
-  playlistIterator_(playlist_), current_(NULL), nextBuff_(NULL) {
+  playlistIterator_(*playlist_), current_(NULL), nextBuff_(NULL) {
     connect(timer_, SIGNAL(timeout()),
             this, SLOT(writeNextBuffer()));
+    QString multicastAddr("234.5.6.7");
     multicastSocket_->setDest(multicastAddr, 0);
 }
+
+MulticastSession::~MulticastSession(){}
 
 void MulticastSession::start() {
     loadBuffer();

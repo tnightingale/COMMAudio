@@ -8,6 +8,8 @@
 #include <QFile>
 #include "udpsocket.h"
 
+
+
 class MulticastSession : public QObject {
   Q_OBJECT
 private:
@@ -41,6 +43,6 @@ public slots:
 
 signals:
 
-}
+};
 
 #endif
