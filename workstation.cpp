@@ -11,7 +11,8 @@
 #define VOICE_CHAT 3
 
 Workstation::Workstation(MainWindow* mainWindow)
-    : socketThread_(new QThread()), mainWindowPointer_(mainWindow) {
+: socketThread_(new QThread()), voiceInThread_(new QThread()),
+  voiceOutThread_(new QThread()), mainWindowPointer_(mainWindow) {
     int err = 0;
     WSADATA wsaData;
     WORD wVersionRequested = MAKEWORD(2,2);
@@ -115,8 +116,11 @@ void Workstation::initializeVoiceStream(short port, QString hostAddr, AudioCompo
         return;
     }
 
-    player->startMic(udpSocket_, socketThread_);
-    player->playStream(udpSocket_, socketThread_);
+    player->startMic(udpSocket_, voiceInThread_);
+    voiceInThread_->start();
+    player->playStream(udpSocket_, voiceOutThread_);
+    voiceOutThread_->start();
+
     mainWindowPointer_->setVoiceCallActive(true);
 }
 
@@ -249,8 +253,10 @@ void Workstation::acceptVoiceChat(Socket *socket)
         AudioComponent *audio = mainWindowPointer_->getAudioPlayer();
         mainWindowPointer_->setVoiceCallActive(true);
 
-        audio->startMic(udpSocket_, socketThread_);
-        audio->playStream(udpSocket_, socketThread_);
+        audio->startMic(udpSocket_, voiceInThread_);
+        voiceInThread_->start();
+        audio->playStream(udpSocket_, voiceOutThread_);
+        voiceOutThread_->start();
 
         // Connect signals
         connect(voiceControlSocket_, SIGNAL(signalSocketClosed()),
