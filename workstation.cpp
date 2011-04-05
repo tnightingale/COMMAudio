@@ -28,21 +28,23 @@ Workstation::Workstation(MainWindow* mainWindow)
             tcpSocket_, SLOT(slotProcessWSAEvent(int, int)));
     tcpSocket_->open(QIODevice::ReadWrite);
 
-    // Connect signal and slot for processing a new connection
+    // Connections for receiving data on the tcp socket
     connect(tcpSocket_, SIGNAL(signalClientConnected(Socket*)),
             this, SLOT(processConnection(Socket*)));
     connect(tcpSocket_, SIGNAL(signalDataReceived(Socket*)),
             this, SLOT(decodeControlMessage(Socket*)));
 
-    // Connect the GUI button signals to the functions in here
+    // Connections for file list transfers
     connect(mainWindow, SIGNAL(requestPlaylist(QString, short)),
             this, SLOT(requestFileList(QString, short)));
     connect(mainWindow, SIGNAL(requestFile(QString, short, QString)),
             this, SLOT(requestFile(QString, short ,QString)));
 
+    // Connection for voice chat
     connect(mainWindowPointer_, SIGNAL(initiateVoiceStream(short, QString, AudioComponent*)),
             this, SLOT(initializeVoiceStream(short, QString, AudioComponent*)));
 
+    // Connections for multicast controls
     connect(mainWindowPointer_, SIGNAL(startMulticast(QStringList*)), this, SLOT(startMulticast(QStringList*)));
 
     // Listen on the TCP socket for other client connections
