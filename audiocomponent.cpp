@@ -191,7 +191,7 @@ void AudioComponent::addFromMulticast(Socket* socket) {
     }else{
         tempformat.setSampleType(QAudioFormat::SignedInt);
     }
-    if(allBuffers_.isEmpty()){
+    if(allFormats_.isEmpty()){
         //allBuffers_.append(new QBuffer);
         allFormats_.append(tempformat);
         output_= new QAudioOutput(allFormats_.first(),NULL);
@@ -218,7 +218,9 @@ void AudioComponent::addFromMulticast(Socket* socket) {
 
     while((i = output_->bytesFree())>1024*8 ) {
         if(!allBuffers_.isEmpty()){
-            buff->write(*(allBuffers_.takeFirst()));
+            QByteArray temparrrrrr = *allBuffers_.takeFirst();
+
+            buff->write(temparrrrrr);
         }
         else {
             break;
