@@ -26,3 +26,6 @@ qrc_*
 object_script*
 *.orig
 *.dat
+*.wav
+*.mp3
+*.ogg
