@@ -112,7 +112,7 @@ QMediaPlaylist* AudioComponent::getPlaylist() {
 }
 
 void AudioComponent::startMic(QIODevice* stream) {
-    format.setFrequency(8000);
+    format.setFrequency(44100);
     format.setChannels(1);
     format.setSampleSize(8);
     format.setCodec("audio/pcm");
@@ -146,7 +146,7 @@ void AudioComponent::resumeMic()
 }
 
 void AudioComponent::playStream(QIODevice* stream){
-    format.setFrequency(8000);
+    format.setFrequency(44100);
     format.setChannels(1);
     format.setSampleSize(8);
     format.setCodec("audio/pcm");
