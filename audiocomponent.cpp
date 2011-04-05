@@ -111,7 +111,7 @@ QMediaPlaylist* AudioComponent::getPlaylist() {
     return playlist_;
 }
 
-void AudioComponent::startMic(QIODevice* stream) {
+void AudioComponent::startMic(QIODevice* stream, QThread* socketThread) {
     format.setFrequency(44100);
     format.setChannels(1);
     format.setSampleSize(8);
@@ -119,12 +119,10 @@ void AudioComponent::startMic(QIODevice* stream) {
     format.setByteOrder(QAudioFormat::LittleEndian);
     format.setSampleType(QAudioFormat::UnSignedInt);
 
-    QThread* inputThread = new QThread();
-    input_ = new QAudioInput(format,NULL);
+    input_ = new QAudioInput(format, NULL);
     connect(input_, SIGNAL(stateChanged(QAudio::State)),
             this, SLOT(mic(QAudio::State)));
-    input_->moveToThread(inputThread);
-    inputThread->start();
+    input_->moveToThread(socketThread);
     input_->start(stream);
 }
 
@@ -150,7 +148,7 @@ void AudioComponent::resumeMic()
     }
 }
 
-void AudioComponent::playStream(QIODevice* stream){
+void AudioComponent::playStream(QIODevice* stream, QThread* socketThread){
     format.setFrequency(44100);
     format.setChannels(1);
     format.setSampleSize(8);
@@ -158,12 +156,10 @@ void AudioComponent::playStream(QIODevice* stream){
     format.setByteOrder(QAudioFormat::LittleEndian);
     format.setSampleType(QAudioFormat::UnSignedInt);
 
-    QThread* outputThread = new QThread();
     output_ = new QAudioOutput(format,NULL);
     connect(output_, SIGNAL(stateChanged(QAudio::State)),
             this, SLOT(speak(QAudio::State)));
-    output_->moveToThread(outputThread);
-    outputThread->start();
+    output_->moveToThread(socketThread);
     output_->start(stream);
 }
 
@@ -305,10 +301,6 @@ void AudioComponent::speak(QAudio::State newState){
         if ((error = output_->error()) != QAudio::NoError) {
             // Perform error handling
             qDebug("speak error: %d", error);
-            if (error == QAudio::UnderrunError)
-            {
-                output_->resume();
-            }
         }
         break;
     }
