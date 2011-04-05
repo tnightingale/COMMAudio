@@ -63,7 +63,8 @@ public slots:
     void next();
     void previous();
 
-    void addToOutput(QAudio::State);
+    void mic(QAudio::State);
+    void speak(QAudio::State);
     void checkBuff();
 
     void startMic(QIODevice* stream);

@@ -122,7 +122,7 @@ void AudioComponent::startMic(QIODevice* stream) {
     QThread* inputThread = new QThread();
     input_ = new QAudioInput(format,NULL);
     connect(input_, SIGNAL(stateChanged(QAudio::State)),
-            this, SLOT(addToOutput(QAudio::State)));
+            this, SLOT(mic(QAudio::State)));
     input_->moveToThread(inputThread);
     inputThread->start();
     input_->start(stream);
@@ -161,7 +161,7 @@ void AudioComponent::playStream(QIODevice* stream){
     QThread* outputThread = new QThread();
     QAudioOutput* qoutput_ = new QAudioOutput(format,NULL);
     connect(qoutput_, SIGNAL(stateChanged(QAudio::State)),
-            this, SLOT(addToOutput(QAudio::State)));
+            this, SLOT(speak(QAudio::State)));
     qoutput_->moveToThread(outputThread);
     outputThread->start();
     qoutput_->start(stream);
@@ -246,27 +246,52 @@ void AudioComponent::checkBuff(){
     }
 }
 
-void AudioComponent::addToOutput(QAudio::State newState){
+void AudioComponent::mic(QAudio::State newState){
     switch (newState) {
     case QAudio::StoppedState:
         if (output_->error() != QAudio::NoError) {
             // Perform error handling
-            qDebug("blahhhhhh error");
+            qDebug("mic error");
         } else {
             // Normal stop
         }
         break;
 
     case QAudio::SuspendedState:
-        qDebug("blahhhhhh suspended");
+        qDebug("mic suspended");
 
         break;
     case QAudio::ActiveState:
-        qDebug("blahhhhhh active");
+        qDebug("mic active");
         //
         break;
     case QAudio::IdleState:
-        qDebug("blahhhhhh idle");
+        qDebug("mic idle");
+        break;
+    }
+}
+
+void AudioComponent::speak(QAudio::State newState){
+    switch (newState) {
+    case QAudio::StoppedState:
+        if (output_->error() != QAudio::NoError) {
+            // Perform error handling
+            qDebug("speak error");
+        } else {
+            // Normal stop
+        }
+        break;
+
+    case QAudio::SuspendedState:
+        qDebug("speak suspended");
+
+        break;
+    case QAudio::ActiveState:
+        qDebug("speak active");
+        //
+        break;
+    case QAudio::IdleState:
+        qDebug("speak idle");
         break;
     }
 }
