@@ -168,6 +168,8 @@ void Workstation::startMulticast(QStringList* list) {
     multicastSession_ = new MulticastSession(udpSocket_, list);
     connect(mainWindowPointer_->getHostMulticast(), SIGNAL(play()),
             multicastSession_, SLOT(start()));
+    connect(mainWindowPointer_->getHostMulticast(), SIGNAL(pause()),
+            multicastSession_, SLOT(pause()));
     connect(mainWindowPointer_->getHostMulticast(),SIGNAL(pause()),multicastSession_,SLOT(endSession()));
 
 }

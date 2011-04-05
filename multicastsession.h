@@ -29,15 +29,11 @@ private:
     QByteArray* generateBuffer() ;
 public:
     MulticastSession(UDPSocket* socket, QStringList* playlist);
-
-
-
-
-
     virtual ~MulticastSession();
 
 public slots:
     void start();
+    void pause();
     void writeNextBuffer();
     void endSession();
 

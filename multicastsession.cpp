@@ -20,6 +20,10 @@ void MulticastSession::start() {
     timer_->start(35);
 }
 
+void MulticastSession::pause() {
+    timer_->stop();
+}
+
 void MulticastSession::writeNextBuffer() {
     QStringList* tempplaylist= playlist_;
     multicastSocket_->write(*nextBuff_);
