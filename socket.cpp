@@ -115,6 +115,9 @@ void Socket::close(PMSG pMsg) {
     emit signalSocketClosed();
 }
 
+void Socket::closeConnection() {
+    ::shutdown(socket_, SD_BOTH);
+}
 
 
 void Socket::slotProcessWSAEvent(PMSG pMsg) {
