@@ -169,7 +169,7 @@ void Workstation::startMulticast(QStringList* list) {
     connect(mainWindowPointer_->getHostMulticast(), SIGNAL(play()),multicastSession_,SLOT(start()));
 }
 void Workstation::joinMulticast(QString address) {
-    udpSocket_->listenMulticast(address,8001);
+    udpSocket_->listenMulticast(address,7000);
     connect(udpSocket_,SIGNAL(signalDataReceived(Socket*)),mainWindowPointer_->getAudioPlayer(),SLOT(addFromMulticast(Socket*)));
 
 }

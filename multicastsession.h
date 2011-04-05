@@ -19,7 +19,7 @@ private:
     QStringListIterator* playlistIterator_;
     QFile* current_;
     QByteArray* nextBuff_;
-    QByteArray* header_;
+    QByteArray header_;
 
     /**
      *

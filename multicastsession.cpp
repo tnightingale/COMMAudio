@@ -31,13 +31,15 @@ void MulticastSession::loadBuffer() {
     if (current_ == NULL) {
         if (!playlistIterator_->hasNext()) {
             endSession();
+            return;
         }
-        QString nameeeu = playlistIterator_->next();
+        //QString nameeeu = playlistIterator_->next();
         current_ = new QFile(playlistIterator_->next());
         if (!current_->open(QIODevice::ReadOnly)) {
             endSession();
+            return;
         }
-        header_ = &current_->read(44);
+        header_ = current_->read(44);
     }
 
     nextBuff_ = generateBuffer();
@@ -45,7 +47,7 @@ void MulticastSession::loadBuffer() {
 
 QByteArray* MulticastSession::generateBuffer() {
     QByteArray* tempArray = new QByteArray;
-    //tempArray->append(header_);
+    tempArray->append(header_);
     tempArray->append(current_->read(1024*8));
     /*if(tempArray->size() != 1024*8 + 44){
 
@@ -59,6 +61,11 @@ QByteArray* MulticastSession::generateBuffer() {
 }
 
 void MulticastSession::endSession() {
+    timer_->stop();
+    disconnect(timer_, SIGNAL(timeout()),
+               this, SLOT(writeNextBuffer()));
+    timer_->deleteLater();
+
     // End of stream.
     // Disconnect timer, delete later.
 }
