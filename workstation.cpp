@@ -164,12 +164,14 @@ void Workstation::startMulticast(QStringList* list) {
     qDebug("Workstation::startMulticast(); Starting multicast.");
 
     udpSocket_ = new UDPSocket(mainWindowPointer_->winId());
+    connect(mainWindowPointer_, SIGNAL(signalWMWSASyncUDPRx(int, int)),
+            udpSocket_, SLOT(slotProcessWSAEvent(int, int)));
     udpSocket_->open(QIODevice::WriteOnly);
+
     multicastSession_ = new MulticastSession(udpSocket_, list);
     connect(mainWindowPointer_->getHostMulticast(), SIGNAL(play()),
             multicastSession_, SLOT(start()));
-    connect(mainWindowPointer_, SIGNAL(signalWMWSASyncUDPRx(int, int)),
-            udpSocket_, SLOT(slotProcessWSAEvent(int, int)));
+
 }
 
 void Workstation::joinMulticast(QString address) {
