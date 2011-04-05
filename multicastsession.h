@@ -16,7 +16,7 @@ private:
     UDPSocket* multicastSocket_;
     QStringList* playlist_;
     QTimer* timer_;
-    QStringListIterator playlistIterator_;
+    QStringListIterator* playlistIterator_;
     QFile* current_;
     QByteArray* nextBuff_;
     QByteArray* header_;

@@ -268,7 +268,7 @@ void AudioComponent::checkBuff(){
     }*/
 }
 
-void AudioComponent::addFromMulticast(QIODevice* socket) {
+void AudioComponent::addFromMulticast(Socket* socket) {
 
     QByteArray newData = socket->read(1024*8+44);
 

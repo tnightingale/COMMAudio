@@ -10,6 +10,7 @@
 #include <QtMultimediaKit/QMediaPlayer>
 #include <QtMultimediaKit/QMediaPlaylist>
 #include <QtMultimediaKit/QMediaObject>
+#include "socket.h"
 
 class AudioComponent : public QObject
 {
@@ -60,7 +61,7 @@ private:
 signals:
 
 public slots:
-    void addFromMulticast(QIODevice* socket);
+    void addFromMulticast(Socket* socket);
     void play();
     void pause();
     void stop();

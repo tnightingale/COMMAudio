@@ -2,6 +2,7 @@
 #include <QThread>
 #include <QMap>
 #include <QByteArray>
+#include "multicastsession.h"
 
 class MainWindow;
 class Socket;
@@ -23,6 +24,7 @@ private:
     UDPSocket *udpSocket_;
 
     QThread* socketThread_;
+    MulticastSession* multicastSession_;
 
     /* Pointer to the main window. This is used to access the window handle for
     when we create new sockets.*/
@@ -58,7 +60,9 @@ public slots:
     void startVoice(AudioComponent*);
     void stopVoice(AudioComponent*);
     void endVoiceStream();
-    void startMulticast();
+    void startMulticast(QStringList* list);
+    void joinMulticast(QString address);
+
 
 signals:
     void signalFileListUpdate(QStringList*);

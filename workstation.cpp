@@ -40,7 +40,8 @@ Workstation::Workstation(MainWindow* mainWindow)
             udpSocket_, SLOT(slotProcessWSAEvent(int, int)));
     connect(mainWindow, SIGNAL(initiateVoiceStream(short, QString, AudioComponent*)),
             this, SLOT(initializeVoiceStream(short, QString, AudioComponent*)));
-
+    connect(mainWindow, SIGNAL(startMulticast(QStringList* )),this,SLOT(startMulticast(QStringList* )));
+    connect(mainWindow->getJoinMulticast(), SIGNAL(play(QString)),this,SLOT(joinMulticast(QString)));
     // Connect the GUI button signals to the functions in here
     connect(mainWindow, SIGNAL(requestPlaylist(QString, short)),
             this, SLOT(requestFileList(QString, short)));
@@ -57,6 +58,7 @@ Workstation::Workstation(MainWindow* mainWindow)
     }
 
     tcpSocket_->moveToThread(socketThread_);
+    udpSocket_->moveToThread(socketThread_);
     socketThread_->start();
 }
 
@@ -157,12 +159,19 @@ void Workstation::endVoiceStreamUser()
     voiceControlSocket_->deleteLater();
 }
 
-void Workstation::startMulticast() {
+void Workstation::startMulticast(QStringList* list) {
     qDebug("Workstation::startMulticast(); Starting multicast.");
 
-    QString multiAddr("234.5.6.7");
+    //QString multiAddr("234.5.6.7");
     //udpSocket_->setDest(multiAddr, 0);
-    //udpSocket_->open(QIODevice::WriteOnly);
+    udpSocket_->open(QIODevice::WriteOnly);
+    multicastSession_ = new MulticastSession(udpSocket_,list);
+    connect(mainWindowPointer_->getHostMulticast(), SIGNAL(play()),multicastSession_,SLOT(start()));
+}
+void Workstation::joinMulticast(QString address) {
+    udpSocket_->listenMulticast(address,8001);
+    connect(udpSocket_,SIGNAL(signalDataReceived(Socket*)),mainWindowPointer_->getAudioPlayer(),SLOT(addFromMulticast(Socket*)));
+
 }
 
 void Workstation::sendFile(Socket *socket, QByteArray *data)

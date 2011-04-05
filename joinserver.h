@@ -18,6 +18,8 @@ public:
     // Getters for input boxes
     QString getIp();
     int getPort();
+signals:
+
 
 private:
     Ui::JoinServer *ui;

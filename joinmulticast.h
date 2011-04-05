@@ -15,7 +15,8 @@ public:
     explicit JoinMulticast(QWidget *parent = 0);
     ~JoinMulticast();
     void setIp(QString ip);
-
+signals:
+    void play(QString ip);
 private:
     Ui::JoinMulticast *ui;
 };

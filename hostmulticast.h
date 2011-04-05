@@ -16,6 +16,7 @@ public:
     explicit HostMulticast(QWidget *parent = 0);
     ~HostMulticast();
     QString findFullPath(QString filename);
+    QStringList* getPlaylist();
 
 private slots:
     void on_playButton_clicked();

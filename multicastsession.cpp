@@ -3,21 +3,24 @@
 
 MulticastSession::MulticastSession(UDPSocket* socket, QStringList* playlist)
 : multicastSocket_(socket), playlist_(playlist), timer_(new QTimer(this)), 
-  playlistIterator_(*playlist_), current_(NULL), nextBuff_(NULL) {
+  playlistIterator_(new QStringListIterator(*playlist_)),current_(NULL), nextBuff_(NULL) {
     connect(timer_, SIGNAL(timeout()),
             this, SLOT(writeNextBuffer()));
     QString multicastAddr("234.5.6.7");
-    multicastSocket_->setDest(multicastAddr, 0);
+    multicastSocket_->setDest(multicastAddr, 9100);
 }
 
 MulticastSession::~MulticastSession(){}
 
 void MulticastSession::start() {
+    playlistIterator_=new QStringListIterator(*playlist_);
+    //playlistIterator_(*playlist_);
     loadBuffer();
     timer_->start(50);
 }
 
 void MulticastSession::writeNextBuffer() {
+    QStringList* tempplaylist= playlist_;
     multicastSocket_->write(*nextBuff_);
     delete nextBuff_;
     nextBuff_ = NULL;
@@ -26,14 +29,15 @@ void MulticastSession::writeNextBuffer() {
 
 void MulticastSession::loadBuffer() {
     if (current_ == NULL) {
-        if (!playlistIterator_.hasNext()) {
+        if (!playlistIterator_->hasNext()) {
             endSession();
         }
-        current_ = new QFile(playlistIterator_.next());
+        QString nameeeu = playlistIterator_->next();
+        current_ = new QFile(playlistIterator_->next());
         if (!current_->open(QIODevice::ReadOnly)) {
             endSession();
         }
-        //header_ = &current_->read(44);
+        header_ = &current_->read(44);
     }
 
     nextBuff_ = generateBuffer();

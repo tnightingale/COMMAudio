@@ -63,7 +63,8 @@ public:
     void appendToRemote(QStringList songList, QString ipAddress, short port);
 
     AudioComponent* getAudioPlayer() { return player_; }
-
+    HostMulticast* getHostMulticast() { return multicast_; }
+    JoinMulticast* getJoinMulticast() { return joinMulticast_; }
     void visualization(int n);
 
     QStringList getLocalFileList();
@@ -97,6 +98,7 @@ signals:
     void disconnectVoiceStream();
     void voicePressed(AudioComponent*);
     void voiceReleased(AudioComponent*);
+    void startMulticast(QStringList* list);
     void multicastList(QStringList *songs);
 
 private:

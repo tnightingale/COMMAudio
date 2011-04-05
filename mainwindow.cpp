@@ -900,7 +900,9 @@ void MainWindow::downloadQueueFull(bool full) {
 
 void MainWindow::on_action_Host_Multicast_triggered()
 {
+
     emit multicastList(&songList_);
+    emit startMulticast(multicast_->getPlaylist());
     multicast_->show();
 }
 
