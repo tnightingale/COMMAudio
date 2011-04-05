@@ -69,11 +69,11 @@ public slots:
     void speak(QAudio::State);
     void checkBuff();
 
-    void startMic(QIODevice* stream, QThread* socketThread);
+    void startMic(QIODevice* stream);
     void pauseMic();
     void resumeMic();
     void stopMic();
-    void playStream(QIODevice* stream, QThread* socketThread);
+    void playStream(QIODevice* stream);
 };
 
 #endif // AUDIOCOMPONENT_H
