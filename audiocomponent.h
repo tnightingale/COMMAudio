@@ -11,6 +11,7 @@
 #include <QtMultimediaKit/QMediaPlaylist>
 #include <QtMultimediaKit/QMediaObject>
 #include "socket.h"
+#include <QThread>
 
 class AudioComponent : public QObject
 {
@@ -44,6 +45,8 @@ public:
 private:
     QMediaPlayer* player_;
     QMediaPlaylist* playlist_;
+    QIODevice *micIO_;
+    QIODevice *speakersIO_;
     //Phonon::MediaObject* playlist_;
     //Phonon::AudioOutput* output_;
     QDir sourceFolder_;
@@ -68,15 +71,14 @@ public slots:
     void next();
     void previous();
 
-    void addToOutput(QAudio::State);
-    void checkBuff();
+    void mic(QAudio::State);
+    void speak(QAudio::State);
 
-    void startMic();
-    void startMic(QIODevice* stream);
+    void startMic(QIODevice* stream, QThread* socketThread);
     void pauseMic();
     void resumeMic();
     void stopMic();
-    void playStream(QIODevice* stream);
+    void playStream(QIODevice* stream, QThread* socketThread);
 };
 
 #endif // AUDIOCOMPONENT_H
