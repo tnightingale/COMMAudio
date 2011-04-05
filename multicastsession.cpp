@@ -17,7 +17,7 @@ void MulticastSession::start() {
     playlistIterator_=new QStringListIterator(*playlist_);
     //playlistIterator_(*playlist_);
     loadBuffer();
-    timer_->start(50);
+    timer_->start(35);
 }
 
 void MulticastSession::writeNextBuffer() {
