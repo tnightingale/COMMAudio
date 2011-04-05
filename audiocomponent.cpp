@@ -271,6 +271,10 @@ void AudioComponent::mic(QAudio::State newState){
         if ((error = input_->error()) != QAudio::NoError) {
             // Perform error handling
             qDebug("mic error: %d", error);
+            if (error == QAudio::UnderrunError)
+            {
+                input_->resume();
+            }
         }
         break;
     }
@@ -301,6 +305,10 @@ void AudioComponent::speak(QAudio::State newState){
         if ((error = output_->error()) != QAudio::NoError) {
             // Perform error handling
             qDebug("speak error: %d", error);
+            if (error == QAudio::UnderrunError)
+            {
+                output_->resume();
+            }
         }
         break;
     }
