@@ -97,23 +97,31 @@ void Workstation::initializeVoiceStream(short port, QString hostAddr, AudioCompo
                SLOT(initializeVoiceStream(short, QString, AudioComponent*)));
 
     // Connect signal and slot for WSA events.
-    udpSocket_ = new UDPSocket(mainWindowPointer_->winId());
+    udpSocketSend_ = new UDPSocket(mainWindowPointer_->winId());
+    udpSocketReceive_ = new UDPSocket(mainWindowPointer_->winId());
     connect(mainWindowPointer_, SIGNAL(signalWMWSASyncUDPRx(int, int)),
-            udpSocket_, SLOT(slotProcessWSAEvent(int, int)));
+            udpSocketSend_, SLOT(slotProcessWSAEvent(int, int)));
+    connect(mainWindowPointer_, SIGNAL(signalWMWSASyncUDPRx(int, int)),
+            udpSocketReceive_, SLOT(slotProcessWSAEvent(int, int)));
 
     // Listen on the TCP socket for other client connections
-    if(!udpSocket_->listen(port)) {
+    if(!udpSocketReceive_->listen(port)) {
         qDebug("Workstation::initializeVoiceChat(); Failed to listen to port: %d",
                port);
         return;
     }
 
-    udpSocket_->open(QIODevice::ReadWrite);
-    udpSocket_->setDest(hostAddr, port);
-    udpSocket_->moveToThread(socketThread_);
+    udpSocketSend_->open(QIODevice::WriteOnly);
+    udpSocketReceive_->open(QIODevice::ReadOnly);
 
-    player->playStream(udpSocket_);
-    player->startMic(udpSocket_);
+    udpSocketSend_->setDest(hostAddr, port);
+
+    udpSocketSend_->moveToThread(socketThread_);
+    udpSocketReceive_->moveToThread(socketThread_);
+
+    player->playStream(udpSocketReceive_);
+    player->startMic(udpSocketSend_);
+
     mainWindowPointer_->setVoiceCallActive(true);
 }
 
