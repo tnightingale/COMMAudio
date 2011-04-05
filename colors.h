@@ -16,12 +16,32 @@ public:
     explicit Colors(QWidget *parent = 0);
     ~Colors();
 
+    /**
+     * returns font color
+     *
+     * @author Joel Stewart
+     */
     QString getFont();
+    /**
+     * returns background color
+     *
+     * @author Joel Stewart
+     */
     QString getBackground();
 private slots:
 
+    /**
+     * tracks text color wanted
+     *
+     * @author Joel Stewart
+     */
     void on_textWidget_currentItemChanged(QListWidgetItem* current, QListWidgetItem* previous);
 
+    /**
+     * tracks background color wanted
+     *
+     * @author Joel Stewart
+     */
     void on_backgroundWidget_currentItemChanged(QListWidgetItem* current, QListWidgetItem* previous);
 
 private:

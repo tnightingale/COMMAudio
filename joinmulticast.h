@@ -14,6 +14,11 @@ class JoinMulticast : public QDialog
 public:
     explicit JoinMulticast(QWidget *parent = 0);
     ~JoinMulticast();
+    /**
+     * sets ip
+     *
+     * @author Joel Stewart
+     */
     void setIp(QString ip);
 
 private:

@@ -247,24 +247,6 @@ void MainWindow::appendToRemote(QStringList songList_, QString ipAddress, short 
     }
 }
 
-/*
--- FUNCTION: on_clientListWidget_itemDoubleClicked
---
--- DATE: March 21, 2011
---
--- REVISIONS: (Date and Description)
---
--- DESIGNER: Joel Stewart
---
--- PROGRAMMER: Joel Stewart
---
--- INTERFACE: void MainWindow::on_clientListWidget_itemDoubleClicked(QListWidgetItem* item)
---
--- RETURNS:
---
--- NOTES:
--- allows clicking on a song in the item list
-*/
 void MainWindow::on_clientListWidget_itemDoubleClicked(QListWidgetItem* item)
 {
     QString dataClicked = item->text();
@@ -281,24 +263,6 @@ void MainWindow::on_clientListWidget_itemDoubleClicked(QListWidgetItem* item)
     timer_->setPaused(true);
 }
 
-/*
--- FUNCTION: on_remoteListWidget_itemDoubleClicked
---
--- DATE: March 21, 2011
---
--- REVISIONS: (Date and Description)
---
--- DESIGNER: Joel Stewart
---
--- PROGRAMMER: Joel Stewart
---
--- INTERFACE: void MainWindow::on_remoteListWidget_itemDoubleClicked(QListWidgetItem* item)
---
--- RETURNS:
---
--- NOTES:
--- combined list of clients
-*/
 void MainWindow::on_remoteListWidget_itemDoubleClicked(QListWidgetItem* item)
 {
     RemoteSong songInfo = remoteList_.value(item->text());
@@ -306,24 +270,6 @@ void MainWindow::on_remoteListWidget_itemDoubleClicked(QListWidgetItem* item)
     addSongToLocal(songInfo.getFilePath());
 }
 
-/*
--- FUNCTION: on_playButton_clicked
---
--- DATE: March 21, 2011
---
--- REVISIONS: (Date and Description)
---
--- DESIGNER: Joel Stewart
---
--- PROGRAMMER: Joel Stewart
---
--- INTERFACE: void MainWindow::on_playButton_clicked()
---
--- RETURNS:
---
--- NOTES:
--- Plays song
-*/
 void MainWindow::on_playButton_clicked()
 {
     if(ui->playlistWidget->count() > 0) {
@@ -347,25 +293,6 @@ void MainWindow::on_playButton_clicked()
 
 }
 
-
-/*
--- FUNCTION: on_stopButton_clicked
---
--- DATE: March 21, 2011
---
--- REVISIONS: (Date and Description)
---
--- DESIGNER: Joel Stewart
---
--- PROGRAMMER: Joel Stewart
---
--- INTERFACE: void MainWindow::on_stopButton_clicked()
---
--- RETURNS:
---
--- NOTES:
--- Stops song
-*/
 void MainWindow::on_stopButton_clicked()
 {
     player_->stop();
@@ -389,24 +316,6 @@ bool MainWindow::winEvent(PMSG msg, long * result) {
     return false;
 }
 
-/*
--- FUNCTION: getLocalFileList
---
--- DATE: March 21, 2011
---
--- REVISIONS: (Date and Description)
---
--- DESIGNER: Luke Queenan
---
--- PROGRAMMER: Luke Queenan
---
--- INTERFACE: QStringList MainWindow::getLocalFileList()
---
--- RETURNS: The local filelist stored in the audio player
---
--- NOTES:
--- Gets the local filelist stored in the audio player in main window.
-*/
 QStringList MainWindow::getLocalFileList()
 {
     return songList_;

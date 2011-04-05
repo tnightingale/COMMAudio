@@ -12,8 +12,23 @@ public:
     ~RemoteSong(){}
 
     // Getters for input boxes
+    /**
+     * returns ip
+     *
+     * @author Joel Stewart
+     */
     QString getIp();
+    /**
+     * returns filepath
+     *
+     * @author Joel Stewart
+     */
     QString getFilePath();
+    /**
+     * returns port
+     *
+     * @author Joel Stewart
+     */
     short getPort();
 
 private:
