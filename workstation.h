@@ -59,8 +59,6 @@ public slots:
     void initializeVoiceStream(short port, QString hostAddr, AudioComponent* player);
     void endVoiceStream();
 
-    void test();
-
 signals:
     void signalFileListUpdate(QStringList*);
     void signalFileProgress(int, int);
