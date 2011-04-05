@@ -143,9 +143,6 @@ void Workstation::endVoiceStream() {
 
     // Make sure that the boolean flag is false
     mainWindowPointer_->setVoiceCallActive(false);
-
-    delete udpSocketReceive_;
-    delete udpSocketSend_;
 }
 
 void Workstation::endVoiceStreamUser()
@@ -218,7 +215,8 @@ void Workstation::acceptVoiceChat(Socket *socket)
         udpSocketReceive_ = new UDPSocket(mainWindowPointer_->winId());
         connect(mainWindowPointer_, SIGNAL(signalWMWSASyncUDPRx(int, int)),
                 udpSocketReceive_, SLOT(slotProcessWSAEvent(int, int)));
-
+        connect(mainWindowPointer_, SIGNAL(signalWMWSASyncUDPRx(int, int)),
+                udpSocketSend_, SLOT(slotProcessWSAEvent(int, int)));
         // Listen on the TCP socket for other client connections
         if(!udpSocketReceive_->listen(7000)) {
             udpSocketReceive_->listen(7001);
