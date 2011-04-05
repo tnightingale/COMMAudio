@@ -119,20 +119,10 @@ void Workstation::initializeVoiceStream(short port, QString hostAddr, AudioCompo
     udpSocketSend_->moveToThread(socketThread_);
     udpSocketReceive_->moveToThread(socketThread_);
 
-    // Temp stuff
-    connect(udpSocketReceive_, SIGNAL(readyRead()),
-            this, SLOT(test()));
-
     player->startMic(udpSocketSend_, socketThread_);
     player->playStream(udpSocketReceive_, socketThread_);
 
     mainWindowPointer_->setVoiceCallActive(true);
-}
-
-// TESTING
-void Workstation::test()
-{
-    qDebug("yo mamma");
 }
 
 void Workstation::endVoiceStream() {
@@ -244,10 +234,6 @@ void Workstation::acceptVoiceChat(Socket *socket)
 
         audio->startMic(udpSocketSend_, socketThread_);
         audio->playStream(udpSocketReceive_, socketThread_);
-
-        // Temp stuff
-        connect(udpSocketReceive_, SIGNAL(readyRead()),
-                this, SLOT(test()));
 
         // Connect signals
         connect(voiceControlSocket_, SIGNAL(signalSocketClosed()),
