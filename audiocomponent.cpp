@@ -192,22 +192,23 @@ void AudioComponent::addFromMulticast(Socket* socket) {
         tempformat.setSampleType(QAudioFormat::SignedInt);
     }
     if(allFormats_.isEmpty()){
-        //allBuffers_.append(new QBuffer);
+        allBuffers_.append(new QList<QByteArray*>);
         allFormats_.append(tempformat);
         output_= new QAudioOutput(allFormats_.first(),NULL);
         connect(output_,SIGNAL(stateChanged(QAudio::State)),this,SLOT(stateChangeStream(QAudio::State)));
         output_->setBufferSize(1024*8*10);
         buff = output_->start();
-        connect(output_,SIGNAL(notify()),this,SLOT(onNotify()));
+        //connect(output_,SIGNAL(notify()),this,SLOT(onNotify()));
 
     }
     newData.remove(0,44);
     if(!(tempformat==allFormats_.last())){
+        allBuffers_.append(new QList<QByteArray*>);
         allFormats_.append(tempformat);
 
         //new audio format append to format list
     }
-    allBuffers_.append(&newData);
+    allBuffers_.last()->append(&newData);
 
    /* allBuffers_.last()->open(QIODevice::Append);
     allBuffers_.last()->write(newData);
@@ -217,8 +218,8 @@ void AudioComponent::addFromMulticast(Socket* socket) {
     int i;
 
     while((i = output_->bytesFree())>1024*8 ) {
-        if(!allBuffers_.isEmpty()){
-            QByteArray temparrrrrr = *allBuffers_.takeFirst();
+        if(!allBuffers_.first()->isEmpty()){
+            QByteArray temparrrrrr = *allBuffers_.first()->takeFirst();
 
             buff->write(temparrrrrr);
         }
@@ -231,8 +232,10 @@ void AudioComponent::addFromMulticast(Socket* socket) {
 
 void AudioComponent::onNotify(){
     while(( output_->bytesFree()) > 1024*8){
-            if(!allBuffers_.empty()){
-                buff->write(*(allBuffers_.takeFirst()));
+            if(!(allBuffers_.first()->isEmpty())){
+                QList<QByteArray*> firstlist = *(allBuffers_.first());
+                QByteArray tempArrr = * (firstlist.takeFirst());
+                buff->write(tempArrr);
             }
             else {
                 break;
@@ -286,15 +289,15 @@ void AudioComponent::stateChangeStream(QAudio::State newState){
             }
         } else {*/
             qDebug("switch songs");
-           /* if(allBuffers_.size()!=1){
+            if(allFormats_.size()!=1){
                 output_->stop();
                 output_->deleteLater();
 
                 allBuffers_.removeFirst();
                 allFormats_.removeFirst();
                 output_= new QAudioOutput(allFormats_.first());
-                buff = output_->start();*/
-           // }
+                buff = output_->start();
+            }
 
         //}
         break;

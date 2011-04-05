@@ -61,7 +61,7 @@ private:
     QBuffer* buffer_;
     QIODevice* buff;
     QBuffer* inputBuffer_;
-    QList<QByteArray*> allBuffers_;
+    QList<QList<QByteArray*>*> allBuffers_;
     QList<QAudioFormat> allFormats_;
 signals:
 
