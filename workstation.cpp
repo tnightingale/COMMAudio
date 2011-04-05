@@ -224,10 +224,10 @@ void Workstation::acceptVoiceChat(Socket *socket)
             udpSocketReceive_->listen(7001);
         }
 
-        udpSocketReceive_->open(QIODevice::Read);
+        udpSocketReceive_->open(QIODevice::ReadOnly);
         udpSocketReceive_->moveToThread(socketThread_);
 
-        udpSocketSend_->open(QIODevice::Write);
+        udpSocketSend_->open(QIODevice::WriteOnly);
         udpSocketSend_->setDest(ip, port);
         udpSocketSend_->moveToThread(socketThread_);
         // The user wants to voice chat
