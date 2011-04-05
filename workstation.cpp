@@ -60,10 +60,13 @@ Workstation::~Workstation() {
 
 void Workstation::initializeVoiceStream(short port, QString hostAddr, AudioComponent* player) {
     qDebug("Workstation::startVoiceStream(); Starting voice chat...");
+
     // Create the socket
     voiceControlSocket_ = new TCPSocket(mainWindowPointer_->winId());
     connect(mainWindowPointer_, SIGNAL(signalWMWSASyncTCPRx(int,int)),
             voiceControlSocket_, SLOT(slotProcessWSAEvent(int,int)));
+    voiceControlSocket_->open(QIODevice::ReadWrite);
+    voiceControlSocket_->moveToThread(socketThread_);
 
     // Connect to a remote host
     if (!voiceControlSocket_->connectRemote(hostAddr, port)) {
@@ -71,14 +74,10 @@ void Workstation::initializeVoiceStream(short port, QString hostAddr, AudioCompo
         return;
     }
 
-    voiceControlSocket_->open(QIODevice::ReadWrite);
-    voiceControlSocket_->moveToThread(socketThread_);
-
     // Create the control packet
-    short thisPort = port;
     QByteArray packet;
     packet.insert(0, VOICE_CHAT);
-    packet += QByteArray::fromRawData((const char*)&thisPort, sizeof(short));
+    packet += QByteArray::fromRawData((const char*)&port, sizeof(short));
 
     // Send the file path to the client
     voiceControlSocket_->write(packet);
@@ -100,16 +99,16 @@ void Workstation::initializeVoiceStream(short port, QString hostAddr, AudioCompo
     connect(mainWindowPointer_, SIGNAL(signalWMWSASyncUDPRx(int, int)),
             udpSocket_, SLOT(slotProcessWSAEvent(int, int)));
 
+    udpSocket_->open(QIODevice::ReadWrite);
+    udpSocket_->setDest(hostAddr, port);
+    udpSocket_->moveToThread(socketThread_);
+
     // Listen on the TCP socket for other client connections
     if(!udpSocket_->listen(port)) {
         qDebug("Workstation::initializeVoiceChat(); Failed to listen to port: %d",
                port);
         return;
     }
-
-    udpSocket_->open(QIODevice::ReadWrite);
-    udpSocket_->setDest(hostAddr, port);
-    udpSocket_->moveToThread(socketThread_);
 
     player->startMic(udpSocket_, socketThread_);
     player->playStream(udpSocket_, socketThread_);
