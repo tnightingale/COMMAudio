@@ -110,6 +110,7 @@ void Workstation::initializeVoiceStream(short port, QString hostAddr, AudioCompo
 
     udpSocket_->open(QIODevice::ReadWrite);
     udpSocket_->setDest(hostAddr, port);
+    udpSocket_->moveToThread(socketThread_);
 
     player->playStream(udpSocket_);
     player->startMic(udpSocket_);
@@ -213,6 +214,7 @@ void Workstation::acceptVoiceChat(Socket *socket)
 
         udpSocket_->open(QIODevice::ReadWrite);
         udpSocket_->setDest(ip, port);
+        udpSocket_->moveToThread(socketThread_);
         // The user wants to voice chat
         AudioComponent *audio = mainWindowPointer_->getAudioPlayer();
         mainWindowPointer_->setVoiceCallActive(true);
