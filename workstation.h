@@ -21,6 +21,8 @@ private:
 
     /**  */
     UDPSocket *udpSocket_;
+    UDPSocket* udpSocketSend_;
+    UDPSocket* udpSocketReceive_;
 
     QThread* socketThread_;
 
