@@ -119,8 +119,9 @@ void Workstation::initializeVoiceStream(short port, QString hostAddr, AudioCompo
     udpSocketSend_->moveToThread(socketThread_);
     udpSocketReceive_->moveToThread(socketThread_);
 
-    player->playStream(udpSocketReceive_);
     player->startMic(udpSocketSend_);
+    Sleep(10);
+    player->playStream(udpSocketReceive_);
 
     mainWindowPointer_->setVoiceCallActive(true);
 }
@@ -232,8 +233,9 @@ void Workstation::acceptVoiceChat(Socket *socket)
         AudioComponent *audio = mainWindowPointer_->getAudioPlayer();
         mainWindowPointer_->setVoiceCallActive(true);
 
-        audio->playStream(udpSocketReceive_);
         audio->startMic(udpSocketSend_);
+        Sleep(10);
+        audio->playStream(udpSocketReceive_);
 
         // Connect signals
         connect(voiceControlSocket_, SIGNAL(signalSocketClosed()),
