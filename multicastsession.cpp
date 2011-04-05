@@ -6,7 +6,7 @@ MulticastSession::MulticastSession(UDPSocket* socket, QStringList* playlist)
   playlistIterator_(new QStringListIterator(*playlist_)),current_(NULL), nextBuff_(NULL) {
     connect(timer_, SIGNAL(timeout()),
             this, SLOT(writeNextBuffer()));
-    QString multicastAddr("234.5.6.7");
+    QString multicastAddr("234.5.6.8");
     multicastSocket_->listen(0);
     multicastSocket_->setDest(multicastAddr, 7000);
 }
