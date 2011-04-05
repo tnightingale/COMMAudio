@@ -178,6 +178,7 @@ void Workstation::joinMulticast(QString address) {
     connect(mainWindowPointer_, SIGNAL(signalWMWSASyncUDPRx(int, int)),
             udpSocket_, SLOT(slotProcessWSAEvent(int, int)));
     udpSocket_->open(QIODevice::ReadOnly);
+    udpSocket_->moveToThread(socketThread_);
     connect(udpSocket_, SIGNAL(signalDataReceived(Socket*)),
             mainWindowPointer_->getAudioPlayer(),
             SLOT(addFromMulticast(Socket*)));

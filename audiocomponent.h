@@ -61,13 +61,15 @@ private:
     QBuffer* buffer_;
     QIODevice* buff;
     QBuffer* inputBuffer_;
-    QList<QBuffer*> allBuffers_;
+    QList<QByteArray*> allBuffers_;
     QList<QAudioFormat> allFormats_;
 signals:
 
 public slots:
     void addFromMulticast(Socket* socket);
     void stateChangeStream(QAudio::State);
+    void onNotify();
+
     void play();
     void pause();
     void stop();
