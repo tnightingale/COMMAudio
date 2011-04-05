@@ -212,6 +212,7 @@ void Workstation::acceptVoiceChat(Socket *socket)
         udpSocket_->open(QIODevice::ReadWrite);
         udpSocket_->setDest(ip, port);
         udpSocket_->moveToThread(socketThread_);
+
         // The user wants to voice chat
         AudioComponent *audio = mainWindowPointer_->getAudioPlayer();
         mainWindowPointer_->setVoiceCallActive(true);
