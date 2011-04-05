@@ -121,6 +121,8 @@ void AudioComponent::startMic(QIODevice* stream) {
 
     QThread* inputThread = new QThread();
     input_ = new QAudioInput(format,NULL);
+    connect(input_, SIGNAL(stateChanged(QAudio::State)),
+            this, SLOT(addToOutput(QAudio::State)));
     input_->moveToThread(inputThread);
     inputThread->start();
     input_->start(stream);
@@ -158,6 +160,8 @@ void AudioComponent::playStream(QIODevice* stream){
 
     QThread* outputThread = new QThread();
     QAudioOutput* qoutput_ = new QAudioOutput(format,NULL);
+    connect(qoutput_, SIGNAL(stateChanged(QAudio::State)),
+            this, SLOT(addToOutput(QAudio::State)));
     qoutput_->moveToThread(outputThread);
     outputThread->start();
     qoutput_->start(stream);
@@ -263,7 +267,6 @@ void AudioComponent::addToOutput(QAudio::State newState){
         break;
     case QAudio::IdleState:
         qDebug("blahhhhhh idle");
-        buff->write(data);
         break;
     }
 }
