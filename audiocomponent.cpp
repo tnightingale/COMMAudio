@@ -114,16 +114,18 @@ QMediaPlaylist* AudioComponent::getPlaylist() {
 void AudioComponent::startMic(QIODevice* stream, QThread* socketThread) {
     micIO_ = stream;
     format.setFrequency(44100);
-    format.setChannels(1);
+    format.setChannels(2);
     format.setSampleSize(8);
     format.setCodec("audio/pcm");
     format.setByteOrder(QAudioFormat::LittleEndian);
     format.setSampleType(QAudioFormat::UnSignedInt);
 
+    QThread* micThread = new QThread();
     input_ = new QAudioInput(format, NULL);
     connect(input_, SIGNAL(stateChanged(QAudio::State)),
             this, SLOT(mic(QAudio::State)));
-    input_->moveToThread(socketThread);
+    input_->moveToThread(micThread);
+    micThread->start();
     input_->start(stream);
 }
 
@@ -152,16 +154,18 @@ void AudioComponent::resumeMic()
 void AudioComponent::playStream(QIODevice* stream, QThread* socketThread){
     speakersIO_ = stream;
     format.setFrequency(44100);
-    format.setChannels(1);
+    format.setChannels(2);
     format.setSampleSize(8);
     format.setCodec("audio/pcm");
     format.setByteOrder(QAudioFormat::LittleEndian);
     format.setSampleType(QAudioFormat::UnSignedInt);
 
+    QThread* streamThread = new QThread();
     output_ = new QAudioOutput(format,NULL);
     connect(output_, SIGNAL(stateChanged(QAudio::State)),
             this, SLOT(speak(QAudio::State)));
-    output_->moveToThread(socketThread);
+    output_->moveToThread(streamThread);
+    streamThread->start();
     output_->start(stream);
 }
 

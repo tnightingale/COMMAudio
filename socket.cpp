@@ -27,6 +27,7 @@ Socket::Socket(SOCKET socket, HWND hWnd, QString remoteAddr)
 
 qint64 Socket::readData(char * data, qint64 maxSize) {
     qint64 bytesRead = 0;
+    //qDebug("Socket::readData(); Socket: %d", (int) socket_);
 
     // Mutex lock here.
     QMutexLocker locker(receiveLock_);
