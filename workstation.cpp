@@ -139,16 +139,6 @@ void Workstation::endVoiceStreamUser()
     disconnect(mainWindowPointer_, SIGNAL(disconnectVoiceStream()),
                this, SLOT(endVoiceStreamUser()));
 
-    // Get the audio component
-    AudioComponent *player = mainWindowPointer_->getAudioPlayer();
-
-    // Stop the audio input and playback
-    player->stopMic();
-    player->stop();
-
-    // Make sure that the boolean flag is false
-    mainWindowPointer_->setVoiceCallActive(false);
-
     // Delete the socket, where the rest of the cleanup will be triggered from
     //voiceControlSocket_->deleteLater();
     delete voiceControlSocket_;
