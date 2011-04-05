@@ -80,26 +80,26 @@ void UDPSocket::listenMulticast(QString address, int port) {
     multicastAddr.imr_interface.s_addr = INADDR_ANY;
 
     // Join multicast group.
-    err = setsockopt(socket_, IPPROTO_IP, IP_ADD_MEMBERSHIP, 
+    err = setsockopt(socket_, IPPROTO_IP, IP_ADD_MEMBERSHIP,
                      (char*) &multicastAddr, sizeof(multicastAddr));
     if (err == SOCKET_ERROR) {
         qDebug("UDPSocket::initMulticastClient(); IP_ADD_MEMBERSHIP failed: %d",
                WSAGetLastError());
-    } 
+    }
 
     /** LEAVE MULTICAST GROUP **/
 
-    /* Leave the multicast group: With IGMP v1 this is a noop, but 
+    /* Leave the multicast group: With IGMP v1 this is a noop, but
      *  with IGMP v2, it may send notification to multicast router.
      *  Even if it's a noop, it's sanitary to cleanup after one's self.
      */
     /*
     multicastAddr.imr_multiaddr.s_addr = inet_addr(achMCAddr);
     multicastAddr.imr_interface.s_addr = INADDR_ANY;
-    nRet = setsockopt(hSocket, 
-       IPPROTO_IP, 
-       IP_DROP_MEMBERSHIP, 
-       (char *)&multicastAddr, 
+    nRet = setsockopt(hSocket,
+       IPPROTO_IP,
+       IP_DROP_MEMBERSHIP,
+       (char *)&multicastAddr,
        sizeof(multicastAddr));
     */
 }
@@ -140,7 +140,7 @@ void UDPSocket::send(PMSG pMsg) {
         delete nextTxBuff_;
         nextTxBuff_ = NULL;
         if ((num = loadBuffer(bytesToRead)) <= 0) {
-            //qDebug("UDPSocket::send(); Finishing...%d", test);
+            qDebug("UDPSocket::send(); Finishing...%d", test);
             break;
         }
         winsockBuff.len = num;
@@ -218,8 +218,8 @@ void UDPSocket::slotProcessWSAEvent(int socket, int lParam) {
 
     switch (WSAGETSELECTEVENT(pMsg->lParam)) {
         case FD_READ:
-            //qDebug("UDPSocket::slotProcessWSAEvent: %d: FD_READ.",
-            //       (int) pMsg->wParam);
+            qDebug("UDPSocket::slotProcessWSAEvent: %d: FD_READ.",
+                   (int) pMsg->wParam);
             receive(pMsg);
             break;
 

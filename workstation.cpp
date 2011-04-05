@@ -168,14 +168,19 @@ void Workstation::startMulticast(QStringList* list) {
     multicastSession_ = new MulticastSession(udpSocket_, list);
     connect(mainWindowPointer_->getHostMulticast(), SIGNAL(play()),
             multicastSession_, SLOT(start()));
+    connect(mainWindowPointer_, SIGNAL(signalWMWSASyncUDPRx(int, int)),
+            udpSocket_, SLOT(slotProcessWSAEvent(int, int)));
 }
 
 void Workstation::joinMulticast(QString address) {
     udpSocket_ = new UDPSocket(mainWindowPointer_->winId());
     udpSocket_->listenMulticast(address,7000);
+    udpSocket_->open(QIODevice::ReadOnly);
     connect(udpSocket_, SIGNAL(signalDataReceived(Socket*)),
             mainWindowPointer_->getAudioPlayer(),
             SLOT(addFromMulticast(Socket*)));
+    connect(mainWindowPointer_, SIGNAL(signalWMWSASyncUDPRx(int, int)),
+            udpSocket_, SLOT(slotProcessWSAEvent(int, int)));
 }
 
 void Workstation::sendFile(Socket *socket, QByteArray *data)
