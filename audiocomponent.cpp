@@ -267,6 +267,10 @@ void AudioComponent::mic(QAudio::State newState){
         break;
     case QAudio::IdleState:
         qDebug("mic idle");
+        if (output_->error() != QAudio::NoError) {
+            // Perform error handling
+            qDebug("mic error");
+        }
         break;
     }
 }
@@ -292,6 +296,10 @@ void AudioComponent::speak(QAudio::State newState){
         break;
     case QAudio::IdleState:
         qDebug("speak idle");
+        if (output_->error() != QAudio::NoError) {
+            // Perform error handling
+            qDebug("speak error");
+        }
         break;
     }
 }

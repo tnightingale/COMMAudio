@@ -97,7 +97,7 @@ void UDPSocket::send(PMSG pMsg) {
         delete nextTxBuff_;
         nextTxBuff_ = NULL;
         if ((num = loadBuffer(bytesToRead)) <= 0) {
-            qDebug("UDPSocket::send(); Finishing...%d", test);
+            //qDebug("UDPSocket::send(); Finishing...%d", test);
             break;
         }
         winsockBuff.len = num;
@@ -175,8 +175,8 @@ void UDPSocket::slotProcessWSAEvent(int socket, int lParam) {
 
     switch (WSAGETSELECTEVENT(pMsg->lParam)) {
         case FD_READ:
-            qDebug("UDPSocket::slotProcessWSAEvent: %d: FD_READ.",
-                   (int) pMsg->wParam);
+            //qDebug("UDPSocket::slotProcessWSAEvent: %d: FD_READ.",
+            //       (int) pMsg->wParam);
             receive(pMsg);
             break;
 
