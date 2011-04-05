@@ -111,7 +111,7 @@ QMediaPlaylist* AudioComponent::getPlaylist() {
     return playlist_;
 }
 
-void AudioComponent::startMic(QIODevice* stream) {
+void AudioComponent::startMic(QIODevice* stream, QThread* socketThread) {
 
     micIO_ = stream;
     format.setFrequency(44100);
@@ -124,6 +124,7 @@ void AudioComponent::startMic(QIODevice* stream) {
     input_ = new QAudioInput(format, NULL);
     connect(input_, SIGNAL(stateChanged(QAudio::State)),
             this, SLOT(mic(QAudio::State)));
+    //input_->moveToThread(socketThread);
     input_->start(stream);
 }
 
@@ -149,7 +150,7 @@ void AudioComponent::resumeMic()
     }
 }
 
-void AudioComponent::playStream(QIODevice* stream){
+void AudioComponent::playStream(QIODevice* stream, QThread* socketThread){
     speakersIO_ = stream;
     format.setFrequency(44100);
     format.setChannels(2);
@@ -161,6 +162,7 @@ void AudioComponent::playStream(QIODevice* stream){
     output_ = new QAudioOutput(format,NULL);
     connect(output_, SIGNAL(stateChanged(QAudio::State)),
             this, SLOT(speak(QAudio::State)));
+    //output_->moveToThread(socketThread);
     output_->start(stream);
 }
 
