@@ -20,11 +20,11 @@ private:
     TCPSocket *voiceControlSocket_;
 
     /**  */
-    UDPSocket *udpSocket_;
-    UDPSocket* udpSocketSend_;
-    UDPSocket* udpSocketReceive_;
+    UDPSocket* udpSocket_;
 
     QThread* socketThread_;
+    QThread* voiceInThread_;
+    QThread* voiceOutThread_;
 
     /* Pointer to the main window. This is used to access the window handle for
     when we create new sockets.*/
