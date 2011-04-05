@@ -34,27 +34,18 @@ Workstation::Workstation(MainWindow* mainWindow)
     connect(tcpSocket_, SIGNAL(signalDataReceived(Socket*)),
             this, SLOT(decodeControlMessage(Socket*)));
 
-    // Connect signal and slot for WSA events.
-    udpSocket_ = new UDPSocket(mainWindow->winId());
-    connect(mainWindow, SIGNAL(signalWMWSASyncUDPRx(int, int)),
-            udpSocket_, SLOT(slotProcessWSAEvent(int, int)));
-    connect(mainWindow, SIGNAL(initiateVoiceStream(short, QString, AudioComponent*)),
-            this, SLOT(initializeVoiceStream(short, QString, AudioComponent*)));
-
     // Connect the GUI button signals to the functions in here
     connect(mainWindow, SIGNAL(requestPlaylist(QString, short)),
             this, SLOT(requestFileList(QString, short)));
     connect(mainWindow, SIGNAL(requestFile(QString, short, QString)),
             this, SLOT(requestFile(QString, short ,QString)));
 
+    connect(mainWindowPointer_, SIGNAL(initiateVoiceStream(short, QString, AudioComponent*)),
+            this, SLOT(initializeVoiceStream(short, QString, AudioComponent*)));
+
     // Listen on the TCP socket for other client connections
     if(!tcpSocket_->listen(7000)) {
         tcpSocket_->listen(7001);
-    }
-
-    // Listen on the TCP socket for other client connections
-    if(!udpSocket_->listen(7000)) {
-        udpSocket_->listen(7001);
     }
 
     tcpSocket_->moveToThread(socketThread_);
@@ -103,6 +94,16 @@ void Workstation::initializeVoiceStream(short port, QString hostAddr, AudioCompo
                SIGNAL(initiateVoiceStream(short, QString, AudioComponent*)),
                this,
                SLOT(initializeVoiceStream(short, QString, AudioComponent*)));
+
+    // Connect signal and slot for WSA events.
+    udpSocket_ = new UDPSocket(mainWindowPointer_->winId());
+    connect(mainWindowPointer_, SIGNAL(signalWMWSASyncUDPRx(int, int)),
+            udpSocket_, SLOT(slotProcessWSAEvent(int, int)));
+
+    // Listen on the TCP socket for other client connections
+    if(!udpSocket_->listen(7000)) {
+        udpSocket_->listen(7001);
+    }
 
     udpSocket_->open(QIODevice::ReadWrite);
     udpSocket_->setDest(hostAddr, port);
@@ -196,6 +197,16 @@ void Workstation::acceptVoiceChat(Socket *socket)
     // Get the user's response
     if (mainWindowPointer_->requestVoiceChat(ip))
     {
+        // Connect signal and slot for WSA events.
+        udpSocket_ = new UDPSocket(mainWindowPointer_->winId());
+        connect(mainWindowPointer_, SIGNAL(signalWMWSASyncUDPRx(int, int)),
+                udpSocket_, SLOT(slotProcessWSAEvent(int, int)));
+
+        // Listen on the TCP socket for other client connections
+        if(!udpSocket_->listen(7000)) {
+            udpSocket_->listen(7001);
+        }
+
         udpSocket_->open(QIODevice::ReadWrite);
         udpSocket_->setDest(ip, port);
         // The user wants to voice chat
