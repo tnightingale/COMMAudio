@@ -42,6 +42,8 @@ public:
     void writeToMulticast(QString fileName, QIODevice* socket);
 
     void joinMulticast();
+
+
 private:
     QMediaPlayer* player_;
     QMediaPlaylist* playlist_;
@@ -65,6 +67,7 @@ signals:
 
 public slots:
     void addFromMulticast(Socket* socket);
+    void stateChangeStream(QAudio::State);
     void play();
     void pause();
     void stop();

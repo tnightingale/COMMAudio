@@ -103,6 +103,7 @@ void MainWindow::on_action_Join_Multicast_triggered()
 {
     if (joinServer_.exec() == QDialog::Accepted)
     {
+        getAudioPlayer()->joinMulticast();
         joinMulticast_->setIp(joinServer_.getIp());
         joinMulticast_->show();
     }

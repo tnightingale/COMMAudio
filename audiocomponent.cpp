@@ -200,6 +200,7 @@ void AudioComponent::addFromMulticast(Socket* socket) {
         allFormats_.append(tempformat);
         output_= new QAudioOutput(allFormats_.first());
         output_->start(allBuffers_.first());
+        connect(output_,SIGNAL(stateChanged(QAudio::State)),this,SLOT(stateChangeStream(QAudio::State)));
     }
     if(tempformat!=allFormats_.last()){
         allFormats_.append(tempformat);
@@ -208,10 +209,14 @@ void AudioComponent::addFromMulticast(Socket* socket) {
     }
 
     newData.remove(0,44);
-    allBuffers_.last()->open(QIODevice::WriteOnly);
+    allBuffers_.last()->open(QIODevice::Append);
     allBuffers_.last()->write(newData);
     allBuffers_.last()->close();
-
+    int i = allBuffers_.last()->bytesAvailable();
+   // output_->start(allBuffers_.first());
+    i = allBuffers_.first()->bytesAvailable();
+    i = output_->state();
+    int j;
 
 }
 /*
@@ -226,7 +231,53 @@ void AudioComponent::joinMulticast(){
 
     //buff = output_->start();
 
-    connect(output_,SIGNAL(stateChanged(QAudio::State)),this,SLOT(addToOutput(QAudio::State)));
+
+
+}
+void AudioComponent::stateChangeStream(QAudio::State newState){
+    int error = 0;
+    switch (newState) {
+    case QAudio::StoppedState:
+        if (output_->error() != QAudio::NoError) {
+            // Perform error handling
+            qDebug("speak error");
+        } else {
+            // Normal stop
+        }
+        break;
+
+    case QAudio::SuspendedState:
+        qDebug("speak suspended");
+
+        break;
+    case QAudio::ActiveState:
+        qDebug("speak active");
+        //
+        break;
+    case QAudio::IdleState:
+        qDebug("speak idle");
+        if ((error = output_->error()) != QAudio::NoError) {
+            // Perform error handling
+            qDebug("speak error: %d", error);
+            if (error == QAudio::UnderrunError)
+            {
+                output_->start(speakersIO_);
+            }
+        } else {
+            qDebug("switch songs");
+            if(allBuffers_.size()!=1){
+                output_->stop();
+                output_->deleteLater();
+
+                allBuffers_.removeFirst();
+                allFormats_.removeFirst();
+                output_= new QAudioOutput(allFormats_.first());
+                output_->start(allBuffers_.first());
+            }
+
+        }
+        break;
+    }
 
 }
 
