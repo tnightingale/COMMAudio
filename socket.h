@@ -116,21 +116,16 @@ public:
      *
      * @author Luke Queenan
      */
-    QString getIp()
-    {
-        return connectedIp_;
-    }
+    QString getIp() { return connectedIp_; }
 
     /**
      * Returns the connected port of the socket.
      *
      * @author Luke Queenan
      */
-    short getPort()
-    {
-        return connectedPort_;
-    }
+    short getPort() { return connectedPort_; }
 
+    void closeConnection();
 
     bool isSequential() const;
     qint64 size() const;
