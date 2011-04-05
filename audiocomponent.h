@@ -41,6 +41,8 @@ public:
 private:
     QMediaPlayer* player_;
     QMediaPlaylist* playlist_;
+    QIODevice *micIO_;
+    QIODevice *speakersIO_;
     //Phonon::MediaObject* playlist_;
     //Phonon::AudioOutput* output_;
     QDir sourceFolder_;
