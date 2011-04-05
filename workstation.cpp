@@ -43,6 +43,8 @@ Workstation::Workstation(MainWindow* mainWindow)
     connect(mainWindowPointer_, SIGNAL(initiateVoiceStream(short, QString, AudioComponent*)),
             this, SLOT(initializeVoiceStream(short, QString, AudioComponent*)));
 
+    connect(mainWindowPointer_, SIGNAL(startMulticast(QStringList*)), this, SLOT(startMulticast(QStringList*)));
+    connect(mainWindowPointer_->getHostMulticast(),SIGNAL(play()),multicastSession_,SLOT(start()));
     // Listen on the TCP socket for other client connections
     if(!tcpSocket_->listen(7000)) {
         tcpSocket_->listen(7001);
