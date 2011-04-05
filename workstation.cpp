@@ -182,6 +182,10 @@ void Workstation::sendFile(Socket *socket, QByteArray *data)
 
 void Workstation::acceptVoiceChat(Socket *socket)
 {
+    if (mainWindowPointer_->getVoiceCallActive())
+    {
+        return;
+    }
     voiceControlSocket_ = (TCPSocket*)socket;
     QString ip;
     QByteArray data;
