@@ -124,7 +124,7 @@ void AudioComponent::startMic(QIODevice* stream, QThread* socketThread) {
     input_ = new QAudioInput(format, NULL);
     connect(input_, SIGNAL(stateChanged(QAudio::State)),
             this, SLOT(mic(QAudio::State)));
-    input_->moveToThread(socketThread);
+    //input_->moveToThread(socketThread);
     input_->start(stream);
 }
 
@@ -162,7 +162,7 @@ void AudioComponent::playStream(QIODevice* stream, QThread* socketThread){
     output_ = new QAudioOutput(format,NULL);
     connect(output_, SIGNAL(stateChanged(QAudio::State)),
             this, SLOT(speak(QAudio::State)));
-    output_->moveToThread(socketThread);
+    //output_->moveToThread(socketThread);
     output_->start(stream);
 }
 
