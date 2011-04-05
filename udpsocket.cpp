@@ -121,9 +121,11 @@ void UDPSocket::send(PMSG pMsg) {
     winsockBuff.buf = nextTxBuff_->data();
     winsockBuff.len = nextTxBuff_->size();
 
+    int test = winsockBuff.len;
+
     while (TRUE) {
         result = WSASendTo(pMsg->wParam, &winsockBuff, 1, &numSent, 0,
-                           (PSOCKADDR) &serverSockAddrIn_, sizeof(serverSockAddrIn_), 
+                           (PSOCKADDR) &serverSockAddrIn_, sizeof(serverSockAddrIn_),
                            NULL, NULL);
 
         if ((err = WSAGetLastError()) > 0 && err != ERROR_IO_PENDING) {
@@ -138,7 +140,7 @@ void UDPSocket::send(PMSG pMsg) {
         delete nextTxBuff_;
         nextTxBuff_ = NULL;
         if ((num = loadBuffer(bytesToRead)) <= 0) {
-            qDebug("UDPSocket::send(); Finishing...");
+            //qDebug("UDPSocket::send(); Finishing...%d", test);
             break;
         }
         winsockBuff.len = num;
@@ -178,7 +180,7 @@ void UDPSocket::receive(PMSG pMsg) {
             return;
         }
     }
-    
+
     if (numReceived == 0) {
         return;
     }
@@ -216,8 +218,8 @@ void UDPSocket::slotProcessWSAEvent(int socket, int lParam) {
 
     switch (WSAGETSELECTEVENT(pMsg->lParam)) {
         case FD_READ:
-            qDebug("UDPSocket::slotProcessWSAEvent: %d: FD_READ.",
-                   (int) pMsg->wParam);
+            //qDebug("UDPSocket::slotProcessWSAEvent: %d: FD_READ.",
+            //       (int) pMsg->wParam);
             receive(pMsg);
             break;
 

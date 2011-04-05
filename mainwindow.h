@@ -122,8 +122,7 @@ private:
     JoinMulticast *joinMulticast_;
 
 private slots:
-    void on_actionDisconnect_triggered();
-    void on_actionConnect_triggered();
+    void on_talkButton_clicked();
     void playlistIndexChanged(int index);
     void seek(int seconds);
     void durationChanged(qint64 duration);
@@ -136,8 +135,6 @@ private slots:
     void on_playButton_clicked();
     void on_stopButton_clicked();
     void on_remoteListWidget_itemDoubleClicked(QListWidgetItem* item);
-    void on_talkButton_pressed();
-    void on_talkButton_released();
     void on_tabWidget_currentChanged(int index);
     void on_nextButton_clicked();
     void on_previousButton_clicked();

@@ -34,31 +34,21 @@ Workstation::Workstation(MainWindow* mainWindow)
     connect(tcpSocket_, SIGNAL(signalDataReceived(Socket*)),
             this, SLOT(decodeControlMessage(Socket*)));
 
-    // Connect signal and slot for WSA events.
-    udpSocket_ = new UDPSocket(mainWindow->winId());
-    connect(mainWindow, SIGNAL(signalWMWSASyncUDPRx(int, int)),
-            udpSocket_, SLOT(slotProcessWSAEvent(int, int)));
-    connect(mainWindow, SIGNAL(initiateVoiceStream(short, QString, AudioComponent*)),
-            this, SLOT(initializeVoiceStream(short, QString, AudioComponent*)));
-    connect(mainWindow, SIGNAL(startMulticast(QStringList* )),this,SLOT(startMulticast(QStringList* )));
-    connect(mainWindow->getJoinMulticast(), SIGNAL(play(QString)),this,SLOT(joinMulticast(QString)));
     // Connect the GUI button signals to the functions in here
     connect(mainWindow, SIGNAL(requestPlaylist(QString, short)),
             this, SLOT(requestFileList(QString, short)));
     connect(mainWindow, SIGNAL(requestFile(QString, short, QString)),
             this, SLOT(requestFile(QString, short ,QString)));
 
+    connect(mainWindowPointer_, SIGNAL(initiateVoiceStream(short, QString, AudioComponent*)),
+            this, SLOT(initializeVoiceStream(short, QString, AudioComponent*)));
+
     // Listen on the TCP socket for other client connections
     if(!tcpSocket_->listen(7000)) {
         tcpSocket_->listen(7001);
     }
-    // Listen on the UDP socket for other client connections
-    if(!udpSocket_->listen(7000)) {
-        udpSocket_->listen(7001);
-    }
 
     tcpSocket_->moveToThread(socketThread_);
-    udpSocket_->moveToThread(socketThread_);
     socketThread_->start();
 }
 
@@ -84,8 +74,9 @@ void Workstation::initializeVoiceStream(short port, QString hostAddr, AudioCompo
     voiceControlSocket_->open(QIODevice::ReadWrite);
     voiceControlSocket_->moveToThread(socketThread_);
 
+
     // Create the control packet
-    short thisPort = udpSocket_->getPort();
+    short thisPort = port;
     QByteArray packet;
     packet.insert(0, VOICE_CHAT);
     packet += QByteArray::fromRawData((const char*)&thisPort, sizeof(short));
@@ -98,10 +89,6 @@ void Workstation::initializeVoiceStream(short port, QString hostAddr, AudioCompo
             this, SLOT(endVoiceStream()));
     connect(mainWindowPointer_, SIGNAL(disconnectVoiceStream()),
             this, SLOT(endVoiceStreamUser()));
-    connect(mainWindowPointer_, SIGNAL(voicePressed(AudioComponent*)),
-            this, SLOT(startVoice(AudioComponent*)));
-    connect(mainWindowPointer_, SIGNAL(voiceReleased(AudioComponent*)),
-            this, SLOT(stopVoice(AudioComponent*)));
 
     // Disconnect the button and the initial dialog
     disconnect(mainWindowPointer_,
@@ -109,21 +96,33 @@ void Workstation::initializeVoiceStream(short port, QString hostAddr, AudioCompo
                this,
                SLOT(initializeVoiceStream(short, QString, AudioComponent*)));
 
-    udpSocket_->open(QIODevice::ReadWrite);
-    udpSocket_->setDest(hostAddr, port);
-    player->playStream(udpSocket_);
-    player->startMic(udpSocket_);
-    player->pauseMic();
-}
+    // Connect signal and slot for WSA events.
+    udpSocketSend_ = new UDPSocket(mainWindowPointer_->winId());
+    udpSocketReceive_ = new UDPSocket(mainWindowPointer_->winId());
+    connect(mainWindowPointer_, SIGNAL(signalWMWSASyncUDPRx(int, int)),
+            udpSocketSend_, SLOT(slotProcessWSAEvent(int, int)));
+    connect(mainWindowPointer_, SIGNAL(signalWMWSASyncUDPRx(int, int)),
+            udpSocketReceive_, SLOT(slotProcessWSAEvent(int, int)));
 
-void Workstation::startVoice(AudioComponent* player) {
-    qDebug("Workstation::startVoice(); Turning on mic.");
-    player->resumeMic();
-}
+    // Listen on the TCP socket for other client connections
+    if(!udpSocketReceive_->listen(port)) {
+        qDebug("Workstation::initializeVoiceChat(); Failed to listen to port: %d",
+               port);
+        return;
+    }
 
-void Workstation::stopVoice(AudioComponent* player) {
-    qDebug("Workstation::stopVoice(); Turning off mic.");
-    player->pauseMic();
+    udpSocketSend_->open(QIODevice::WriteOnly);
+    udpSocketReceive_->open(QIODevice::ReadOnly);
+
+    udpSocketSend_->setDest(hostAddr, port);
+
+    udpSocketSend_->moveToThread(socketThread_);
+    udpSocketReceive_->moveToThread(socketThread_);
+
+    player->startMic(udpSocketSend_, socketThread_);
+    player->playStream(udpSocketReceive_, socketThread_);
+
+    mainWindowPointer_->setVoiceCallActive(true);
 }
 
 void Workstation::endVoiceStream() {
@@ -134,10 +133,6 @@ void Workstation::endVoiceStream() {
                this, SLOT(endVoiceStream()));
     disconnect(mainWindowPointer_, SIGNAL(disconnectVoiceStream()),
                this, SLOT(endVoiceStreamUser()));
-    disconnect(mainWindowPointer_, SIGNAL(voicePressed(AudioComponent*)),
-               this, SLOT(startVoice(AudioComponent*)));
-    disconnect(mainWindowPointer_, SIGNAL(voiceReleased(AudioComponent*)),
-               this, SLOT(stopVoice(AudioComponent*)));
 
     // Get the audio component
     AudioComponent *player = mainWindowPointer_->getAudioPlayer();
@@ -145,6 +140,9 @@ void Workstation::endVoiceStream() {
     // Stop the audio input and playback
     player->stopMic();
     player->stop();
+
+    // Make sure that the boolean flag is false
+    mainWindowPointer_->setVoiceCallActive(false);
 }
 
 void Workstation::endVoiceStreamUser()
@@ -156,7 +154,8 @@ void Workstation::endVoiceStreamUser()
                this, SLOT(endVoiceStreamUser()));
 
     // Delete the socket, where the rest of the cleanup will be triggered from
-    voiceControlSocket_->deleteLater();
+    //voiceControlSocket_->deleteLater();
+    delete voiceControlSocket_;
 }
 
 void Workstation::startMulticast(QStringList* list) {
@@ -202,13 +201,18 @@ void Workstation::sendFile(Socket *socket, QByteArray *data)
 
 void Workstation::acceptVoiceChat(Socket *socket)
 {
-    TCPSocket *mySocket = (TCPSocket*)socket;
+    // Make sure that we are not already connected to another
+    if (mainWindowPointer_->getVoiceCallActive())
+    {
+        return;
+    }
+    voiceControlSocket_ = (TCPSocket*)socket;
     QString ip;
     QByteArray data;
     short port = 0;
 
     // Read the packet
-    QByteArray packet = mySocket->readAll();
+    QByteArray packet = voiceControlSocket_->readAll();
 
     // Get the port
     data = packet.left(2);
@@ -216,16 +220,41 @@ void Workstation::acceptVoiceChat(Socket *socket)
     //packet = packet.right((packet.size() - 2));
 
     // Get the ip
-    ip = mySocket->getIp();
+    ip = voiceControlSocket_->getIp();
 
     // Get the user's response
     if (mainWindowPointer_->requestVoiceChat(ip))
     {
-        udpSocket_->open(QIODevice::ReadWrite);
+        // Connect signal and slot for WSA events.
+        udpSocketSend_ = new UDPSocket(mainWindowPointer_->winId());
+        udpSocketReceive_ = new UDPSocket(mainWindowPointer_->winId());
+        connect(mainWindowPointer_, SIGNAL(signalWMWSASyncUDPRx(int, int)),
+                udpSocketReceive_, SLOT(slotProcessWSAEvent(int, int)));
+        connect(mainWindowPointer_, SIGNAL(signalWMWSASyncUDPRx(int, int)),
+                udpSocketSend_, SLOT(slotProcessWSAEvent(int, int)));
+        // Listen on the TCP socket for other client connections
+        if(!udpSocketReceive_->listen(7000)) {
+            udpSocketReceive_->listen(7001);
+        }
+
+        udpSocketReceive_->open(QIODevice::ReadOnly);
+        udpSocketReceive_->moveToThread(socketThread_);
+
+        udpSocketSend_->open(QIODevice::WriteOnly);
+        udpSocketSend_->setDest(ip, port);
+        udpSocketSend_->moveToThread(socketThread_);
         // The user wants to voice chat
         AudioComponent *audio = mainWindowPointer_->getAudioPlayer();
-        audio->playStream(udpSocket_);
-        audio->startMic(udpSocket_);
+        mainWindowPointer_->setVoiceCallActive(true);
+
+        audio->startMic(udpSocketSend_, socketThread_);
+        audio->playStream(udpSocketReceive_, socketThread_);
+
+        // Connect signals
+        connect(voiceControlSocket_, SIGNAL(signalSocketClosed()),
+                this, SLOT(endVoiceStream()));
+        connect(mainWindowPointer_, SIGNAL(disconnectVoiceStream()),
+                this, SLOT(endVoiceStreamUser()));
     }
     else
     {
