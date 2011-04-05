@@ -161,18 +161,8 @@ void Workstation::startMulticast() {
     qDebug("Workstation::startMulticast(); Starting multicast.");
 
     QString multiAddr("234.5.6.7");
-    udpSocket_->setDest(multiAddr, 0);
-    udpSocket_->open(QIODevice::WriteOnly);
-
-    QTimer *timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(broadcastMulti()));
-    timer->start(1000);
-}
-
-void Workstation::broadcastMulti() {
-    QDebug("Workstation::broadcastMulti(); Sending 1024 bytes.");
-    QByteArray data(1024, 'T');
-    udpSocket_->write(data);
+    //udpSocket_->setDest(multiAddr, 0);
+    //udpSocket_->open(QIODevice::WriteOnly);
 }
 
 void Workstation::sendFile(Socket *socket, QByteArray *data)
