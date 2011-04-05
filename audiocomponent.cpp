@@ -115,7 +115,7 @@ void AudioComponent::startMic(QIODevice* stream, QThread* socketThread) {
 
     micIO_ = stream;
     format.setFrequency(44100);
-    format.setChannels(1);
+    format.setChannels(2);
     format.setSampleSize(8);
     format.setCodec("audio/pcm");
     format.setByteOrder(QAudioFormat::LittleEndian);
