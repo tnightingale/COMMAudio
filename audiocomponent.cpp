@@ -194,9 +194,10 @@ void AudioComponent::addFromMulticast(Socket* socket) {
     if(allBuffers_.empty()){
         allBuffers_.append(new QBuffer);
         allFormats_.append(tempformat);
-        output_= new QAudioOutput(allFormats_.first());
+        output_= new QAudioOutput(allFormats_.first(),NULL);
         connect(output_,SIGNAL(stateChanged(QAudio::State)),this,SLOT(stateChangeStream(QAudio::State)));
-        output_->start(allBuffers_.first());
+        output_->setBufferSize(1024*8*10);
+        buff = output_->start();
 
     }
     if(tempformat!=allFormats_.last()){
@@ -209,11 +210,14 @@ void AudioComponent::addFromMulticast(Socket* socket) {
     allBuffers_.last()->open(QIODevice::Append);
     allBuffers_.last()->write(newData);
     allBuffers_.last()->close();
-    int i = allBuffers_.last()->bytesAvailable();
+    allBuffers_.last()->bytesAvailable();
    // output_->start(allBuffers_.first());
-    i = allBuffers_.first()->bytesAvailable();
-    i = output_->state();
-    int j;
+    int i;
+
+    while((i = output_->bytesFree())>0 && !allBuffers_.first()->atEnd()) {
+        buff->write(allBuffers_.first()->read(i));
+
+    }
 
 }
 /*
@@ -269,7 +273,7 @@ void AudioComponent::stateChangeStream(QAudio::State newState){
                 allBuffers_.removeFirst();
                 allFormats_.removeFirst();
                 output_= new QAudioOutput(allFormats_.first());
-                output_->start(allBuffers_.first());
+                buff = output_->start();
             }
 
         }
