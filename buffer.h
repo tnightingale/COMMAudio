@@ -5,6 +5,11 @@
 #include <exception>
 
 /**
+ * NOTE:
+ * This class originated in the TD project (our COMP 4981 game project
+ * source code). It was originally written by Darryl Pogue but has been
+ * modified by Tom Nightingale for usage within his Socket classes.
+ *
  * Access class for data in a network buffer.
  * This class allows reading and writing standard data types to a byte array
  * buffer intended for use with network packets. You can you this class to
@@ -13,7 +18,7 @@
  * Internally, this class is implemented as a wrapper over the QByteArray
  * class, which is the common data type for Qt's socket buffers.
  *
- * @author Darryl Pogue
+ * @author Darryl Pogue, Tom Nightingale
  */
 class Buffer
 {
@@ -23,7 +28,7 @@ public:
      * Any calls to read functions can throw this exception and it MUST be
      * handled by the caller.
      *
-     * @author Darryl Pogue
+     * @author Darryl Pogue, Tom Nightingale
      */
     class EOFException : public std::exception
     {
@@ -65,7 +70,7 @@ public:
      * For reading, this is the total amount of available data.
      * For writing, this is the amount of data already written.
      *
-     * @author Darryl Pogue
+     * @author Darryl Pogue, Tom Nightingale
      * @return The total buffer size.
      */
     int size() const {
@@ -77,7 +82,7 @@ public:
      * For reading, this is the progress through the buffer.
      * For writing, this is the amount of data already written.
      *
-     * @author Darryl Pogue
+     * @author Darryl Pogue, Tom Nightingale
      * @return The current position in the buffer.
      */
     int readPosition() const {
@@ -93,7 +98,7 @@ public:
      * For reading, this is a valid check.
      * For writing, this will always be true.
      *
-     * @author Darryl Pogue
+     * @author Darryl Pogue, Tom Nightingale
      * @return true if the end of buffer is reached, false otherwise.
      */
     bool eof() const {
@@ -109,7 +114,7 @@ public:
      * Returns the Buffer buffer as a constant QByteArray reference.
      * This is needed when writing the buffer data to a file or socket.
      *
-     * @author Darryl Pogue
+     * @author Darryl Pogue, Tom Nightingale
      * @return The buffer data as a QByteArray reference.
      */
     const QByteArray& data() const {
@@ -119,7 +124,7 @@ public:
     /**
      * Reads a byte (unsigned char) from the buffer.
      *
-     * @author Darryl Pogue
+     * @author Darryl Pogue, Tom Nightingale
      * @throw EOFException if the end of buffer has been reached.
      *        The caller must safely handle this exception!
      * @return A byte read from the buffer.
@@ -129,7 +134,7 @@ public:
     /**
      * Reads a (unsigned) short from the buffer.
      *
-     * @author Darryl Pogue
+     * @author Darryl Pogue, Tom Nightingale
      * @throw EOFException if the end of buffer has been reached.
      *        The caller must safely handle this exception!
      * @return A short read from the buffer.
@@ -139,7 +144,7 @@ public:
     /**
      * Reads an (unsigned) int from the buffer.
      *
-     * @author Darryl Pogue
+     * @author Darryl Pogue, Tom Nightingale
      * @throw EOFException if the end of buffer has been reached.
      *        The caller must safely handle this exception!
      * @return An int read from the buffer.
@@ -149,7 +154,7 @@ public:
     /**
      * Reads a float from the buffer.
      *
-     * @author Darryl Pogue
+     * @author Darryl Pogue, Tom Nightingale
      * @throw EOFException if the end of buffer has been reached.
      *        The caller must safely handle this exception!
      * @return A float read from the buffer.
@@ -159,7 +164,7 @@ public:
     /**
      * Reads a double from the buffer.
      *
-     * @author Darryl Pogue
+     * @author Darryl Pogue, Tom Nightingale
      * @throw EOFException if the end of buffer has been reached.
      *        The caller must safely handle this exception!
      * @return A double read from the buffer.
@@ -171,7 +176,7 @@ public:
      * If the length is greater than the remaining buffer size, the
      * returned array contains up to the end of the buffer.
      *
-     * @author Darryl Pogue
+     * @author Darryl Pogue, Tom Nightingale
      * @param length The number of bytes to read.
      * @throw EOFException if the end of buffer has been reached.
      *        The caller must safely handle this exception!
@@ -182,7 +187,7 @@ public:
     /**
      * Writes a byte to the buffer.
      *
-     * @author Darryl Pogue
+     * @author Darryl Pogue, Tom Nightingale
      * @param value The byte value to be written.
      */
     void writeByte(const unsigned char value);
@@ -190,7 +195,7 @@ public:
     /**
      * Writes a short to the buffer.
      *
-     * @author Darryl Pogue
+     * @author Darryl Pogue, Tom Nightingale
      * @param value The short value to be written.
      */
     void writeShort(const short value);
@@ -198,7 +203,7 @@ public:
     /**
      * Writes an int to the buffer.
      *
-     * @author Darryl Pogue
+     * @author Darryl Pogue, Tom Nightingale
      * @param value The int value to be written.
      */
     void writeInt(const int value);
@@ -206,7 +211,7 @@ public:
     /**
      * Writes a float to the buffer.
      *
-     * @author Darryl Pogue
+     * @author Darryl Pogue, Tom Nightingale
      * @param value The float value to be written.
      */
     void writeFloat(const float value);
@@ -214,7 +219,7 @@ public:
     /**
      * Writes a double to the buffer.
      *
-     * @author Darryl Pogue
+     * @author Darryl Pogue, Tom Nightingale
      * @param value The double value to be written.
      */
     void writeDouble(const double value);
@@ -222,7 +227,7 @@ public:
     /**
      * Writes an existing QByteArray to the buffer.
      *
-     * @author Darryl Pogue
+     * @author Darryl Pogue, Tom Nightingale
      * @param value The byte array to be written.
      */
     void write(const QByteArray& value);
