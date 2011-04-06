@@ -130,8 +130,6 @@ void Workstation::endVoiceStream() {
     qDebug("Workstation::endVoiceStream(); Ending voice chat.");
 
     // Disconnect this slot and signal
-    disconnect(voiceControlSocket_, SIGNAL(signalSocketClosed()),
-               this, SLOT(endVoiceStream()));
     disconnect(mainWindowPointer_, SIGNAL(disconnectVoiceStream()),
                this, SLOT(endVoiceStreamUser()));
 
