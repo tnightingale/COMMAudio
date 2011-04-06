@@ -162,6 +162,12 @@ void AudioComponent::playStream(QIODevice* stream, QThread* streamThread){
     output_->start(stream);
 }
 
+void AudioComponent::stopStream()
+{
+    output_->stop();
+    output_->deleteLater();
+}
+
 void AudioComponent::addFromMulticast(Socket* socket) {
 
     QByteArray newData = socket->read(1024*8+44);
