@@ -11,8 +11,8 @@
 #define VOICE_CHAT 3
 
 Workstation::Workstation(MainWindow* mainWindow)
-: socketThread_(new QThread()), voiceInThread_(new QThread()),
-  voiceOutThread_(new QThread()), mainWindowPointer_(mainWindow) {
+    : socketThread_(new QThread()), voiceInThread_(new QThread()),
+    voiceOutThread_(new QThread()), mainWindowPointer_(mainWindow) {
     int err = 0;
     WSADATA wsaData;
     WORD wVersionRequested = MAKEWORD(2,2);
@@ -142,6 +142,12 @@ void Workstation::endVoiceStream() {
 
     // Make sure that the boolean flag is false
     mainWindowPointer_->setVoiceCallActive(false);
+
+    // Disconnect the button and the initial dialog
+    connect(mainWindowPointer_,
+            SIGNAL(initiateVoiceStream(short, QString, AudioComponent*)),
+            this,
+            SLOT(initializeVoiceStream(short, QString, AudioComponent*)));
 }
 
 void Workstation::endVoiceStreamUser()
@@ -169,6 +175,12 @@ void Workstation::endVoiceStreamUser()
     voiceControlSocket_->deleteLater();
     voiceControlSocket_ = NULL;
     //delete voiceControlSocket_;
+
+    // Disconnect the button and the initial dialog
+    connect(mainWindowPointer_,
+            SIGNAL(initiateVoiceStream(short, QString, AudioComponent*)),
+            this,
+            SLOT(initializeVoiceStream(short, QString, AudioComponent*)));
 }
 
 void Workstation::startMulticast(QStringList* list) {
