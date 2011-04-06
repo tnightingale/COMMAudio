@@ -608,12 +608,14 @@ bool Workstation::processReceivingFile(Socket* socket, QByteArray* packet)
                 mainWindowPointer_, SLOT(downloadStarted(int, int,QString)));
     }
 
+    emit signalFileProgress(fileData->getTotalSize(), packet->size(), fileData->getPath());
     // Append any new data to any existing data
     fileData->append(*packet);
 
     // Check to see if we have received all the data
     if (fileData->transferComplete())
     {
+        emit signalFileProgress(fileData->getTotalSize(), fileData->getTotalSize(), fileData->getPath());
         // Write all the data to disk
         fileData->writeToFile();
 
@@ -622,7 +624,6 @@ bool Workstation::processReceivingFile(Socket* socket, QByteArray* packet)
 
         isFileListTransferComplete = true;
     }
-    emit signalFileProgress(fileData->getTotalSize(), packet->size(), fileData->getPath());
     return isFileListTransferComplete;
 }
 

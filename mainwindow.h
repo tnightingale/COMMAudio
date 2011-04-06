@@ -470,12 +470,6 @@ private slots:
      */
     void downloadStarted(int filesize, int packsizeRecv, QString file);
     /**
-     * download view pops up
-     *
-     * @author Joel Stewart
-     */
-    void on_viewDownloadButton_clicked();
-    /**
      * download is full
      *
      * @param full, is download queue full

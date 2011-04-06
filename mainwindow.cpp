@@ -57,6 +57,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->remoteListWidget->setSortingEnabled(true);
     connect(&downloads_,SIGNAL(queueFull(bool)),this,SLOT(downloadQueueFull(bool)));
     connect(this,SIGNAL(multicastList(QStringList*)),multicast_,SLOT(loadLibrary(QStringList*)));
+    ui->downloadBar->setValue(0);
     //downloads_.exec();
     //downloads_.hide();
     // ui->clientListWidget->setSortingEnabled(true);
@@ -270,6 +271,9 @@ void MainWindow::on_remoteListWidget_itemDoubleClicked(QListWidgetItem* item)
     emit requestFile(songInfo.getIp(),songInfo.getPort(), songInfo.getFilePath());
     addSongToLocal(songInfo.getFilePath());
     ui->songTransferedEditBox->setText(item->text());
+    ui->remoteListWidget->setDisabled(true);
+    ui->downloadBar->reset();
+    ui->downloadBar->setValue(0);
 }
 
 void MainWindow::on_playButton_clicked()
@@ -447,7 +451,6 @@ void MainWindow::backgroundColor(QString background, QString font) {
     ui->clearPlaylistButton->setStyleSheet(button);
     ui->clearRemoteButton->setStyleSheet(button);
     ui->removeButton->setStyleSheet(button);
-    ui->viewDownloadButton->setStyleSheet(button);
     slider_->setStyleSheet(sliderMods);
     ui->horizontalSlider->setStyleSheet(sliderMods);
     ui->playlistWidget->setStyleSheet(border);
@@ -767,16 +770,17 @@ bool MainWindow::requestVoiceChat(QString fromIp)
 
 void MainWindow::downloadStarted(int filesize, int packsizeRecv, QString file) {
 
-    QString songTitle;
-    int n = file.lastIndexOf('/');
-    int s = file.size() - n - 1;
-    songTitle = file.right(s);
-    downloads_.downloadFile(filesize, packsizeRecv, songTitle);
-}
-
-void MainWindow::on_viewDownloadButton_clicked()
-{
-    downloads_.show();
+    //QString songTitle;
+    //int n = file.lastIndexOf('/');
+    //int s = file.size() - n - 1;
+    //songTitle = file.right(s);
+    //downloads_.downloadFile(filesize, packsizeRecv, songTitle);
+    ui->downloadBar->setMaximum(filesize);
+    ui->downloadBar->setValue(ui->downloadBar->value() + packsizeRecv);
+    if(filesize == packsizeRecv) {
+        ui->downloadBar->setValue(ui->downloadBar->maximum());
+        ui->remoteListWidget->setDisabled(false);
+    }
 }
 
 void MainWindow::downloadQueueFull(bool full) {
