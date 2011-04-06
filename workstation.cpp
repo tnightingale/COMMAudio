@@ -143,7 +143,10 @@ void Workstation::endVoiceStream() {
     // Make sure that the boolean flag is false
     mainWindowPointer_->setVoiceCallActive(false);
 
-    // Disconnect the button and the initial dialog
+    udpSocket_->deleteLater();
+    udpSocket_ = NULL;
+
+    // Reconnect the button and the initial dialog
     connect(mainWindowPointer_,
             SIGNAL(initiateVoiceStream(short, QString, AudioComponent*)),
             this,
@@ -174,9 +177,11 @@ void Workstation::endVoiceStreamUser()
     // Delete the socket, where the rest of the cleanup will be triggered from
     voiceControlSocket_->deleteLater();
     voiceControlSocket_ = NULL;
-    //delete voiceControlSocket_;
 
-    // Disconnect the button and the initial dialog
+    udpSocket_->deleteLater();
+    udpSocket_ = NULL;
+
+    // Reconnect the button and the initial dialog
     connect(mainWindowPointer_,
             SIGNAL(initiateVoiceStream(short, QString, AudioComponent*)),
             this,
