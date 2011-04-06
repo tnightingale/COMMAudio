@@ -16,7 +16,7 @@ unsigned char Buffer::readByte()
 
 short Buffer::readShort()
 {
-    if (bytesAvailable() < sizeof(short)) {
+    if ((uint) bytesAvailable() < sizeof(short)) {
         throw new EOFException();
     }
 
@@ -27,7 +27,7 @@ short Buffer::readShort()
 
 int Buffer::readInt()
 {
-    if (bytesAvailable() < sizeof(int)) {
+    if ((uint) bytesAvailable() < sizeof(int)) {
         throw new EOFException();
     }
 
@@ -38,7 +38,7 @@ int Buffer::readInt()
 
 float Buffer::readFloat()
 {
-    if (bytesAvailable() < sizeof(float)) {
+    if ((uint)bytesAvailable() < sizeof(float)) {
         throw new EOFException();
     }
 
@@ -49,7 +49,7 @@ float Buffer::readFloat()
 
 double Buffer::readDouble()
 {
-    if (bytesAvailable() < sizeof(double)) {
+    if ((uint) bytesAvailable() < sizeof(double)) {
         throw new EOFException();
     }
 
