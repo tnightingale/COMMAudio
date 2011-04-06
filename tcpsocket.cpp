@@ -211,6 +211,7 @@ bool TCPSocket::connectRemote(QString address, int port) {
 
 void TCPSocket::slotProcessWSAEvent(int socket, int lParam) {
     MSG msg;
+    int err = 0;
     msg.wParam = socket;
     msg.lParam = lParam;
     PMSG pMsg = &msg;
@@ -220,7 +221,12 @@ void TCPSocket::slotProcessWSAEvent(int socket, int lParam) {
         return;
     }
 
-    if (WSAGETSELECTERROR(pMsg->lParam)) {
+    if (err = WSAGETSELECTERROR(pMsg->lParam)) {
+        if (err = WSAECONNABORTED) {
+            qDebug("TCPSocket::slotProcessWSAEvent(); Remote aborted connection.");
+            close(pMsg);
+            return;
+        }
         qDebug("TCPSocket::slotProcessWSAEvent(): %d: Socket failed. Error: %d",
               (int) pMsg->wParam, WSAGETSELECTERROR(pMsg->lParam));
         return;
