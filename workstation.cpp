@@ -138,6 +138,7 @@ void Workstation::endVoiceStream() {
 
     // Stop the audio input and playback
     player->stopMic();
+    player->stopStream();
 
     // Make sure that the boolean flag is false
     mainWindowPointer_->setVoiceCallActive(false);
@@ -158,6 +159,7 @@ void Workstation::endVoiceStreamUser()
 
     // Stop the audio input
     player->stopMic();
+    player->stopStream();
 
     // Make sure that the boolean flag is false
     mainWindowPointer_->setVoiceCallActive(false);

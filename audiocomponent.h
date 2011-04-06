@@ -80,6 +80,7 @@ public slots:
     void pauseMic();
     void resumeMic();
     void stopMic();
+    void stopStream();
     void playStream(QIODevice* stream, QThread* socketThread);
 };
 
