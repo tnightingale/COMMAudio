@@ -49,7 +49,7 @@ Workstation::Workstation(MainWindow* mainWindow)
     connect(mainWindowPointer_, SIGNAL(startMulticast(QStringList*)),
             this, SLOT(startMulticast(QStringList*)));
     connect(mainWindowPointer_->getJoinMulticast(),
-            SIGNAL(play(QString)),this,SLOT(joinMulticast(QString)));
+            SIGNAL(play(QString,int)),this,SLOT(joinMulticast(QString, int)));
 
     // Listen on the TCP socket for other client connections
     if(!tcpSocket_->listen(7000)) {

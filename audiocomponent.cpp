@@ -264,8 +264,6 @@ void AudioComponent::stateChangeStream(QAudio::State newState){
             output_= new QAudioOutput(allFormats_.first());
             buff = output_->start();
         }
-
-
         break;
     }
 
