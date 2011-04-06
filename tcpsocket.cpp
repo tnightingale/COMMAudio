@@ -119,7 +119,7 @@ void TCPSocket::receive(PMSG pMsg) {
     int err = 0;
     DWORD flags = 0;
     DWORD numReceived = 0;
-    int bytesWritten = 0;
+
     WSABUF winsockBuff;
 
     winsockBuff.len = MAXUDPDGRAMSIZE;
@@ -221,7 +221,7 @@ void TCPSocket::slotProcessWSAEvent(int socket, int lParam) {
         return;
     }
 
-    if (err = WSAGETSELECTERROR(pMsg->lParam)) {
+    if ((err = WSAGETSELECTERROR(pMsg->lParam))) {
         if (err = WSAECONNABORTED) {
             qDebug("TCPSocket::slotProcessWSAEvent(); Remote aborted connection.");
             close(pMsg);

@@ -241,6 +241,8 @@ void AudioComponent::joinMulticast(){
 
 void AudioComponent::stateChangeStream(QAudio::State newState){
     switch (newState) {
+    case QAudio::StoppedState:
+        break;
     case QAudio::SuspendedState:
         qDebug("AudioComponent::stateChangeStream(); SuspendedState.");
         break;
@@ -273,6 +275,8 @@ void AudioComponent::mic(QAudio::State newState){
     }
     int error = 0;
     switch (newState) {
+    case QAudio::StoppedState:
+        break;
     case QAudio::SuspendedState:
         qDebug("AudioComponent::mic(); State: SuspendedState.");
         break;
@@ -300,6 +304,8 @@ void AudioComponent::speak(QAudio::State newState){
     }
     int error = 0;
     switch (newState) {
+    case QAudio::StoppedState:
+        break;
     case QAudio::SuspendedState:
         qDebug("AudioComponent::speak(); State: SuspendedState.");
         break;
