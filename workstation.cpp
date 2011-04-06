@@ -46,8 +46,10 @@ Workstation::Workstation(MainWindow* mainWindow)
             this, SLOT(initializeVoiceStream(short, QString, AudioComponent*)));
 
     // Connections for multicast controls
-    connect(mainWindowPointer_, SIGNAL(startMulticast(QStringList*)), this, SLOT(startMulticast(QStringList*)));
-    connect(mainWindowPointer_->getJoinMulticast(),SIGNAL(play(QString)),this,SLOT(joinMulticast(QString)));
+    connect(mainWindowPointer_, SIGNAL(startMulticast(QStringList*)),
+            this, SLOT(startMulticast(QStringList*)));
+    connect(mainWindowPointer_->getJoinMulticast(),
+            SIGNAL(play(QString)),this,SLOT(joinMulticast(QString)));
 
     // Listen on the TCP socket for other client connections
     if(!tcpSocket_->listen(7000)) {
@@ -170,6 +172,8 @@ void Workstation::startMulticast(QStringList* list) {
             multicastSession_, SLOT(start()));
     connect(mainWindowPointer_->getHostMulticast(), SIGNAL(pause()),
             multicastSession_, SLOT(pause()));
+    connect(mainWindowPointer_->getHostMulticast(), SIGNAL(rejected()),
+            multicastSession_, SLOT(endSession()));
 }
 
 void Workstation::joinMulticast(QString address) {

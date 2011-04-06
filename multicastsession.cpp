@@ -11,7 +11,11 @@ MulticastSession::MulticastSession(UDPSocket* socket, QStringList* playlist)
     multicastSocket_->setDest(multicastAddr, 7000);
 }
 
-MulticastSession::~MulticastSession(){}
+MulticastSession::~MulticastSession(){
+    delete playlistIterator_;
+    delete current_;
+    delete nextBuff_;
+}
 
 void MulticastSession::start() {
     playlistIterator_ = new QStringListIterator(*playlist_);
@@ -20,7 +24,7 @@ void MulticastSession::start() {
 }
 
 void MulticastSession::pause() {
-    killTimer(currentTimer_);
+    if (currentTimer_ > 0) killTimer(currentTimer_);
 }
 
 void MulticastSession::timerEvent(QTimerEvent* event) {
@@ -65,12 +69,9 @@ QByteArray* MulticastSession::generateBuffer() {
 }
 
 void MulticastSession::endSession() {
-    qDebug("Multicastsession::closeSession(); closed.");
-    //timer_->stop();
-    //disconnect(timer_, SIGNAL(timeout()),
-    //           this, SLOT(writeNextBuffer()));
-    //timer_->deleteLater();
-
-    // End of stream.
-    // Disconnect timer, delete later.
+    qDebug("Multicastsession::closeSession(); Multicast session closed.");
+    pause();
+    this->deleteLater();
+    multicastSocket_->deleteLater();
+    multicastSocket_ = NULL;
 }
