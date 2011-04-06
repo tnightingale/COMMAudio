@@ -213,7 +213,7 @@ void UDPSocket::slotProcessWSAEvent(int socket, int lParam) {
 
     if (WSAGETSELECTERROR(pMsg->lParam)) {
         qDebug("UDPSocket::slotProcessWSAEvent(): %d: Socket failed. Error: %d",
-              (int) pMsg->wParam, WSAGETSELECTERROR(pMsg->lParam));
+               (int) pMsg->wParam, WSAGETSELECTERROR(pMsg->lParam));
         return;
     }
 

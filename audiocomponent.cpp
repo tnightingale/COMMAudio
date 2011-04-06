@@ -212,50 +212,34 @@ void AudioComponent::addFromMulticast(Socket* socket) {
     while((i = output_->bytesFree())>1024*8 ) {
         if(!allBuffers_.first()->isEmpty()){
             QByteArray temparrrrrr = *allBuffers_.first()->takeFirst();
-
             buff->write(temparrrrrr);
         }
         else {
             break;
         }
     }
-
 }
 
-
-/*
- * creates the AudioOutput
- *
- */
 void AudioComponent::joinMulticast(){
     allBuffers_.clear();;
     allFormats_.clear();;
 }
+
 void AudioComponent::stateChangeStream(QAudio::State newState){
-    int error = 0;
     switch (newState) {
-    case QAudio::StoppedState:
-        if (output_->error() != QAudio::NoError) {
-            // Perform error handling
-            qDebug("speak error");
-        } else {
-            // Normal stop
-        }
-        break;
-
     case QAudio::SuspendedState:
-        qDebug("speak suspended");
-
+        qDebug("AudioComponent::stateChangeStream(); SuspendedState.");
         break;
+
     case QAudio::ActiveState:
-        qDebug("speak active");
-        //
+        qDebug("AudioComponent::stateChangeStream(); ActiveState.");
         break;
-    case QAudio::IdleState:
-        qDebug("speak idle");
 
-        qDebug("switch songs");
+    case QAudio::IdleState:
+        qDebug("AudioComponent::stateChangeStream(); IdleState.");
+
         if(allFormats_.size()!=1){
+            qDebug("AudioComponent::stateChangeStream(); Switching songs.");
             output_->stop();
             output_->deleteLater();
 
@@ -264,40 +248,28 @@ void AudioComponent::stateChangeStream(QAudio::State newState){
             output_= new QAudioOutput(allFormats_.first());
             buff = output_->start();
         }
-
-
         break;
     }
-
 }
 
 void AudioComponent::mic(QAudio::State newState){
     int error = 0;
     switch (newState) {
-    case QAudio::StoppedState:
-        if (input_->error() != QAudio::NoError) {
-            // Perform error handling
-            qDebug("mic error");
-        } else {
-            // Normal stop
-        }
-        break;
-
     case QAudio::SuspendedState:
-        qDebug("mic suspended");
+        qDebug("AudioComponent::mic(); State: SuspendedState.");
+        break;
 
-        break;
     case QAudio::ActiveState:
-        qDebug("mic active");
-        //
+        qDebug("AudioComponent::mic(); State: ActiveState.");
         break;
+
     case QAudio::IdleState:
-        qDebug("mic idle");
+        qDebug("AudioComponetn:mic(); State: IdleState.");
         if ((error = input_->error()) != QAudio::NoError) {
-            // Perform error handling
-            qDebug("mic error: %d", error);
-            if (error == QAudio::UnderrunError)
-            {
+            if (error == QAudio::UnderrunError) {
+                qDebug("AudioComponent::mic() Underrun error.");
+                // Give it a second to buffer then try again.
+                Sleep(1000);
                 input_->start(micIO_);
             }
         }
@@ -308,30 +280,21 @@ void AudioComponent::mic(QAudio::State newState){
 void AudioComponent::speak(QAudio::State newState){
     int error = 0;
     switch (newState) {
-    case QAudio::StoppedState:
-        if (output_->error() != QAudio::NoError) {
-            // Perform error handling
-            qDebug("speak error");
-        } else {
-            // Normal stop
-        }
-        break;
-
     case QAudio::SuspendedState:
-        qDebug("speak suspended");
+        qDebug("AudioComponent::speak(); State: SuspendedState.");
+        break;
 
-        break;
     case QAudio::ActiveState:
-        qDebug("speak active");
-        //
+        qDebug("AudioComponent::speak(); State: ActiveState.");
         break;
+
     case QAudio::IdleState:
-        qDebug("speak idle");
+        qDebug("AudioComponent::speak(); State: IdleState.");
         if ((error = output_->error()) != QAudio::NoError) {
-            // Perform error handling
-            qDebug("speak error: %d", error);
-            if (error == QAudio::UnderrunError)
-            {
+            if (error == QAudio::UnderrunError) {
+                qDebug("AudioComponent::speak(); Underrun error.");
+                // Give it a second to buffer then try again.
+                Sleep(1000);
                 output_->start(speakersIO_);
             }
         }
