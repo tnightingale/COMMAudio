@@ -112,16 +112,14 @@ private:
 
     QDir sourceFolder_;
 
-    QByteArray data;
     QAudioInput* input_;
     QAudioOutput* output_;
     QFile outputFile;
     QAudioFormat format;
-    QBuffer* buffer_;
     QIODevice* buff;
-    QBuffer* inputBuffer_;
     QList<QList<QByteArray*>*> allBuffers_;
     QList<QAudioFormat> allFormats_;
+
     bool isMicOn;
     bool isSpeakersOn;
 signals:
@@ -168,13 +166,13 @@ public slots:
     /**
     * error handling for microphone.
     * voice chat.
-    *@author Ian Lee
+    *@author Tom Nightingale, Luke Queenan, Ian Lee
     */
     void mic(QAudio::State);
     /**
     * error handling for speakers.
     * voice chat
-    *@author Ian Lee
+    *@author Tom Nightingale, Luke Queenan, Ian Lee
     */
     void speak(QAudio::State);
     /**
@@ -201,7 +199,7 @@ public slots:
     /**
     * disconnects speakers.
     * voice chat.
-    *@author Ian Lee
+    *@author Tom Nightingale, Luke Queenan, Ian Lee
     */
     void stopStream();
     /**
