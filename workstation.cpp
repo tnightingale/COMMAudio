@@ -176,9 +176,9 @@ void Workstation::startMulticast(QStringList* list) {
             multicastSession_, SLOT(endSession()));
 }
 
-void Workstation::joinMulticast(QString address) {
+void Workstation::joinMulticast(QString address, int port) {
     udpSocket_ = new UDPSocket(mainWindowPointer_->winId());
-    udpSocket_->listenMulticast(address,7000);
+    udpSocket_->listenMulticast(address,port);
     connect(mainWindowPointer_, SIGNAL(signalWMWSASyncUDPRx(int, int)),
             udpSocket_, SLOT(slotProcessWSAEvent(int, int)));
     udpSocket_->open(QIODevice::ReadOnly);

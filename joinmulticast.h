@@ -15,10 +15,12 @@ public:
     explicit JoinMulticast(QWidget *parent = 0);
     ~JoinMulticast();
     void setIp(QString ip);
+    void setPort(int port);
 signals:
-    void play(QString ip);
+    void play(QString ip,int port);
 private:
     Ui::JoinMulticast *ui;
+    int port_;
 };
 
 #endif // JOINMULTICAST_H
