@@ -14,8 +14,11 @@ JoinMulticast::~JoinMulticast()
 {
     delete ui;
 }
+void JoinMulticast::setPort(int port){
+    port_ = port;
+}
 
 void JoinMulticast::setIp(QString ip){
     ui->ipField->setText(ip);
-    emit play(ip);
+    emit play(ip, port_);
 }
