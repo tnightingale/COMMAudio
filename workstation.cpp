@@ -140,7 +140,6 @@ void Workstation::endVoiceStream() {
 
     // Stop the audio input and playback
     player->stopMic();
-    player->stop();
 
     // Make sure that the boolean flag is false
     mainWindowPointer_->setVoiceCallActive(false);
@@ -159,9 +158,8 @@ void Workstation::endVoiceStreamUser()
     // Get the audio component
     AudioComponent *player = mainWindowPointer_->getAudioPlayer();
 
-    // Stop the audio input and playback
+    // Stop the audio input
     player->stopMic();
-    player->stop();
 
     // Make sure that the boolean flag is false
     mainWindowPointer_->setVoiceCallActive(false);
