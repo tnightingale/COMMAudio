@@ -61,7 +61,7 @@ public slots:
     void initializeVoiceStream(short port, QString hostAddr, AudioComponent* player);
     void endVoiceStream();
     void startMulticast(QStringList* list);
-    void joinMulticast(QString address);
+    void joinMulticast(QString address,int port);
 
 
 signals:
