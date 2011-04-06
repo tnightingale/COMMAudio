@@ -3,23 +3,22 @@
 
 #include <QObject>
 #include <QStringList>
-#include <QTimer>
 #include <QByteArray>
 #include <QFile>
-#include "udpsocket.h"
+#include <QTimerEvent>
 
-
+class UDPSocket;
 
 class MulticastSession : public QObject {
   Q_OBJECT
 private:
     UDPSocket* multicastSocket_;
     QStringList* playlist_;
-    QTimer* timer_;
     QStringListIterator* playlistIterator_;
     QFile* current_;
     QByteArray* nextBuff_;
     QByteArray header_;
+    int currentTimer_;
 
     /**
      *
@@ -27,18 +26,17 @@ private:
      */
     void loadBuffer();
     QByteArray* generateBuffer() ;
+
+protected:
+    void timerEvent(QTimerEvent* event);
+
 public:
     MulticastSession(UDPSocket* socket, QStringList* playlist);
-
-
-
-
-
     virtual ~MulticastSession();
 
 public slots:
     void start();
-    void writeNextBuffer();
+    void pause();
     void endSession();
 
 signals:

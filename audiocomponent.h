@@ -2,7 +2,7 @@
 #define AUDIOCOMPONENT_H
 
 #include <QObject>
-//#include <Phonon>
+
 #include <QDir>
 #include <QAudioInput>
 #include <QAudioOutput>
@@ -37,9 +37,7 @@ public:
     void gotoIndex(int index);
     QMediaPlaylist* getPlaylist();
     int getIndex();
-    void testwav(QString fileName);
 
-    void writeToMulticast(QString fileName, QIODevice* socket);
 
     void joinMulticast();
 
@@ -49,8 +47,7 @@ private:
     QMediaPlaylist* playlist_;
     QIODevice *micIO_;
     QIODevice *speakersIO_;
-    //Phonon::MediaObject* playlist_;
-    //Phonon::AudioOutput* output_;
+
     QDir sourceFolder_;
 
     QByteArray data;
@@ -61,14 +58,14 @@ private:
     QBuffer* buffer_;
     QIODevice* buff;
     QBuffer* inputBuffer_;
-    QList<QByteArray*> allBuffers_;
+    QList<QList<QByteArray*>*> allBuffers_;
     QList<QAudioFormat> allFormats_;
 signals:
 
 public slots:
     void addFromMulticast(Socket* socket);
     void stateChangeStream(QAudio::State);
-    void onNotify();
+
 
     void play();
     void pause();

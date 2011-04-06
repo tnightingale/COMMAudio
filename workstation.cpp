@@ -46,8 +46,10 @@ Workstation::Workstation(MainWindow* mainWindow)
             this, SLOT(initializeVoiceStream(short, QString, AudioComponent*)));
 
     // Connections for multicast controls
-    connect(mainWindowPointer_, SIGNAL(startMulticast(QStringList*)), this, SLOT(startMulticast(QStringList*)));
-    connect(mainWindowPointer_->getJoinMulticast(),SIGNAL(play(QString)),this,SLOT(joinMulticast(QString)));
+    connect(mainWindowPointer_, SIGNAL(startMulticast(QStringList*)),
+            this, SLOT(startMulticast(QStringList*)));
+    connect(mainWindowPointer_->getJoinMulticast(),
+            SIGNAL(play(QString,int)),this,SLOT(joinMulticast(QString, int)));
 
     // Listen on the TCP socket for other client connections
     if(!tcpSocket_->listen(7000)) {
@@ -168,13 +170,15 @@ void Workstation::startMulticast(QStringList* list) {
     multicastSession_ = new MulticastSession(udpSocket_, list);
     connect(mainWindowPointer_->getHostMulticast(), SIGNAL(play()),
             multicastSession_, SLOT(start()));
-    connect(mainWindowPointer_->getHostMulticast(),SIGNAL(pause()),multicastSession_,SLOT(endSession()));
-
+    connect(mainWindowPointer_->getHostMulticast(), SIGNAL(pause()),
+            multicastSession_, SLOT(pause()));
+    connect(mainWindowPointer_->getHostMulticast(), SIGNAL(rejected()),
+            multicastSession_, SLOT(endSession()));
 }
 
-void Workstation::joinMulticast(QString address) {
+void Workstation::joinMulticast(QString address, int port) {
     udpSocket_ = new UDPSocket(mainWindowPointer_->winId());
-    udpSocket_->listenMulticast(address,7000);
+    udpSocket_->listenMulticast(address,port);
     connect(mainWindowPointer_, SIGNAL(signalWMWSASyncUDPRx(int, int)),
             udpSocket_, SLOT(slotProcessWSAEvent(int, int)));
     udpSocket_->open(QIODevice::ReadOnly);
