@@ -6,15 +6,19 @@ UDPSocket::UDPSocket(HWND hWnd)
 
 UDPSocket::~UDPSocket() {
     int err = 0;
-    struct ip_mreq multicastAddr;
+    if (isMulticast_) {
+        struct ip_mreq multicastAddr;
 
-    multicastAddr.imr_multiaddr.s_addr = inet_addr(connectedIp_.toAscii().constData());
-    multicastAddr.imr_interface.s_addr = INADDR_ANY;
-    err = setsockopt(socket_,
-       IPPROTO_IP,
-       IP_DROP_MEMBERSHIP,
-       (char *)&multicastAddr,
-       sizeof(multicastAddr));
+        qDebug("UDPSocket::~UDPSocket() Informing router of departure from multicast group.");
+
+        multicastAddr.imr_multiaddr.s_addr = inet_addr(connectedIp_.toAscii().constData());
+        multicastAddr.imr_interface.s_addr = INADDR_ANY;
+        err = setsockopt(socket_,
+            IPPROTO_IP,
+            IP_DROP_MEMBERSHIP,
+            (char *)&multicastAddr,
+            sizeof(multicastAddr));
+    }
 }
 
 bool UDPSocket::open(OpenMode mode) {

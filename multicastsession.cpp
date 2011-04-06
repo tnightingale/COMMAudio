@@ -20,7 +20,7 @@ MulticastSession::~MulticastSession(){
 void MulticastSession::start() {
     playlistIterator_ = new QStringListIterator(*playlist_);
     loadBuffer();
-    currentTimer_ = startTimer(35);  //timer_->start(35);
+    currentTimer_ = startTimer(35);
 }
 
 void MulticastSession::pause() {
@@ -55,9 +55,7 @@ QByteArray* MulticastSession::generateBuffer() {
     QByteArray* tempArray = new QByteArray;
     tempArray->append(header_);
     tempArray->append(current_->read(1024*8));
-    /*if(tempArray->size() != 1024*8 + 44){
 
-    }*/
     if(current_->atEnd()){
         current_->close();
         current_->deleteLater();

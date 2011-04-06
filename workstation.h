@@ -62,7 +62,7 @@ public slots:
     void endVoiceStream();
     void startMulticast(QStringList* list);
     void joinMulticast(QString address,int port);
-
+    void leaveMulticast();
 
 signals:
     void signalFileListUpdate(QStringList*);

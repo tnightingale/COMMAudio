@@ -215,7 +215,14 @@ void Workstation::joinMulticast(QString address, int port) {
     connect(udpSocket_, SIGNAL(signalDataReceived(Socket*)),
             mainWindowPointer_->getAudioPlayer(),
             SLOT(addFromMulticast(Socket*)));
+    connect(mainWindowPointer_->getJoinMulticast(), SIGNAL(rejected()),
+            this, SLOT(leaveMulticast()));
+}
 
+void Workstation::leaveMulticast() {
+    qDebug("Workstation::leaveMulticast(); Leaving multicast session.");
+    udpSocket_->deleteLater();
+    udpSocket_ = NULL;
 }
 
 void Workstation::sendFile(Socket *socket, QByteArray *data)
