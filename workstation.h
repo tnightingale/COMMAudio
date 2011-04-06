@@ -12,27 +12,75 @@ class FileData;
 class AudioComponent;
 
 class Workstation : public QObject {
-  Q_OBJECT
+    Q_OBJECT
 
 private:
-    /**  */
+    /**
+    * The 'server' socket that remains open for the programs duration.
+    *
+    * @author Luke Queenan
+    */
     TCPSocket *tcpSocket_;
 
+    /**
+     * The control socket for voice control. The request for the voice
+     * connection is sent out across this socket, and when the voice chat ends,
+     * this socket closes.
+     *
+     * @author Luke Queenan
+     */
     TCPSocket *voiceControlSocket_;
 
-    /**  */
+    /**
+     * The general purpose UDP socket. This socket is used for sending and
+     * receiving voice data, along with multicsting sending or receiving.
+     *
+     * @author Luke Queenan
+     */
     UDPSocket* udpSocket_;
 
+    /**
+     * This thread holds all the general purpose sockets, such as file list
+     * transfer and actual file transfer.
+     *
+     * @author Luke Queenan
+     */
     QThread* socketThread_;
+
+    /**
+     * Pointer to the multicast session object.
+     *
+     * @author Luke Queenan
+     */
     MulticastSession* multicastSession_;
+
+    /**
+     * The thread holding the voice in audio.
+     *
+     * @author Luke Queenan
+     */
     QThread* voiceInThread_;
+
+    /**
+     * The thread for holding the voice out audio
+     *
+     * @author Luke Queenan
+     */
     QThread* voiceOutThread_;
 
-    /* Pointer to the main window. This is used to access the window handle for
-    when we create new sockets.*/
+    /**
+     * Pointer to the main window, used for creating new sockets and calling
+     * functions in the application layer.
+     *
+     * @author Luke Queenan
+     */
     MainWindow *mainWindowPointer_;
 
-    // Collection for file transfers
+    /**
+     * The map containing any current file transfer objects.
+     *
+     * @author Luke Queenan
+     */
     QMap <Socket*, FileData*> currentTransfers;
 
     // Functions
