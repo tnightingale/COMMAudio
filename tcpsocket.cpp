@@ -113,10 +113,6 @@ void TCPSocket::receive(PMSG pMsg) {
     int err = 0;
     DWORD flags = 0;
     DWORD numReceived = 0;
-<<<<<<< HEAD
-
-=======
->>>>>>> 24ef4197ad7232ae757ceb982f415020fc102d8f
     WSABUF winsockBuff;
 
     winsockBuff.len = MAXUDPDGRAMSIZE;
@@ -219,11 +215,8 @@ void TCPSocket::slotProcessWSAEvent(int socket, int lParam) {
     }
 
     if ((err = WSAGETSELECTERROR(pMsg->lParam))) {
-<<<<<<< HEAD
-        if (err = WSAECONNABORTED) {
-=======
+
         if (err == WSAECONNABORTED) {
->>>>>>> 24ef4197ad7232ae757ceb982f415020fc102d8f
             qDebug("TCPSocket::slotProcessWSAEvent(); Remote aborted connection.");
             close(pMsg);
             return;
