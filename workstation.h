@@ -128,22 +128,98 @@ private:
 
 public slots:
     // Triggered by GUI buttons
-    void connectToServer();
+    /**
+     * Triggered by the GUI when the user requests a file
+     *
+     * @author Luke Queenan
+     */
     void requestFile(QString, short, QString);
+    /**
+     * Triggered by the GUI when the user wishes to exchange file lists
+     *
+     * @author Luke Queenan
+     */
     void requestFileList(QString, short);
+    /**
+     * Triggered by the GUI when the user wishes to end a voice chat session
+     *
+     * @author Luke Queenan
+     */
     void endVoiceStreamUser();
     // Triggered by sockets
+    /**
+     * Connects signals and opens the socket for read write
+     *
+     * @author Luke Queenan
+     */
     void processConnection(Socket*);
+    /**
+     * Takes a newly connected socket and determines its purpose based on the
+     * first byte.
+     *
+     * @author Luke Queenan
+     */
     void decodeControlMessage(Socket*);
-    void receiveUDP();
+    /**
+     * The controller for receiving a file. If the file has been received, then
+     * the socket is destroyed.
+     *
+     * @author Luke Queenan
+     */
     void receiveFileController(Socket*);
+    /**
+     * The controller for receiving a file list. If the file list has been
+     * received, our own list is sent out.
+     *
+     * @author Luke Queenan
+     */
     void receiveFileListController(Socket*);
+    /**
+     * Receives the other clients file list
+     *
+     * @author Luke Queenan
+     */
     void requestFileListController(Socket*);
+    /**
+     * The send file controller that receives the file name to send out.
+     *
+     * @author Luke Queenan
+     */
     void sendFileController(Socket*);
+    /**
+     * Triggered when the user wishes to start a voice chat. Creates the
+     * resources and sends the request packet.
+     *
+     * @author Luke Queenan
+     */
     void initializeVoiceStream(short port, QString hostAddr, AudioComponent* player);
+    /**
+     * Triggered when the voice control connection is disconnected, which causes
+     * the voice chat to terminate.
+     *
+     * @author Luke Queenan
+     */
     void endVoiceStream();
+    /**
+     * This starts a multicast session by creating the sockets and connecting
+     * the signals and slots
+     *
+     * @author Luke Queenan
+     */
     void startMulticast(QStringList* list);
+    /**
+     * Joins a multicast session by creating the socket and connecting signals
+     * and slots.
+     *
+     * @author Luke Queenan
+     */
     void joinMulticast(QString address,int port);
+    /**
+     * Leaves the multicast session by destroying the socket and shutting off
+     * the audio.
+     *
+     * @author Luke Queenan
+     */
     void leaveMulticast();
 
 signals:
