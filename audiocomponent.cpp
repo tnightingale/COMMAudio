@@ -232,7 +232,6 @@ void AudioComponent::joinMulticast(){
     allFormats_.clear();;
 }
 void AudioComponent::stateChangeStream(QAudio::State newState){
-    int error = 0;
     switch (newState) {
     case QAudio::StoppedState:
         if (output_->error() != QAudio::NoError) {
