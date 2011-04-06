@@ -268,8 +268,6 @@ void AudioComponent::mic(QAudio::State newState){
         if ((error = input_->error()) != QAudio::NoError) {
             if (error == QAudio::UnderrunError) {
                 qDebug("AudioComponent::mic() Underrun error.");
-                // Give it a second to buffer then try again.
-                Sleep(1000);
                 input_->start(micIO_);
             }
         }
@@ -293,8 +291,6 @@ void AudioComponent::speak(QAudio::State newState){
         if ((error = output_->error()) != QAudio::NoError) {
             if (error == QAudio::UnderrunError) {
                 qDebug("AudioComponent::speak(); Underrun error.");
-                // Give it a second to buffer then try again.
-                Sleep(1000);
                 output_->start(speakersIO_);
             }
         }
