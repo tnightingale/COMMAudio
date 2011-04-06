@@ -129,9 +129,7 @@ void Workstation::initializeVoiceStream(short port, QString hostAddr, AudioCompo
 void Workstation::endVoiceStream() {
     qDebug("Workstation::endVoiceStream(); Ending voice chat.");
 
-    // Disconnect everything
-    disconnect(mainWindowPointer_, SIGNAL(disconnectVoiceStream()),
-               this, SLOT(endVoiceStream()));
+    // Disconnect this slot and signal
     disconnect(mainWindowPointer_, SIGNAL(disconnectVoiceStream()),
                this, SLOT(endVoiceStreamUser()));
 
@@ -140,7 +138,6 @@ void Workstation::endVoiceStream() {
 
     // Stop the audio input and playback
     player->stopMic();
-    player->stop();
 
     // Make sure that the boolean flag is false
     mainWindowPointer_->setVoiceCallActive(false);
@@ -151,12 +148,25 @@ void Workstation::endVoiceStreamUser()
     qDebug("Workstation::endVoiceStreamUser(); Ending voice chat.");
 
     // Disconnect this slot and signal
+    disconnect(voiceControlSocket_, SIGNAL(signalSocketClosed()),
+               this, SLOT(endVoiceStream()));
     disconnect(mainWindowPointer_, SIGNAL(disconnectVoiceStream()),
                this, SLOT(endVoiceStreamUser()));
 
+    // Get the audio component
+    AudioComponent *player = mainWindowPointer_->getAudioPlayer();
+
+    // Stop the audio input
+    player->stopMic();
+
+    // Make sure that the boolean flag is false
+    mainWindowPointer_->setVoiceCallActive(false);
+
+    voiceControlSocket_->closeConnection();
     // Delete the socket, where the rest of the cleanup will be triggered from
-    //voiceControlSocket_->deleteLater();
-    delete voiceControlSocket_;
+    voiceControlSocket_->deleteLater();
+    voiceControlSocket_ = NULL;
+    //delete voiceControlSocket_;
 }
 
 void Workstation::startMulticast(QStringList* list) {
