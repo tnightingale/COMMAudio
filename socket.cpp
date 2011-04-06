@@ -27,7 +27,6 @@ Socket::Socket(SOCKET socket, HWND hWnd, QString remoteAddr)
 
 qint64 Socket::readData(char * data, qint64 maxSize) {
     qint64 bytesRead = 0;
-    //qDebug("Socket::readData(); Socket: %d", (int) socket_);
 
     // Mutex lock here.
     QMutexLocker locker(receiveLock_);
@@ -81,14 +80,12 @@ int Socket::loadBuffer(size_t bytesToRead) {
     return bytesRead;
 }
 
-
 qint64 Socket::size() const {
     return bytesAvailable();
 }
 
 qint64 Socket::bytesAvailable() const {
     QMutexLocker locker(receiveLock_);
-    qDebug("Socket::bytesAvailable(); Bytes: %d", inputBuffer_->size() + QIODevice::bytesAvailable());
     qint64 size = inputBuffer_->size() + QIODevice::bytesAvailable();
 
     return size;
@@ -119,7 +116,6 @@ void Socket::closeConnection() {
     ::shutdown(socket_, SD_BOTH);
 }
 
-
 void Socket::slotProcessWSAEvent(PMSG pMsg) {
     if (WSAGETSELECTERROR(pMsg->lParam)) {
         //qDebug("Socket::slotProcessWSAEvent(): %d: Socket failed with error %d",
@@ -134,8 +130,8 @@ void Socket::slotProcessWSAEvent(PMSG pMsg) {
     switch (WSAGETSELECTEVENT(pMsg->lParam)) {
 
         case FD_CLOSE:
-            //qDebug("Socket::slotProcessWSAEvent(); %d: FD_CLOSE.",
-                   //(int) pMsg->wParam);
+            qDebug("Socket::slotProcessWSAEvent(); %d: FD_CLOSE.",
+                   (int) pMsg->wParam);
             close(pMsg);
             break;
     }
