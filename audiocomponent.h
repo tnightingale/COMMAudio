@@ -60,6 +60,8 @@ private:
     QBuffer* inputBuffer_;
     QList<QList<QByteArray*>*> allBuffers_;
     QList<QAudioFormat> allFormats_;
+    bool isMicOn;
+    bool isSpeakersOn;
 signals:
 
 public slots:

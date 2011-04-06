@@ -122,10 +122,14 @@ void AudioComponent::startMic(QIODevice* stream, QThread* micThread) {
             this, SLOT(mic(QAudio::State)));
     input_->moveToThread(micThread);
     input_->start(stream);
+    isMicOn = true;
 }
 
 void AudioComponent::stopMic(){
     input_->stop();
+    disconnect(input_, SIGNAL(stateChanged(QAudio::State)),
+            this, SLOT(mic(QAudio::State)));
+    isMicOn = false;
     input_->deleteLater();
 
 }
@@ -160,11 +164,15 @@ void AudioComponent::playStream(QIODevice* stream, QThread* streamThread){
             this, SLOT(speak(QAudio::State)));
     output_->moveToThread(streamThread);
     output_->start(stream);
+    isSpeakersOn = true;
 }
 
 void AudioComponent::stopStream()
 {
     output_->stop();
+    disconnect(output_, SIGNAL(stateChanged(QAudio::State)),
+            this, SLOT(speak(QAudio::State)));
+    isSpeakersOn = false;
     output_->deleteLater();
 }
 
@@ -259,6 +267,10 @@ void AudioComponent::stateChangeStream(QAudio::State newState){
 }
 
 void AudioComponent::mic(QAudio::State newState){
+    if (!isMicOn)
+    {
+        return;
+    }
     int error = 0;
     switch (newState) {
     case QAudio::SuspendedState:
@@ -282,6 +294,10 @@ void AudioComponent::mic(QAudio::State newState){
 }
 
 void AudioComponent::speak(QAudio::State newState){
+    if (!isSpeakersOn)
+    {
+        return;
+    }
     int error = 0;
     switch (newState) {
     case QAudio::SuspendedState:
