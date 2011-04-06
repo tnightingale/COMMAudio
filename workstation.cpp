@@ -312,29 +312,6 @@ void Workstation::acceptVoiceChat(Socket *socket)
     }
 }
 
-/*
--- FUNCTION: connectToServer
---
--- DATE: March 21, 2011
---
--- REVISIONS: (Date and Description)
---
--- DESIGNER: Luke Queenan
---
--- PROGRAMMER: Luke Queenan
---
--- INTERFACE: void Workstation::connectToServer();
---
--- RETURNS: void
---
--- NOTES:
--- Function for connecting to a multicast server.
-*/
-void Workstation::connectToServer()
-{
-
-}
-
 void Workstation::requestFile(QString ip, short port, QString songPath)
 {
     // Create the socket
@@ -529,11 +506,6 @@ void Workstation::decodeControlMessage(Socket *socket)
         //socket->deleteLater();
         break;
     }
-}
-
-void Workstation::receiveUDP()
-{
-
 }
 
 void Workstation::sendFileController(Socket *socket)
