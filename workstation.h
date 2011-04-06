@@ -84,11 +84,45 @@ private:
     QMap <Socket*, FileData*> currentTransfers;
 
     // Functions
+    /**
+     * This function opens a file, reads it into a QByteArray, inserts its size
+     * at the front of the array and writes it to the supplied socket.
+     *
+     * @author Luke Queenan
+     */
     void sendFile(Socket*, QByteArray*);
+
+    /**
+     * This function is called when an incoming voice call is detected. It
+     * prompts the user for a response and then sets up the voice call (if the
+     * user said yes).
+     *
+     * @author Luke Queenan
+     */
     void acceptVoiceChat(Socket*);
 
+    /**
+     * Processes a file packet. If it is the first packet, the size of the file
+     * is stripped off the front of the packet and stored. If it is the last
+     * packet, the file is written to disk in the file transfer object.
+     * Otherwise the data is appended to the file data's internal array.
+     *
+     * @author Luke Queenan
+     */
     bool processReceivingFile(Socket*, QByteArray*);
+
+    /**
+     * Process a file list packet. Same format as above.
+     *
+     * @author Luke Queenan
+     */
     bool processReceivingFileList(Socket*, QByteArray*);
+
+    /**
+     * Same format as above.
+     *
+     * @author Luke Queenan
+     */
     bool processReceivingFileRequest(Socket*, QByteArray*);
 
 
