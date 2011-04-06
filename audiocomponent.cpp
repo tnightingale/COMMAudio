@@ -292,9 +292,9 @@ void AudioComponent::mic(QAudio::State newState){
             }
         }
         break;
-    }
     default:
         break;
+    }
 }
 
 void AudioComponent::speak(QAudio::State newState){
