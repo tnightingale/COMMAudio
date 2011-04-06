@@ -67,8 +67,6 @@ void TCPSocket::accept(PMSG pMsg) {
     QObject::connect(clientSocket, SIGNAL(signalDataReceived(Socket*)),
                      this, SIGNAL(signalDataReceived(Socket*)));
 
-    //connectedPort_ = client.sin_port;
-
     emit signalClientConnected(clientSocket);
 }
 
@@ -109,10 +107,6 @@ void TCPSocket::send(PMSG pMsg) {
         }
         winsockBuff.len = num;
     }
-
-    //if (data_->status() == QDataStream::Ok) {
-    //    ::shutdown(socket_, SD_SEND);
-    //}
 }
 
 void TCPSocket::receive(PMSG pMsg) {
@@ -188,7 +182,7 @@ bool TCPSocket::connectRemote(QString address, int port) {
 
     if ((host = gethostbyname(address.toAscii().data())) == NULL) {
         err = GetLastError();
-        //qDebug("Client::writeTCP(): Unknown server address. Error: %d.", err);
+        qDebug("Client::writeTCP(): Unknown server address. Error: %d.", err);
         return false;
     }
 
@@ -199,8 +193,8 @@ bool TCPSocket::connectRemote(QString address, int port) {
     if ((err = ::connect(socket_, (PSOCKADDR) &serverSockAddrIn,
                    sizeof(SOCKADDR_IN))) == SOCKET_ERROR) {
         if ((err = WSAGetLastError()) != WSAEWOULDBLOCK) {
-            //qDebug("TCPSocket::connectRemote(): Connect failed. Error: %d",
-                   //WSAGetLastError());
+            qDebug("TCPSocket::connectRemote(): Connect failed. Error: %d",
+                   WSAGetLastError());
             return false;
         }
     }
