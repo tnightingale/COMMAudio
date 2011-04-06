@@ -11,9 +11,11 @@ class UDPSocket : public Socket
     Q_OBJECT
 private:
     SOCKADDR_IN serverSockAddrIn_;
+    bool isMulticast_;
 
 public:
     UDPSocket(HWND hWnd);
+    virtual ~UDPSocket();
 
     bool open(OpenMode mode);
 

@@ -28,7 +28,6 @@ void MulticastSession::pause() {
 }
 
 void MulticastSession::timerEvent(QTimerEvent* event) {
-    QStringList* tempplaylist= playlist_;
     multicastSocket_->write(*nextBuff_);
     delete nextBuff_;
     nextBuff_ = NULL;
@@ -41,7 +40,6 @@ void MulticastSession::loadBuffer() {
             endSession();
             return;
         }
-        //QString nameeeu = playlistIterator_->next();
         current_ = new QFile(playlistIterator_->next());
         if (!current_->open(QIODevice::ReadOnly)) {
             endSession();
