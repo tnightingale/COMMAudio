@@ -3,13 +3,14 @@
 #include "audiocomponent.h"
 #include <QFileDialog>
 #include <QMessageBox>
+#include <math.h>
 
 MainWindow::MainWindow(QWidget *parent) :
-        QMainWindow(parent),
-        ui(new Ui::MainWindow),
-        slider_(0),
-        muted_(false),
-        voiceCallActive_(FALSE)
+    QMainWindow(parent),
+    ui(new Ui::MainWindow),
+    slider_(0),
+    muted_(false),
+    voiceCallActive_(FALSE)
 {
     ui->setupUi(this);
     QWidget::setWindowIcon(style()->standardIcon(QStyle::SP_MediaPlay));
@@ -419,11 +420,11 @@ void MainWindow::backgroundColor(QString background, QString font) {
     hover.prepend("QPushButton:pressed {border-style:ridge;border-width:3px;border-color:" + fontColor + ";background-color:");
     hover.append(font);
     hover += " QPushButton {border-style:ridge;border-width:3px;border-color:" + backColor + ";background-color:" +
-             fontColor + ";color:" + backColor + ";}";
+            fontColor + ";color:" + backColor + ";}";
     QString sliderColor = "QSlider::groove:horizontal {background:" +  fontColor + ";position: absolute;"
-                          "border-style:solid;border-width:3px;border-color:" + backColor + ";}";
+            "border-style:solid;border-width:3px;border-color:" + backColor + ";}";
     sliderColor += "QSlider::handle:horizontal {height: 20px;background:" + backColor + ";width:4px;"
-                   "border-style:solid;border-width:1px;border-color:" + fontColor + ";}";
+            "border-style:solid;border-width:1px;border-color:" + fontColor + ";}";
     sliderColor += "QSlider::add-page:horizontal {background:" + fontColor + ";}";
     sliderColor += "QSlider::sub-page:horizontal {background:" + backColor + ";}";
     sliderColor += "QSlider {border-style:groove;border-width:2px;border-color:" + backColor + ";}";
@@ -435,8 +436,8 @@ void MainWindow::backgroundColor(QString background, QString font) {
     const QString button = hover;
     const QString border = "* {border-style:groove;border-width:1px;border-color:" + fontColor + ";}";
     const QString tabColor = "QTabWidget::tab-bar {background: Red;} QTabBar::tab"
-                             "{background:" + backColor + ";color:" + fontColor + ";}" + color +
-                             "QTabBar::tab:hover{background:" + fontColor + ";color:" + backColor + ";}";
+            "{background:" + backColor + ";color:" + fontColor + ";}" + color +
+            "QTabBar::tab:hover{background:" + fontColor + ";color:" + backColor + ";}";
     ui->tabWidget->setStyleSheet(tabColor);
     ui->volumeLcdNumber->setStyleSheet(color);
     ui->playbackBox->setStyleSheet(color);
@@ -452,6 +453,8 @@ void MainWindow::backgroundColor(QString background, QString font) {
     ui->clearPlaylistButton->setStyleSheet(button);
     ui->clearRemoteButton->setStyleSheet(button);
     ui->removeButton->setStyleSheet(button);
+    ui->addAllButton->setStyleSheet(button);
+    ui->shuffleButton->setStyleSheet(button);
     slider_->setStyleSheet(sliderMods);
     ui->horizontalSlider->setStyleSheet(sliderMods);
     ui->playlistWidget->setStyleSheet(border);
@@ -567,10 +570,10 @@ void MainWindow::loadlastPlaylist() {
     int size;
     QString song;
     QString filename = QFileDialog::getOpenFileName(
-            this,
-            tr("Load Playlist"),
-            QDir::currentPath(),
-            tr("Documents (*.dat)") );
+                this,
+                tr("Load Playlist"),
+                QDir::currentPath(),
+                tr("Documents (*.dat)") );
     QFile file(filename);
     if(file.open(QIODevice::ReadOnly)) {
         ui->clearPlaylistButton->click();
@@ -597,10 +600,10 @@ void MainWindow::savePlaylist() {
     QBuffer buffer;
     buffer.open(QBuffer::WriteOnly);
     QString filename = QFileDialog::getSaveFileName(
-            this,
-            tr("Save Playlist"),
-            QDir::currentPath(),
-            tr("Documents (*.dat)") );
+                this,
+                tr("Save Playlist"),
+                QDir::currentPath(),
+                tr("Documents (*.dat)") );
     QFile file(filename);
     file.open(QIODevice::WriteOnly);
     playlist_->save(&buffer, "m3u");
@@ -713,10 +716,10 @@ void MainWindow::on_action_Folder_triggered() {
 void MainWindow::on_action_Song_triggered() {
     QString songTitle;
     QString filename = QFileDialog::getOpenFileName(
-            this,
-            tr("Load Song"),
-            QDir::currentPath(),
-            tr("Documents (*.wav *.mp3)") );
+                this,
+                tr("Load Song"),
+                QDir::currentPath(),
+                tr("Documents (*.wav *.mp3)") );
     QFile file(filename);
     if(file.open(QIODevice::ReadOnly)) {
         songList_.append(filename);
@@ -833,4 +836,69 @@ void MainWindow::on_talkButton_clicked()
             emit initiateVoiceStream(joinServer_.getPort(), joinServer_.getIp(), player_);
         }
     }
+}
+
+void MainWindow::on_addAllButton_clicked()
+{
+    for(int i = 0; i < ui->clientListWidget->count();i++) {
+        QListWidgetItem *item = ui->clientListWidget->item(i);
+        QString dataClicked = item->text();
+        QString fullPath = findFullPath(dataClicked);
+        if(player_->addSong(fullPath)) {
+            ui->playlistWidget->addItem(new QListWidgetItem(dataClicked));
+            ui->songAddedEditBox->setText(dataClicked);
+            if(ui->playlistWidget->count() == 1) {
+                ui->currentSongEditBox->setText(dataClicked);
+                ui->currentSongEditBox_2->setText(dataClicked);
+            }
+            playlistData_.append(item->text());
+        }
+    }
+}
+
+void MainWindow::on_shuffleButton_clicked()
+{
+    QString filename;
+    QString songTitle;
+    playlist_->shuffle();
+    ui->playlistWidget->clear();
+    playlistData_.clear();
+    for(int i = 0;i < playlist_->mediaCount(); i++) {
+        filename = playlist_->media(i).canonicalUrl().toString();
+        int n = filename.lastIndexOf('/');
+        int s = filename.size() - n - 1;
+        songTitle = filename.right(s);
+        ui->playlistWidget->addItem(new QListWidgetItem(songTitle));
+        playlistData_.append(songTitle);
+    }
+    player_->play();
+    ui->playButton->setText("Pause");
+    ui->playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPause));
+    filename = playerlink_->media().canonicalUrl().toString();
+    int n = filename.lastIndexOf('/');
+    int s = filename.size() - n - 1;
+    songTitle = filename.right(s);
+    ui->currentSongEditBox->setText(songTitle);
+    ui->currentSongEditBox_2->setText(songTitle);
+    ui->playlistWidget->setCurrentRow(playlist_->currentIndex());
+}
+
+void MainWindow::on_loopCurrentSongButton_clicked()
+{
+    playlist_->setPlaybackMode(QMediaPlaylist::CurrentItemInLoop);
+}
+
+void MainWindow::on_randomButton_clicked()
+{
+    playlist_->setPlaybackMode(QMediaPlaylist::Random);
+}
+
+void MainWindow::on_normalButton_clicked()
+{
+    playlist_->setPlaybackMode(QMediaPlaylist::Sequential);
+}
+
+void MainWindow::on_loopButton_clicked()
+{
+    playlist_->setPlaybackMode(QMediaPlaylist::Loop);
 }

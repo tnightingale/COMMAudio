@@ -483,6 +483,12 @@ private slots:
      * @author Joel Stewart
      */
     void on_action_Host_Multicast_triggered();
+    void on_addAllButton_clicked();
+    void on_shuffleButton_clicked();
+    void on_loopCurrentSongButton_clicked();
+    void on_randomButton_clicked();
+    void on_normalButton_clicked();
+    void on_loopButton_clicked();
 };
 
 #endif // MAINWINDOW_H

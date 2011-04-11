@@ -73,7 +73,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -210,6 +210,19 @@
        <number>24</number>
       </property>
      </widget>
+     <widget class="QPushButton" name="addAllButton">
+      <property name="geometry">
+       <rect>
+        <x>180</x>
+        <y>350</y>
+        <width>93</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Add All</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">
@@ -314,6 +327,87 @@
       <property name="text">
        <string>Remove</string>
       </property>
+     </widget>
+     <widget class="QGroupBox" name="groupBox">
+      <property name="geometry">
+       <rect>
+        <x>510</x>
+        <y>40</y>
+        <width>171</width>
+        <height>181</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Controls</string>
+      </property>
+      <widget class="QRadioButton" name="loopCurrentSongButton">
+       <property name="geometry">
+        <rect>
+         <x>21</x>
+         <y>112</y>
+         <width>134</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Loop Current Song</string>
+       </property>
+      </widget>
+      <widget class="QRadioButton" name="loopButton">
+       <property name="geometry">
+        <rect>
+         <x>21</x>
+         <y>85</y>
+         <width>111</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Loop Playlist</string>
+       </property>
+      </widget>
+      <widget class="QRadioButton" name="normalButton">
+       <property name="geometry">
+        <rect>
+         <x>21</x>
+         <y>31</y>
+         <width>56</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>None</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QRadioButton" name="randomButton">
+       <property name="geometry">
+        <rect>
+         <x>21</x>
+         <y>58</y>
+         <width>74</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Random</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="shuffleButton">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>140</y>
+         <width>111</width>
+         <height>28</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Shuffle</string>
+       </property>
+      </widget>
      </widget>
     </widget>
    </widget>

@@ -8,6 +8,7 @@ int main(int argc, char *argv[])
     MainWindow w;
 
     Workstation * ws = new Workstation(&w);
+
     w.show();
 
     return a.exec();
